@@ -21,20 +21,48 @@ Live-Share-Strafe, wenn X das Spielgebiet verlässt.
 ## Lokal starten
 
 ```bash
-npm ci
-npm run build                 # baut client/dist (inkl. Service Worker)
+npm ci                        # Lockfile-basiert; verlinkt shared/ in die Workspaces
+npm run build                 # baut client/dist inkl. Service Worker und Manifest
 cd server && npx wrangler dev --ip 0.0.0.0 --port 3000
 ```
 
 `wrangler dev` liefert API, WebSocket-Route und die gebauten Assets von **einer** Origin
-(`http://localhost:3000`). Details in `.freebuff/run.md`.
+(`http://localhost:3000`) — kein Vite-Proxy, kein CORS. Aus `server/` starten, damit
+`wrangler.toml` (Assets-Pfad `../client/dist`) gefunden wird. `--ip 0.0.0.0` ist nötig,
+sobald der Server von außerhalb des eigenen Rechners erreichbar sein soll (Container, VM,
+Handy im WLAN); ohne die Angabe lauscht er nur auf `127.0.0.1`.
+
+**Im Hintergrund starten** (überlebt das Schließen des Terminals):
+
+```bash
+cd server
+setsid nohup npx wrangler dev --ip 0.0.0.0 --port 3000 > ../preview.log 2>&1 < /dev/null &
+echo $! > ../preview.pid                                 # PID merken
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/   # wartet auf 200
+kill "$(cat ../preview.pid)"                             # beenden
+```
+
+Aufräumen und Prüfen:
+
+- Der lokale Zustand der Durable Objects (Spielräume, Ratenbegrenzung) liegt unter
+  `server/.wrangler/state` — löschen, um mit leerer Datenbank zu beginnen.
+- Beendet `kill` den Server nicht, zusätzlich die Prozessgruppe beenden: `kill -TERM -<PID>`.
+- Assets werden aus `client/dist` gelesen; nach Client-Änderungen neu bauen, sonst läuft
+  die alte Version.
 
 Weitere Skripte:
 
 ```bash
 npm run typecheck        # alle Workspaces
 npm run dev:client       # Vite-Dev-Server mit HMR (API dann separat auf 8787)
-npm run test:integration # kompletter Spielablauf + Reconnect über WebSockets (Server auf 8787)
+npm run test:integration # kompletter Spielablauf + Reconnect über WebSockets
+```
+
+Der Integrationstest erwartet den Server auf Port 8787:
+
+```bash
+cd server && npx wrangler dev --port 8787 &
+cd .. && npm run test:integration    # 18/18
 ```
 
 ## Spielablauf
