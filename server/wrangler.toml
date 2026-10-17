@@ -1,0 +1,31 @@
+name = "fang-x-server"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Logs und Metriken im Cloudflare-Dashboard (hilft beim Betrieb)
+[observability]
+enabled = true
+
+[assets]
+directory = "../client/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[durable_objects.bindings]]
+name = "GAME_ROOM"
+class_name = "GameRoom"
+
+[[durable_objects.bindings]]
+name = "RATE_LIMIT"
+class_name = "RateLimiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["RateLimiter"]
+
+# Eigene Domain? Dann eintragen (Route oder Custom Domain):
+# routes = [{ pattern = "fangx.example.de", custom_domain = true }]

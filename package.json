@@ -1,0 +1,22 @@
+{
+  "name": "fang-x",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-Source GPS-Fangspiel (Konkurrenz zu Fang den X)",
+  "license": "AGPL-3.0-only",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace @fang-x/server",
+    "dev:client": "npm run dev --workspace @fang-x/client",
+    "build": "npm run build --workspace @fang-x/client",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:integration": "node scripts/integration-test.mjs"
+  },
+  "devDependencies": {
+    "ws": "^8.18.0"
+  }
+}
