@@ -115,23 +115,24 @@ Der Client enthält zwei statische Seiten:
 | `/impressum` | Angaben gemäß § 5 DDG, Verantwortlichkeit nach § 18 Abs. 2 MStV, Haftung, Lizenzhinweise |
 | `/datenschutz` | Verantwortlicher, Hosting (Cloudflare), verarbeitete Daten, Rechtsgrundlagen, Speicherdauer, Betroffenenrechte |
 
-Die Betreiberangaben sind **nicht** im Quellcode hinterlegt, sondern kommen beim Build aus
-Umgebungsvariablen. Vorlage: [`.env.example`](.env.example) nach `.env.local` kopieren und
-ausfüllen:
+Die Betreiberangaben stehen direkt im Dokument, in
+[`client/src/legal.ts`](client/src/legal.ts) — bewusst **nicht** in Umgebungsvariablen oder
+einer `.env`-Datei. Dort die Werte in eckigen Klammern ersetzen:
 
-```bash
-VITE_LEGAL_NAME="Vorname Nachname"
-VITE_LEGAL_STREET="Straße Hausnummer"
-VITE_LEGAL_POSTAL_CODE="12345"
-VITE_LEGAL_CITY="Ort"
-VITE_LEGAL_EMAIL="kontakt@example.de"
-# optional: VITE_LEGAL_COUNTRY, VITE_LEGAL_PHONE, VITE_LEGAL_AUTHORITY, VITE_LEGAL_UPDATED
+```ts
+name: "Vorname Nachname",
+street: "Straße Hausnummer",
+postalCode: "12345",
+city: "Ort",
+country: "Deutschland",
+email: "kontakt@example.de",
+phone: "",              // optional
+// authority und updated sind ebenfalls optional
 ```
 
-Fehlende Pflichtangaben werden auf den Seiten sichtbar als Platzhalter markiert und mit einem
-Warnhinweis versehen — eine unfertige Seite fällt so sofort auf. `.env.local` ist in
-`.gitignore`; für den Betrieb müssen die Werte in der Build-Umgebung gesetzt sein
-(z. B. Cloudflare Workers Builds → *Variables*, oder lokal vor `npm run build`).
+Solange Pflichtangaben fehlen oder noch als Platzhalter (`[...]`) dastehen, markiert die Seite
+sie gelb und zeigt einen Warnhinweis — eine unfertige Rechtsseite fällt so sofort auf. Für den
+Betrieb genügt ein normales `npm run build`, ohne zusätzliche Build-Variablen.
 
 Die Texte sind eine sorgfältige Vorlage, keine Rechtsberatung: Wer die Instanz betreibt, ist
 für die Angaben verantwortlich und sollte sie prüfen (lassen).
@@ -147,7 +148,8 @@ cd server && npx wrangler deploy
   Migrationen `v1`/`v2` (`new_sqlite_classes`). Migrationen laufen beim Deploy automatisch.
 - `[observability] enabled = true` schaltet Logs und Metriken im Dashboard frei.
 - Eigene Domain: Route bzw. Custom Domain in `wrangler.toml` eintragen (Vorlage kommentiert).
-- Keine Secrets nötig. `VITE_LEGAL_*` wird zur **Build-Zeit** in die Assets eingebacken.
+- Keine Secrets und keine rechtlichen Build-Variablen nötig; die Betreiberangaben kommen aus
+  `client/src/legal.ts` und werden beim Build mit eingebunden.
 - Ratenbegrenzung pro IP: 10 neue Spiele pro 10 Minuten, 60 Code-Prüfungen pro Minute; dazu
   maximal 24 Spieler pro Raum. Zähler liegen im `RateLimiter`-Objekt und setzen sich bei
   einem Neustart zurück.
