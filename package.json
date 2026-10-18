@@ -17,6 +17,6 @@
     "test:integration": "node scripts/integration-test.mjs"
   },
   "devDependencies": {
-    "ws": "^8.18.0"
+    "ws": "^8.22.0"
   }
 }
