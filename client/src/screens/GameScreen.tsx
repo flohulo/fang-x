@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { LatLng } from "@fang-x/shared";
+import type { LatLng, ObjectiveState } from "@fang-x/shared";
 import { distanceMeters } from "@fang-x/shared";
 import { MapView } from "../components/MapView";
 import { useGeolocation } from "../lib/useGeolocation";
@@ -13,9 +13,12 @@ interface GameScreenProps {
   myId: string | null;
   ruleset: any;
   lastReveal: any;
+  objective: ObjectiveState | null;
+  serverError: string | null;
   yourPositionIsShared: boolean;
   gameResult: any;
   onPosition: (pos: LatLng) => void;
+  onSetObjective: (target: LatLng) => void;
   onLeave: () => void;
 }
 
@@ -53,14 +56,18 @@ export function GameScreen({
   myId,
   ruleset,
   lastReveal,
+  objective,
+  serverError,
   yourPositionIsShared,
   gameResult,
   onPosition,
+  onSetObjective,
   onLeave,
 }: GameScreenProps) {
   const [mapCenter, setMapCenter] = useState<LatLng | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSimHint, setShowSimHint] = useState(false);
+  const [choosingObjective, setChoosingObjective] = useState(false);
   const lastSentRef = useRef<number>(0);
 
   const playAreaRadius: number = ruleset?.map?.playAreaRadiusMeters ?? 700;
@@ -110,6 +117,11 @@ export function GameScreen({
   };
 
   const handleMapClick = (pos: LatLng) => {
+    if (choosingObjective) {
+      onSetObjective(pos);
+      setChoosingObjective(false);
+      return;
+    }
     if (simulated || showSimHint) {
       setSimulatedPosition(pos);
     }
@@ -130,8 +142,14 @@ export function GameScreen({
     hasPosition: position !== null,
     simulated,
     lastReveal,
+    objective,
     phaseActive: phase === "HEADSTART" || phase === "RUNNING",
   });
+  const canChooseObjective =
+    phase === "RUNNING" &&
+    isX &&
+    ruleset?.objective?.enabled &&
+    objective?.status === "PENDING";
 
   if (gameResult) {
     return (
@@ -157,6 +175,7 @@ export function GameScreen({
           playAreaRadiusMeters={playAreaRadius}
           players={playerMarkers}
           lastReveal={lastReveal}
+          objective={isX ? objective : null}
           onMapClick={handleMapClick}
         />
 
@@ -175,6 +194,16 @@ export function GameScreen({
         {yourPositionIsShared && (
           <div className="alert-banner" style={{ top: 64 }}>
             ⚠️ Du hast das Spielfeld verlassen! Dein Standort wird jetzt geteilt.
+          </div>
+        )}
+
+        {serverError && (
+          <div
+            className="alert-banner"
+            role="alert"
+            style={{ top: yourPositionIsShared ? 112 : 64 }}
+          >
+            {serverError}
           </div>
         )}
 
@@ -220,12 +249,20 @@ export function GameScreen({
         </div>
 
         <div className="map-bottom-controls">
-          {!simulated && (
+          {canChooseObjective && !choosingObjective && (
+            <button onClick={() => setChoosingObjective(true)}>Ziel auf Karte wählen</button>
+          )}
+          {choosingObjective && (
+            <button className="secondary" onClick={() => setChoosingObjective(false)}>
+              Karte antippen · Abbrechen
+            </button>
+          )}
+          {!choosingObjective && !simulated && (
             <button className="secondary" onClick={handleSimMode}>
               Simulationsmodus
             </button>
           )}
-          {simulated && (
+          {!choosingObjective && simulated && (
             <button className="secondary" onClick={enableRealGps}>
               GPS aktivieren
             </button>
@@ -244,6 +281,7 @@ function buildHint({
   hasPosition,
   simulated,
   lastReveal,
+  objective,
   phaseActive,
 }: {
   phase: string;
@@ -252,6 +290,7 @@ function buildHint({
   hasPosition: boolean;
   simulated: boolean;
   lastReveal: any;
+  objective: ObjectiveState | null;
   phaseActive: boolean;
 }): { title: string; text: string } {
   if (!hasPosition && phaseActive) {
@@ -281,6 +320,24 @@ function buildHint({
 
     case "RUNNING":
       if (isX) {
+        if (objective?.status === "PENDING") {
+          return {
+            title: "Bonusmission verfügbar.",
+            text: "Wähle einen sicheren, öffentlichen Ort im Spielgebiet. Erreichst du ihn, wird deine nächste Sichtung um 2 Minuten verschoben.",
+          };
+        }
+        if (objective?.status === "ACTIVE") {
+          return {
+            title: "Bonusziel gesetzt.",
+            text: `Erreiche die Markierung innerhalb von ${objective.radiusMeters} m, um die nächste Sichtung um 2 Minuten zu verschieben.`,
+          };
+        }
+        if (objective?.status === "COMPLETED") {
+          return {
+            title: "Bonusmission geschafft!",
+            text: "Deine nächste Sichtung kommt 2 Minuten später.",
+          };
+        }
         return {
           title: isSolo ? "Probelauf ohne Jäger." : "Du wirst gejagt.",
           text: isSolo

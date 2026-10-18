@@ -21,6 +21,7 @@ export type ClientMessage =
     }
   | { t: "configure"; ruleset: Ruleset }
   | { t: "setRole"; playerId: string; wantsX: boolean }
+  | { t: "setObjective"; target: LatLng }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -50,6 +51,12 @@ export interface RevealEvent {
   isLive: boolean; // true = LIVE_SHARE (X außerhalb des Gebiets)
 }
 
+export interface ObjectiveState {
+  status: "PENDING" | "ACTIVE" | "COMPLETED";
+  target: LatLng | null;
+  radiusMeters: number;
+}
+
 export type ServerMessage =
   | { t: "joined"; playerId: string; phase: Phase; players: PlayerInfo[]; ruleset: Ruleset; youAreHost: boolean }
   | { t: "players"; players: PlayerInfo[] }
@@ -65,6 +72,11 @@ export type ServerMessage =
     }
   | { t: "config"; ruleset: Ruleset }
   | { t: "reveal"; reveal: RevealEvent }
+  | {
+      t: "objective";
+      objective: ObjectiveState | null;
+      revealDelayedUntil?: number;
+    }
   | { t: "yourPositionIsShared"; shared: boolean }
   | { t: "end"; winner: "X" | "DETECTIVES"; reason: string; players: PlayerInfo[] }
   | { t: "error"; message: string; code?: string }

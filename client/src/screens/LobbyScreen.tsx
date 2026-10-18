@@ -220,6 +220,19 @@ export function LobbyScreen({
             </div>
           </div>
 
+          <label className="objective-option">
+            <input
+              type="checkbox"
+              checked={localRuleset.objective.enabled}
+              onChange={(e) => updateNested("objective", { enabled: e.target.checked })}
+            />
+            Bonusmission für X aktivieren
+          </label>
+          <p className="config-hint">
+            X wählt während der Runde ein sicheres, öffentliches Ziel im Spielgebiet. Erreicht X
+            es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.
+          </p>
+
           <button onClick={onStart} disabled={!hasX} style={{ marginTop: 16 }}>
             {hasX ? "Spiel starten" : "Mindestens 1 X nötig"}
           </button>

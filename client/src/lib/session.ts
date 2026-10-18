@@ -1,6 +1,4 @@
 // Lokale Sitzung: erlaubt Reconnect und Wiederaufnahme nach einem Reload.
-// Hier liegen nur der Spiel-Code, der Anzeigename und die eigene Spieler-ID —
-// kein Standort, kein Konto, nichts, was den Server überlebt.
 
 const SESSION_KEY = "fangx:session";
 const PLAYER_KEY_PREFIX = "fangx:player:";
@@ -23,7 +21,6 @@ function safeWrite(key: string, value: string) {
   try {
     localStorage.setItem(key, value);
   } catch {
-    // Privater Modus o. Ä. — dann eben ohne Wiederaufnahme.
   }
 }
 
@@ -31,7 +28,6 @@ function safeRemove(key: string) {
   try {
     localStorage.removeItem(key);
   } catch {
-    // ignorieren
   }
 }
 

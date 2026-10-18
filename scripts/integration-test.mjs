@@ -121,6 +121,7 @@ async function run() {
         reveal: { intervalMinutes: 0.1, firstRevealAfterMinutes: 0.05 },
         catch: { radiusMeters: 50 },
         map: { playAreaRadiusMeters: 100 },
+        objective: { enabled: true },
       },
     })
   );
@@ -141,6 +142,10 @@ async function run() {
   // 6. X positioniert sich (im Spielgebiet)
   const xPos = { lat: 47.3769, lng: 8.5417 };
   host.ws.send(JSON.stringify({ t: "position", pos: xPos }));
+  const pendingObjective = await host.waitFor(
+    (m) => m.t === "objective" && m.objective?.status === "PENDING"
+  );
+  assert(pendingObjective.objective.target === null, "Bonusmission wartet auf X-Zielpunkt");
 
   // 7. Detektiv positioniert sich weit entfernt
   const detPos = { lat: 47.39, lng: 8.56 };
@@ -152,9 +157,41 @@ async function run() {
   assert(reveal.reveal.pos.lat === xPos.lat, `Reveal empfangen: X bei ${reveal.reveal.pos.lat}`);
   assert(reveal.reveal.radiusMeters > 0, `Sichtradius: ${reveal.reveal.radiusMeters}m`);
 
+  const objectiveTarget = { lat: xPos.lat, lng: xPos.lng + 0.0008 };
+  det.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
+  const unauthorizedObjective = await det.waitFor(
+    (m) => m.t === "error" && m.message.includes("Nur X")
+  );
+  assert(unauthorizedObjective.message.includes("Nur X"), "Nur X darf ein Missionsziel setzen");
+  host.ws.send(
+    JSON.stringify({
+      t: "setObjective",
+      target: { lat: xPos.lat + 0.01, lng: xPos.lng },
+    })
+  );
+  const outsideObjective = await host.waitFor(
+    (m) => m.t === "error" && m.message.includes("innerhalb")
+  );
+  assert(outsideObjective.message.includes("innerhalb"), "Missionsziel außerhalb wird abgelehnt");
+
+  host.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
+  await host.waitFor((m) => m.t === "objective" && m.objective?.status === "ACTIVE");
+  assert(
+    !det.messages.some((m) => m.t === "objective"),
+    "Bonusmissions-Ziel bleibt vor Detektiven geheim"
+  );
+  host.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
+  const completedObjective = await host.waitFor(
+    (m) => m.t === "objective" && m.objective?.status === "COMPLETED"
+  );
+  assert(
+    completedObjective.revealDelayedUntil > Date.now() + 120_000,
+    "Bonusmission verschiebt die nächste Sichtung um zwei Minuten"
+  );
+
   // 9. Detektiv bewegt sich zu X → Fang
   console.log("\nDetektiv bewegt sich zu X...");
-  det.ws.send(JSON.stringify({ t: "position", pos: xPos }));
+  det.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
 
   // 10. Spielende: Detektive gewinnen
   console.log("\nWarte auf Spielende...");

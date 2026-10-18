@@ -21,6 +21,7 @@ import {
   mergeRuleset,
   type ClientMessage,
   type LatLng,
+  type ObjectiveState,
   type PlayerInfo,
   type RevealEvent,
   type Role,
@@ -52,6 +53,9 @@ const GRACE_ENDED_MS = 30 * 60_000;
 /** Leere Räume und beendete Spiele werden irgendwann vergessen. */
 const EMPTY_LOBBY_TTL_MS = 6 * 60 * 60_000;
 const ENDED_TTL_MS = 30 * 60_000;
+const OBJECTIVE_RADIUS_METERS = 50;
+const OBJECTIVE_MIN_DISTANCE_METERS = 100;
+const OBJECTIVE_REVEAL_DELAY_MS = 2 * 60_000;
 
 const STATE_KEY = "room";
 
@@ -93,6 +97,7 @@ interface RoomSnapshot {
   lastRevealAt: number;
   playAreaCenter: LatLng | null;
   xCurrentlyOutOfBounds: boolean;
+  objective: ObjectiveState | null;
   winner: "X" | "DETECTIVES" | null;
   endReason: string | null;
   nextPlayerId: number;
@@ -113,6 +118,7 @@ export class GameRoom {
   /** Verlauf der Reveals (nur im Speicher, nicht persistiert) */
   private xPositions: Array<{ pos: LatLng; at: number; radius: number }> = [];
   private xCurrentlyOutOfBounds = false;
+  private objective: ObjectiveState | null = null;
   /** Einmalig festgelegter Mittelpunkt des Spielgebiets (Startposition von X) */
   private playAreaCenter: LatLng | null = null;
   private winner: "X" | "DETECTIVES" | null = null;
@@ -182,6 +188,13 @@ export class GameRoom {
       lastRevealAt: this.lastRevealAt,
       playAreaCenter: this.playAreaCenter,
       xCurrentlyOutOfBounds: this.xCurrentlyOutOfBounds,
+      objective: this.objective
+        ? {
+            ...this.objective,
+            status: this.objective.status === "ACTIVE" ? "PENDING" : this.objective.status,
+            target: null,
+          }
+        : null,
       winner: this.winner,
       endReason: this.endReason,
       nextPlayerId: this.nextPlayerId,
@@ -222,6 +235,7 @@ export class GameRoom {
     this.lastRevealAt = snap.lastRevealAt;
     this.playAreaCenter = snap.playAreaCenter;
     this.xCurrentlyOutOfBounds = snap.xCurrentlyOutOfBounds;
+    this.objective = snap.objective ?? null;
     this.winner = snap.winner;
     this.endReason = snap.endReason;
     this.nextPlayerId = Math.max(1, snap.nextPlayerId);
@@ -365,6 +379,7 @@ export class GameRoom {
     this.phase = "LOBBY";
     this.ruleset = DEFAULT_RULESET;
     this.playAreaCenter = null;
+    this.objective = null;
     this.winner = null;
     this.endReason = null;
     this.xPositions.length = 0;
@@ -462,6 +477,7 @@ export class GameRoom {
           // Phase/Zeit/Reveals nachliefern — nach einem Reload fehlt dem
           // Client sonst der komplette Spielzustand.
           this.sendTo(ws, this.phaseMessage());
+          this.sendObjective(player);
           this.broadcastPlayers();
           // Beendetes Spiel? Ergebnis direkt nachliefern, damit ein Reload im
           // Endzustand nicht die Karte statt des Ergebnisses zeigt.
@@ -503,6 +519,10 @@ export class GameRoom {
           this.persist();
           break;
         }
+        case "setObjective": {
+          this.setObjective(player, msg.target);
+          break;
+        }
         case "start": {
           if (!player || !player.isHost) return;
           if (this.phase !== "LOBBY") return;
@@ -530,6 +550,7 @@ export class GameRoom {
           }
           if (player.role === "X") {
             this.checkXOutOfBounds(player);
+            this.checkObjective(player);
           } else {
             this.checkCatch();
           }
@@ -666,6 +687,9 @@ export class GameRoom {
     // Neues Spielgebiet: wird mit der ersten X-Position festgelegt.
     this.playAreaCenter = null;
     this.xCurrentlyOutOfBounds = false;
+    this.objective = this.ruleset.objective.enabled
+      ? { status: "PENDING", target: null, radiusMeters: OBJECTIVE_RADIUS_METERS }
+      : null;
     this.winner = null;
     this.endReason = null;
     this.lastRevealIndex = 0;
@@ -677,6 +701,7 @@ export class GameRoom {
     this.phaseEndsAt = Date.now() + this.ruleset.game.countdownSeconds * 1000;
     this.lastActiveAt = Date.now();
     this.broadcastPhase();
+    this.broadcastObjectiveToX();
     this.broadcastPlayers();
     this.persist();
     this.scheduleAlarm();
@@ -814,6 +839,73 @@ export class GameRoom {
     }
   }
 
+  private setObjective(player: Player | null, target: LatLng) {
+    if (!player || player.role !== "X") {
+      if (player) this.sendTo(player.ws, { t: "error", message: "Nur X kann ein Missionsziel setzen." });
+      return;
+    }
+    if (this.phase !== "RUNNING" || !this.ruleset.objective.enabled) {
+      this.sendTo(player.ws, { t: "error", message: "Das Missionsziel ist gerade nicht verfügbar." });
+      return;
+    }
+    if (!this.objective || this.objective.status !== "PENDING") {
+      this.sendTo(player.ws, { t: "error", message: "Das Missionsziel wurde bereits festgelegt." });
+      return;
+    }
+    if (!isValidPosition(target) || !this.playAreaCenter) {
+      this.sendTo(player.ws, { t: "error", message: "Ungültiger Zielpunkt." });
+      return;
+    }
+
+    const now = Date.now();
+    const positionFreshFor = this.ruleset.movement.minUpdateSeconds * 3 * 1000;
+    if (!player.position || now - player.lastPositionAt > positionFreshFor) {
+      this.sendTo(player.ws, { t: "error", message: "Dein Standort ist gerade nicht aktuell." });
+      return;
+    }
+
+    const areaRadius = this.ruleset.map.playAreaRadiusMeters;
+    if (distanceMeters(this.playAreaCenter, target) > areaRadius) {
+      this.sendTo(player.ws, { t: "error", message: "Das Ziel muss innerhalb des Spielgebiets liegen." });
+      return;
+    }
+    const minimumDistance = Math.min(OBJECTIVE_MIN_DISTANCE_METERS, areaRadius * 0.25);
+    if (distanceMeters(player.position, target) < minimumDistance) {
+      this.sendTo(player.ws, {
+        t: "error",
+        message: `Das Ziel muss mindestens ${Math.round(minimumDistance)} m entfernt sein.`,
+      });
+      return;
+    }
+
+    this.objective = { ...this.objective, status: "ACTIVE", target: { ...target } };
+    this.broadcastObjectiveToX();
+    this.persist();
+  }
+
+  private checkObjective(x: Player) {
+    const objective = this.objective;
+    if (
+      x.role !== "X" ||
+      this.phase !== "RUNNING" ||
+      !x.position ||
+      !objective ||
+      objective.status !== "ACTIVE" ||
+      !objective.target
+    ) {
+      return;
+    }
+
+    if (distanceMeters(x.position, objective.target) > objective.radiusMeters) return;
+
+    objective.status = "COMPLETED";
+    const now = Date.now();
+    this.nextRevealAt = Math.max(this.nextRevealAt ?? now, now) + OBJECTIVE_REVEAL_DELAY_MS;
+    this.broadcastObjectiveToX(this.nextRevealAt);
+    this.persist();
+    this.scheduleAlarm();
+  }
+
   private checkCatch() {
     if (this.phase !== "RUNNING") return;
     const catchRadius = this.ruleset.catch.radiusMeters;
@@ -882,6 +974,7 @@ export class GameRoom {
 
   private endGame(winner: "X" | "DETECTIVES", reason: string) {
     this.phase = "ENDED";
+    this.objective = null;
     this.winner = winner;
     this.endReason = reason;
     this.phaseEndsAt = null;
@@ -909,6 +1002,7 @@ export class GameRoom {
     this.nextRevealAt = null;
     this.playAreaCenter = null;
     this.xCurrentlyOutOfBounds = false;
+    this.objective = null;
     this.winner = null;
     this.endReason = null;
     this.lastRevealIndex = 0;
@@ -959,6 +1053,24 @@ export class GameRoom {
   private broadcastToDetectives(msg: ServerMessage) {
     for (const p of this.players.values()) {
       if (p.role !== "X") this.sendTo(p.ws, msg);
+    }
+  }
+
+  private sendObjective(player: Player) {
+    if (player.role === "X") {
+      this.sendTo(player.ws, { t: "objective", objective: this.objective });
+    }
+  }
+
+  private broadcastObjectiveToX(revealDelayedUntil?: number) {
+    for (const player of this.players.values()) {
+      if (player.role === "X") {
+        this.sendTo(player.ws, {
+          t: "objective",
+          objective: this.objective,
+          ...(revealDelayedUntil === undefined ? {} : { revealDelayedUntil }),
+        });
+      }
     }
   }
 
