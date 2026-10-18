@@ -1,14 +1,4 @@
-// Betreiberangaben für Impressum und Datenschutzerklärung.
-//
-// Diese Werte gehören NICHT in den Quellcode eines öffentlichen Repositories,
-// wenn du sie nicht veröffentlichen willst. Setze sie stattdessen beim Build
-// über Umgebungsvariablen (siehe `.env.example`):
-//
-//   VITE_LEGAL_NAME, VITE_LEGAL_STREET, VITE_LEGAL_POSTAL_CODE, VITE_LEGAL_CITY,
-//   VITE_LEGAL_COUNTRY, VITE_LEGAL_EMAIL, VITE_LEGAL_PHONE,
-//   VITE_LEGAL_AUTHORITY, VITE_LEGAL_UPDATED
-//
-// Leere Felder werden auf den Rechtsseiten sichtbar als Platzhalter markiert.
+// Betreiberangaben für Impressum und Datenschutzerklärung
 
 const env = import.meta.env;
 
@@ -20,9 +10,7 @@ export interface LegalInfo {
   country: string;
   email: string;
   phone: string;
-  /** Zuständige Datenschutz-Aufsichtsbehörde (Land/Region) */
   authority: string;
-  /** Stand der Datenschutzerklärung, z. B. "17. Oktober 2026" */
   updated: string;
 }
 

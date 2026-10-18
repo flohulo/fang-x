@@ -91,7 +91,15 @@ JSON-Keys sind englisch (Konvention für Contributors), die UI-Sprache ist aussc
 | `catch.anyDetectiveWins` | bool | — | true | Erster Fang gewinnt für alle Detektive (sonst: nur fürs Team). |
 | `catch.xCanSurrender` | bool | — | false | X kann aufgeben. |
 
-### 3.4 Bewegung & Verkehrsmittel
+### 3.4 Bonusmission
+
+| Key | Typ | Default | Bedeutung |
+|---|---|---|---|
+| `objective.enabled` | bool | false | X kann während der Runde ein geheimes Bonusziel setzen. Erreicht ein X-Spieler den gewählten Punkt innerhalb von 50 m, wird die nächste Sichtung einmalig um 2 Minuten verschoben. |
+
+X setzt das Ziel auf der Karte. Es muss innerhalb des Spielgebiets und mindestens 25–100 m vom aktuellen X-Standort entfernt liegen (abhängig von der Gebietsgröße). X sollte nur einen sicheren, öffentlichen und erreichbaren Ort wählen. Zielkoordinaten werden nicht in der Durable-Object-Persistenz gespeichert; nach einem Serverneustart wird ein noch offenes Ziel erneut wählbar.
+
+### 3.5 Bewegung & Verkehrsmittel
 
 Das Original erlaubt Wahl zwischen „zu Fuß" und „Bus & Bahn" — wir parametrisieren es:
 
@@ -104,7 +112,7 @@ Das Original erlaubt Wahl zwischen „zu Fuß" und „Bus & Bahn" — wir parame
 | `movement.jumpDetectionMeters` | int | 0–5000 | 300 | Einzelsprung über N m = GPS-Fehler oder Schummeln → Warnung. |
 | `movement.minUpdateSeconds` | int | 5–300 | 15 | Wie oft Client Position nachsendet (nur während des Spiels). |
 
-### 3.5 Rollen, Teams & Spielervariationen
+### 3.6 Rollen, Teams & Spielervariationen
 
 | Key | Typ | Bereich | Default | Bedeutung |
 |---|---|---|---|---|
@@ -114,7 +122,7 @@ Das Original erlaubt Wahl zwischen „zu Fuß" und „Bus & Bahn" — wir parame
 | `roles.rolesHiddenUntilCatch` | bool | — | false | Rollen sind geheim (jeder könnte X sein — Bluff-Variante). |
 | `roles.spectatorMode` | bool | — | true | Mitspieler ohne Rolle können zuschauen. |
 
-### 3.6 Sonderoptionen (Scotland-Yard-inspiriert, optional)
+### 3.7 Sonderoptionen (Scotland-Yard-inspiriert, optional)
 
 Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Regelwerk einzeln aktivieren — reines Add-on für Experimentierfreude:
 
@@ -127,7 +135,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
 | `specials.barrierRadiusMeters` | int 0–500 | 0 | Detektive kommen X's Position nie näher als dieser Radius (Schutzschild — X gewinnt durchs Überleben mit Abstand). |
 | `specials.poiChainsEnabled` | bool | false | X muss Zwischenziele (Points of Interest) anstecken wie in Scotland Yard. |
 
-### 3.7 Siegbedingungen
+### 3.8 Siegbedingungen
 
 | Key | Typ | Bereich | Default | Bedeutung |
 |---|---|---|---|---|
@@ -135,7 +143,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
 | `win.drawEnabled` | bool | — | false | Unentschieden möglich (z. B. wenn X in letzter Sekunde in Fangradius läuft). |
 | `win.suddenDeathEnabled` | bool | — | false | Letzte Phase: Intervall halbiert sich, Fangradius wächst (finale Jagd). |
 
-### 3.8 Karte, Raum & Datenschutz
+### 3.9 Karte, Raum & Datenschutz
 
 | Key | Typ | Bereich | Default | Bedeutung |
 |---|---|---|---|---|

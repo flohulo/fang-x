@@ -546,6 +546,18 @@ label {
   margin-top: 0;
 }
 
+.objective-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  color: var(--text);
+}
+
+.objective-option input {
+  accent-color: var(--accent);
+}
+
 .privacy-note {
   font-size: 0.75rem;
   color: var(--text-dim);

@@ -70,6 +70,9 @@ export interface Ruleset {
     outOfBoundsPenalty: OutOfBoundsPenalty;
     detectiveOutOfBoundsPenalty: DetectiveOutOfBoundsPenalty;
   };
+  objective: {
+    enabled: boolean;
+  };
   privacy: {
     locationRetention: "DELETE_AFTER_GAME" | "KEEP_24H" | "KEEP_7D";
     replayEnabled: boolean;
@@ -140,6 +143,9 @@ export const DEFAULT_RULESET: Ruleset = {
     outOfBoundsPenalty: "LIVE_SHARE",
     detectiveOutOfBoundsPenalty: "NONE",
   },
+  objective: {
+    enabled: false,
+  },
   privacy: {
     locationRetention: "DELETE_AFTER_GAME",
     replayEnabled: false,
@@ -178,6 +184,7 @@ export function mergeRuleset(partial?: DeepPartial<Ruleset> | null): Ruleset {
     roles: { ...DEFAULT_RULESET.roles, ...(p.roles ?? {}) },
     win: { ...DEFAULT_RULESET.win, ...(p.win ?? {}) },
     map: { ...DEFAULT_RULESET.map, ...(p.map ?? {}) },
+    objective: { ...DEFAULT_RULESET.objective, ...(p.objective ?? {}) },
     privacy: { ...DEFAULT_RULESET.privacy, ...(p.privacy ?? {}) },
   };
 }

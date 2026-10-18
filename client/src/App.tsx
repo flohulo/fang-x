@@ -166,9 +166,12 @@ export default function App() {
         myId={game.myId}
         ruleset={game.ruleset}
         lastReveal={game.lastReveal}
+        objective={game.objective}
+        serverError={game.error}
         yourPositionIsShared={game.yourPositionIsShared}
         gameResult={game.gameResult}
         onPosition={game.sendPosition}
+        onSetObjective={game.setObjectiveTarget}
         onLeave={handleLeave}
       />
     );

@@ -74,6 +74,11 @@ cd .. && npm run test:integration    # 18/18
 5. Detektive erhalten periodische Sichtungen (FIXED/DECREASING/RANDOM, optional mit Jitter).
 6. X gewinnt bei Zeitablauf, Detektive gewinnen im Fangradius.
 
+Optional kann der Host eine Bonusmission aktivieren: X wählt einen sicheren, öffentlichen
+Zielpunkt im Spielgebiet. Erreicht X den Punkt innerhalb von 50 m, wird die nächste Sichtung
+einmalig um zwei Minuten verschoben. Der Zielpunkt bleibt geheim und wird nicht dauerhaft
+gespeichert; nach einem Serverneustart kann X ein aktives Ziel neu setzen.
+
 ## Verbindungsabbrüche und Neustarts
 
 - **Reconnect:** Ein Reload oder Funkloch beendet das Spiel nicht. Die Spieler-ID liegt im
@@ -88,7 +93,8 @@ cd .. && npm run test:integration    # 18/18
   alle zeitgesteuerten Schritte laufen über Durable-Object-Alarms. Ein Neustart oder eine
   Eviction der Instanz setzt das Spiel korrekt fort.
 - **Bewusst nicht persistiert:** Standorte. Nach einem Neustart schickt jedes Gerät beim
-  nächsten GPS-Update wieder eine Position (Client-Intervall: 15 s).
+  nächsten GPS-Update wieder eine Position (Client-Intervall: 15 s). Auch ein aktiver
+  Bonusmissions-Zielpunkt wird nicht persistiert.
 
 ## Karte
 

@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import type { ClientMessage, LatLng, Ruleset, ServerMessage } from "@fang-x/shared";
+import type {
+  ClientMessage,
+  LatLng,
+  ObjectiveState,
+  Ruleset,
+  ServerMessage,
+} from "@fang-x/shared";
 import { clearPlayerId, loadPlayerId, savePlayerId } from "./session";
 
 interface Session {
@@ -23,6 +29,7 @@ export function useGame() {
   const [ruleset, setRuleset] = useState<Ruleset | null>(null);
   const [reveals, setReveals] = useState<any[]>([]);
   const [lastReveal, setLastReveal] = useState<any>(null);
+  const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
   const [gameResult, setGameResult] = useState<{ winner: string; reason: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +41,7 @@ export function useGame() {
   const intentionalRef = useRef(false);
   const retryTimerRef = useRef<number | null>(null);
   const attemptRef = useRef(0);
-  const connectRef = useRef<(session: Session) => void>(() => {});
+  const connectRef = useRef<(session: Session) => void>(() => { });
 
   const send = (msg: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -113,8 +120,7 @@ export function useGame() {
           break;
         case "phase":
           setPhase(msg.phase);
-          // Server-Zeit auf lokale Uhr umrechnen, damit der Countdown auch bei
-          // abweichender Geräteuhr stimmt.
+          // Server-Zeit auf lokale Uhr umrechnen, damit der Countdown auch bei abweichender Geräteuhr stimmt.
           setPhaseEndsAt(
             msg.phaseEndsAt === null ? null : msg.phaseEndsAt - msg.serverTime + Date.now()
           );
@@ -124,6 +130,7 @@ export function useGame() {
             setLastReveal(null);
             setGameResult(null);
             setYourPositionIsShared(false);
+            setObjective(null);
           } else if (msg.reveals && msg.reveals.length > 0) {
             // Nach Reload/Reconnect: bereits erfolgte Sichtungen nachziehen.
             setReveals(msg.reveals);
@@ -136,6 +143,9 @@ export function useGame() {
         case "reveal":
           setLastReveal(msg.reveal);
           setReveals((prev) => [...prev, msg.reveal]);
+          break;
+        case "objective":
+          setObjective(msg.objective);
           break;
         case "yourPositionIsShared":
           setYourPositionIsShared(msg.shared);
@@ -177,6 +187,7 @@ export function useGame() {
   const join = (code: string, name: string, wantsX: boolean) => {
     intentionalRef.current = false;
     attemptRef.current = 0;
+    setObjective(null);
     sessionRef.current = { code, name, wantsX };
     wsRef.current?.close();
     connect({ code, name, wantsX });
@@ -192,6 +203,11 @@ export function useGame() {
 
   const start = () => {
     send({ t: "start" });
+  };
+
+  const setObjectiveTarget = (target: LatLng) => {
+    setError(null);
+    send({ t: "setObjective", target });
   };
 
   const sendPosition = (pos: LatLng) => {
@@ -210,6 +226,7 @@ export function useGame() {
     setMyId(null);
     setConnected(false);
     setReconnecting(false);
+    setObjective(null);
   };
 
   // Beim Verlassen der Seite sauber abschalten, ohne Reconnect zu starten.
@@ -231,6 +248,7 @@ export function useGame() {
     ruleset,
     reveals,
     lastReveal,
+    objective,
     yourPositionIsShared,
     gameResult,
     error,
@@ -240,6 +258,7 @@ export function useGame() {
     configure,
     setRole,
     start,
+    setObjectiveTarget,
     sendPosition,
     leave,
     clearError: () => setError(null),

@@ -1,8 +1,4 @@
 // Einfacher Ratenbegrenzer als Durable Object.
-//
-// Workers sind zustandslos, deshalb liegt der Zähler in einem einzelnen
-// Objekt (Name "global"). Fixes Zeitfenster pro Schlüssel — gut genug, um
-// massenhaftes Anlegen von Spielen und das Durchprobieren von Codes zu bremsen.
 
 const MAX_KEYS = 5000;
 
