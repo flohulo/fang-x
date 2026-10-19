@@ -108,9 +108,6 @@ OpenStreetMap-Basis, ohne API-Key, kommerzielle Nutzung erlaubt). Der Stil liefe
 Attribution mit, deshalb steht die Nennung (OpenFreeMap, OpenMapTiles, OpenStreetMap) fest
 im Spielbildschirm.
 
-Der öffentliche `tile.openstreetmap.org`-Server darf für Anwendungen wie diese **nicht**
-verwendet werden — deshalb der Umweg über OpenFreeMap.
-
 ## Rechtliches
 
 Der Client enthält zwei statische Seiten:
