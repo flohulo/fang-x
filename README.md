@@ -147,22 +147,7 @@ npx wrangler deploy
   maximal 24 Spieler pro Raum. Zähler liegen im `RateLimiter`-Objekt und setzen sich bei
   einem Neustart zurück.
 
-### GitHub-Veröffentlichung
-
-1. Unter **Settings → Secrets and variables → Actions → Secrets** `CLOUDFLARE_API_TOKEN`
-   anlegen. Verwende ein Cloudflare-API-Token mit minimal nötiger Workers-Deploy-Berechtigung.
-2. Unter **Variables** `CLOUDFLARE_ACCOUNT_ID` und `CLOUDFLARE_WORKERS_SUBDOMAIN` anlegen. Der
-   Subdomain-Wert ist der Account-Teil deiner `*.workers.dev`-Adresse.
-3. Unter **Settings → Environments** die Umgebungen `preview` und `production` anlegen und
-   jeweils das Secret `CLOUDFLARE_API_TOKEN` freigeben. So lassen sich Vorschau- und
-   Produktions-Deploys getrennt einschränken. Für automatische PR-Vorschauen sollte `preview`
-   keine manuelle Freigabe verlangen.
-4. Für Release Please ein Repository-Secret `RELEASE_PLEASE_TOKEN` anlegen. Es wird für
-   Release-PRs und GitHub-Releases benötigt, damit deren Events CI und Deploy-Workflows
-   auslösen können. Der Token braucht `contents:write` und `pull-requests:write`. Zusätzlich
-   zum Deploy-Token wird dieser Token nur für Release-Verwaltung verwendet.
-
-Workflows:
+### Workflows:
 
 - **PR-Titelprüfung** validiert PR-Titel als Conventional Commits, damit Release Please die
   Änderung korrekt einordnen kann.
@@ -176,9 +161,6 @@ Workflows:
   (Patch), `feat!: neues Spielprotokoll` (Major). Erst wenn der Release-PR gemergt wird,
   erscheint das GitHub-Release; danach testet und deployed der Workflow den `main`-Stand.
   PRs sollten per Squash Merge mit dem Conventional-Commit-Titel als Merge-Commit landen.
-
-Vor dem ersten Produktionsrelease müssen die Platzhalter in `client/src/legal.tsx` durch
-vollständige Betreiberangaben ersetzt werden.
 
 ## Bekannte Grenzen
 
