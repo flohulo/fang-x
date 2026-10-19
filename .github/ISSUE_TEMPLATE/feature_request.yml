@@ -1,0 +1,25 @@
+name: Feature vorschlagen
+description: Schlage eine Verbesserung oder Spielidee vor.
+title: "[Idee]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Welches Problem soll gelöst werden?
+      description: Beschreibe den Anwendungsfall.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Was schlägst du vor?
+      description: Erkläre, wie sich die Funktion für Spieler anfühlen oder verhalten soll.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativen oder weitere Hinweise
+    validations:
+      required: false

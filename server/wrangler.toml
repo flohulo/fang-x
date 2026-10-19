@@ -1,6 +1,7 @@
 name = "fang-x-server"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
+workers_dev = true
 
 # Logs und Metriken im Cloudflare-Dashboard (hilft beim Betrieb)
 [observability]

@@ -1,4 +1,46 @@
-import { LEGAL, LEGAL_COMPLETE, isPlaceholder } from "../legal";
+export interface LegalInfo {
+  name: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  email: string;
+  phone: string;
+  authority: string;
+  updated: string;
+}
+
+export const LEGAL: LegalInfo = {
+  name: "[Vor- und Nachname eintragen]",
+  street: "[Straße und Hausnummer eintragen]",
+  postalCode: "[Postleitzahl eintragen]",
+  city: "[Ort eintragen]",
+  country: "Deutschland",
+  email: "[E-Mail-Adresse eintragen]",
+  phone: "",
+  authority: "",
+  updated: "",
+};
+
+const PLACEHOLDER_MARKER = /\[[^\]]*\]/;
+
+export function isPlaceholder(value: string): boolean {
+  return PLACEHOLDER_MARKER.test(value);
+}
+
+export const LEGAL_COMPLETE =
+  LEGAL.name.trim() !== "" &&
+  !isPlaceholder(LEGAL.name) &&
+  LEGAL.street.trim() !== "" &&
+  !isPlaceholder(LEGAL.street) &&
+  LEGAL.postalCode.trim() !== "" &&
+  !isPlaceholder(LEGAL.postalCode) &&
+  LEGAL.city.trim() !== "" &&
+  !isPlaceholder(LEGAL.city) &&
+  LEGAL.country.trim() !== "" &&
+  !isPlaceholder(LEGAL.country) &&
+  LEGAL.email.trim() !== "" &&
+  !isPlaceholder(LEGAL.email);
 
 export function LegalScreen({ page }: { page: "impressum" | "datenschutz" }) {
   return (
@@ -11,7 +53,7 @@ export function LegalScreen({ page }: { page: "impressum" | "datenschutz" }) {
         {!LEGAL_COMPLETE && (
           <p className="legal-warning">
             <strong>Hinweis für den Betreiber:</strong> In{" "}
-            <code>client/src/legal.ts</code> stehen noch Platzhalter. Sie sind auf dieser
+            <code>client/src/legal.tsx</code> stehen noch Platzhalter. Sie sind auf dieser
             Seite gelb markiert. Solange Name, Anschrift und E-Mail-Adresse fehlen, ist
             diese Seite kein gültiges Impressum und keine vollständige
             Datenschutzerklärung.
@@ -54,7 +96,7 @@ function Contact() {
 }
 
 /**
- * Zeigt einen Wert an. Platzhalter aus `legal.ts` werden hervorgehoben; ein
+ * Zeigt einen Wert an. Platzhalter aus `legal.tsx` werden hervorgehoben; ein
  * leerer Pflichtwert wird ebenfalls als Platzhalter ausgegeben, damit die
  * Lücke auf der Seite nicht übersehen wird.
  */

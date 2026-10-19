@@ -5,7 +5,7 @@ import { clearSession, loadSession, saveSession } from "./lib/session";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LobbyScreen } from "./screens/LobbyScreen";
 import { GameScreen } from "./screens/GameScreen";
-import { LegalScreen } from "./screens/LegalScreen";
+import { LegalScreen } from "./legal";
 
 type Screen = "home" | "lobby" | "game";
 

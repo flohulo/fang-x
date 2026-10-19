@@ -1,0 +1,34 @@
+name: Fehler melden
+description: Melde einen reproduzierbaren Fehler in Fang X.
+title: "[Fehler]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Was ist passiert?
+      description: Beschreibe kurz das beobachtete Verhalten.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Schritte zum Reproduzieren
+      placeholder: |
+        1. Spiel erstellen
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Gerät und Browser
+      placeholder: Android / Chrome, iPhone / Safari, Desktop / Firefox ...
+    validations:
+      required: true

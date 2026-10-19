@@ -1,6 +1,6 @@
 # Fang X
 
-Open-Source-GPS-Fangspiel für draußen: Eine Person ist **X** und läuft weg, alle anderen sind
+Open-Source-GPS-Fangspiel für draussen: Eine Person ist **X** und läuft weg, alle anderen sind
 **Detektive** und bekommen in festen Abständen eine ungefähre Sichtung. Wer X im Fangradius
 erreicht, gewinnt.
 
@@ -31,6 +31,11 @@ cd server && npx wrangler dev --ip 0.0.0.0 --port 3000
 `wrangler.toml` (Assets-Pfad `../client/dist`) gefunden wird. `--ip 0.0.0.0` ist nötig,
 sobald der Server von außerhalb des eigenen Rechners erreichbar sein soll (Container, VM,
 Handy im WLAN); ohne die Angabe lauscht er nur auf `127.0.0.1`.
+
+Die installierbare PWA zeigt ihre Release-Version auf der Startseite. Ein geöffneter Client
+prüft alle fünf Minuten auf einen neuen Service Worker; bei einer neuen Version übernimmt
+`autoUpdate` das Update automatisch und Workbox entfernt nicht mehr benötigte Precaches.
+Das Spiel selbst benötigt weiterhin eine Internetverbindung.
 
 **Im Hintergrund starten** (überlebt das Schließen des Terminals):
 
@@ -101,7 +106,7 @@ gespeichert; nach einem Serverneustart kann X ein aktives Ziel neu setzen.
 Kartenkacheln kommen von [OpenFreeMap](https://openfreemap.org/) (freie Vektor-Kacheln auf
 OpenStreetMap-Basis, ohne API-Key, kommerzielle Nutzung erlaubt). Der Stil liefert keine
 Attribution mit, deshalb steht die Nennung (OpenFreeMap, OpenMapTiles, OpenStreetMap) fest
-im Spielbildschirm. Über `VITE_MAP_STYLE_URL` lässt sich ein eigener Stil eintragen.
+im Spielbildschirm.
 
 Der öffentliche `tile.openstreetmap.org`-Server darf für Anwendungen wie diese **nicht**
 verwendet werden — deshalb der Umweg über OpenFreeMap.
@@ -115,24 +120,12 @@ Der Client enthält zwei statische Seiten:
 | `/impressum` | Angaben gemäß § 5 DDG, Verantwortlichkeit nach § 18 Abs. 2 MStV, Haftung, Lizenzhinweise |
 | `/datenschutz` | Verantwortlicher, Hosting (Cloudflare), verarbeitete Daten, Rechtsgrundlagen, Speicherdauer, Betroffenenrechte |
 
-Die Betreiberangaben stehen direkt im Dokument, in
-[`client/src/legal.ts`](client/src/legal.ts) — bewusst **nicht** in Umgebungsvariablen oder
-einer `.env`-Datei. Dort die Werte in eckigen Klammern ersetzen:
-
-```ts
-name: "Vorname Nachname",
-street: "Straße Hausnummer",
-postalCode: "12345",
-city: "Ort",
-country: "Deutschland",
-email: "kontakt@example.de",
-phone: "",              // optional
-// authority und updated sind ebenfalls optional
-```
-
-Solange Pflichtangaben fehlen oder noch als Platzhalter (`[...]`) dastehen, markiert die Seite
-sie gelb und zeigt einen Warnhinweis — eine unfertige Rechtsseite fällt so sofort auf. Für den
-Betrieb genügt ein normales `npm run build`, ohne zusätzliche Build-Variablen.
+Impressum, Datenschutzerklärung und Betreiberangaben stehen gemeinsam in
+[`client/src/legal.tsx`](client/src/legal.tsx). Ersetze dort die Angaben in `LEGAL` und passe
+bei Bedarf direkt in derselben Datei die beiden Texte an. Dafür gibt es keine `.env`-Datei
+und keine Build- oder GitHub-Variablen. Da das Repository öffentlich ist, sind auch die
+Betreiberangaben im Quellcode öffentlich. Solange Pflichtangaben Platzhalter sind, zeigen die
+Rechtsseiten einen deutlichen Hinweis.
 
 Die Texte sind eine sorgfältige Vorlage, keine Rechtsberatung: Wer die Instanz betreibt, ist
 für die Angaben verantwortlich und sollte sie prüfen (lassen).
@@ -141,18 +134,51 @@ für die Angaben verantwortlich und sollte sie prüfen (lassen).
 
 ```bash
 npm ci && npm run build     # Client-Assets müssen aktuell sein
-cd server && npx wrangler deploy
+cd server
+npx wrangler login          # einmalig lokal anmelden
+npx wrangler deploy
 ```
 
 - `wrangler.toml` enthält die Bindings `GAME_ROOM`, `RATE_LIMIT` und `ASSETS` sowie die
   Migrationen `v1`/`v2` (`new_sqlite_classes`). Migrationen laufen beim Deploy automatisch.
 - `[observability] enabled = true` schaltet Logs und Metriken im Dashboard frei.
 - Eigene Domain: Route bzw. Custom Domain in `wrangler.toml` eintragen (Vorlage kommentiert).
-- Keine Secrets und keine rechtlichen Build-Variablen nötig; die Betreiberangaben kommen aus
-  `client/src/legal.ts` und werden beim Build mit eingebunden.
 - Ratenbegrenzung pro IP: 10 neue Spiele pro 10 Minuten, 60 Code-Prüfungen pro Minute; dazu
   maximal 24 Spieler pro Raum. Zähler liegen im `RateLimiter`-Objekt und setzen sich bei
   einem Neustart zurück.
+
+### GitHub-Veröffentlichung
+
+1. Unter **Settings → Secrets and variables → Actions → Secrets** `CLOUDFLARE_API_TOKEN`
+   anlegen. Verwende ein Cloudflare-API-Token mit minimal nötiger Workers-Deploy-Berechtigung.
+2. Unter **Variables** `CLOUDFLARE_ACCOUNT_ID` und `CLOUDFLARE_WORKERS_SUBDOMAIN` anlegen. Der
+   Subdomain-Wert ist der Account-Teil deiner `*.workers.dev`-Adresse.
+3. Unter **Settings → Environments** die Umgebungen `preview` und `production` anlegen und
+   jeweils das Secret `CLOUDFLARE_API_TOKEN` freigeben. So lassen sich Vorschau- und
+   Produktions-Deploys getrennt einschränken. Für automatische PR-Vorschauen sollte `preview`
+   keine manuelle Freigabe verlangen.
+4. Für Release Please ein Repository-Secret `RELEASE_PLEASE_TOKEN` anlegen. Es wird für
+   Release-PRs und GitHub-Releases benötigt, damit deren Events CI und Deploy-Workflows
+   auslösen können. Der Token braucht `contents:write` und `pull-requests:write`. Zusätzlich
+   zum Deploy-Token wird dieser Token nur für Release-Verwaltung verwendet.
+
+Workflows:
+
+- **PR-Titelprüfung** validiert PR-Titel als Conventional Commits, damit Release Please die
+  Änderung korrekt einordnen kann.
+- **CI** führt bei jedem PR und jeder Aktualisierung Typecheck, Build und Integrationstest aus.
+- **PR Preview** deployed PRs aus diesem Repository als eigenen öffentlichen Worker unter
+  `https://fang-x-pr-<nummer>.<subdomain>.workers.dev`, postet den Link in den PR und löscht
+  den Worker beim Schließen oder Mergen. Fork-PRs erhalten wegen fehlender Cloudflare-
+  Zugangsdaten nur CI, keine Live-Vorschau.
+- **Release Please** erstellt bzw. aktualisiert nach Conventional Commits auf `main` einen PR
+  für Version und Changelog. Beispiele: `feat: neue Bonusmission` (Minor), `fix: Fangradius`
+  (Patch), `feat!: neues Spielprotokoll` (Major). Erst wenn der Release-PR gemergt wird,
+  erscheint das GitHub-Release; danach testet und deployed der Workflow den `main`-Stand.
+  PRs sollten per Squash Merge mit dem Conventional-Commit-Titel als Merge-Commit landen.
+
+Vor dem ersten Produktionsrelease müssen die Platzhalter in `client/src/legal.tsx` durch
+vollständige Betreiberangaben ersetzt werden.
 
 ## Bekannte Grenzen
 
