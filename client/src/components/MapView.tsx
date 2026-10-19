@@ -11,8 +11,7 @@ import type { LatLng, ObjectiveState, RevealEvent } from "@fang-x/shared";
 import { circlePolygon } from "@fang-x/shared";
 import type { Feature, Polygon } from "geojson";
 
-const MAP_STYLE_URL =
-  import.meta.env.VITE_MAP_STYLE_URL ?? "https://tiles.openfreemap.org/styles/liberty";
+const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
 interface PlayerMarker {
   id: string;
