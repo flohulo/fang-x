@@ -27,6 +27,3 @@ new_sqlite_classes = ["GameRoom"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["RateLimiter"]
-
-# Eigene Domain? Dann eintragen (Route oder Custom Domain):
-# routes = [{ pattern = "fangx.example.de", custom_domain = true }]
