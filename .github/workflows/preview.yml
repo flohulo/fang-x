@@ -19,6 +19,7 @@ jobs:
       github.event.action != 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: preview
     steps:
       - name: Check out pull request
@@ -42,7 +43,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
@@ -51,10 +51,10 @@ jobs:
           fi
           worker_name="fang-x-pr-${PR_NUMBER}"
           export WRANGLER_OUTPUT_FILE_PATH="$RUNNER_TEMP/wrangler-output.json"
-          npx wrangler deploy --name "$worker_name" --var PREVIEW:true --workers-dev
+          npx wrangler deploy --name "$worker_name"
           preview_url=$(jq -r 'select(.type=="deploy") | .targets[0]' "$WRANGLER_OUTPUT_FILE_PATH" | tail -n1)
           if [[ -z "$preview_url" || "$preview_url" == "null" ]]; then
-            echo "::error title=Preview URL::Wrangler did not report a URL. Is workers_dev enabled?"
+            echo "::error title=Preview URL::Wrangler did not report a URL. Is workers_dev enabled in wrangler.toml?"
             exit 1
           fi
           echo "worker_name=$worker_name" >> "$GITHUB_OUTPUT"
@@ -94,6 +94,7 @@ jobs:
       github.event.action == 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: preview
     steps:
       - name: Delete preview Worker if it exists
