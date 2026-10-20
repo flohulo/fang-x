@@ -61,6 +61,11 @@ h1 {
   color: var(--text-dim);
   font-size: 0.75rem;
   margin: -8px 0 0;
+  text-decoration: none;
+}
+
+.app-version:hover {
+  color: var(--accent);
 }
 
 button {

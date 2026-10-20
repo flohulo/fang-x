@@ -6,6 +6,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { LobbyScreen } from "./screens/LobbyScreen";
 import { GameScreen } from "./screens/GameScreen";
 import { LegalScreen } from "./legal";
+import { ChangelogScreen } from "./changelog";
 
 type Screen = "home" | "lobby" | "game";
 
@@ -18,12 +19,17 @@ function readLegalPage(): LegalPage {
   return null;
 }
 
+function isChangelogPage(): boolean {
+  return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/changelog";
+}
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [checkingCode, setCheckingCode] = useState(false);
   const legalPage = useMemo(readLegalPage, []);
+  const changelogPage = useMemo(isChangelogPage, []);
   const resumedRef = useRef(false);
 
   const game = useGame();
@@ -133,6 +139,10 @@ export default function App() {
 
   if (legalPage) {
     return <LegalScreen page={legalPage} />;
+  }
+
+  if (changelogPage) {
+    return <ChangelogScreen />;
   }
 
   const content =

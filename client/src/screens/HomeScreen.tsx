@@ -136,7 +136,9 @@ export function HomeScreen({
         <span aria-hidden="true">·</span>
         <a href="/datenschutz">Datenschutz</a>
       </footer>
-      <p className="app-version">Version {__APP_VERSION__}</p>
+      <a className="app-version" href="/changelog">
+        Version {__APP_VERSION__}
+      </a>
     </div>
   );
 }
