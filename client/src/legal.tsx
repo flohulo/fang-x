@@ -45,20 +45,7 @@ function Impressum() {
 
       <h2>Kartendaten</h2>
       <p>
-        Kartendarstellung mit Daten von{" "}
-        <a
-          href="https://www.openstreetmap.org/copyright"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          OpenStreetMap-Mitwirkenden
-        </a>{" "}
-        (ODbL), bereitgestellt über{" "}
-        <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
-          OpenFreeMap
-        </a>{" "}
-        und OpenMapTiles (CC-BY 4.0). Die Urheberangaben stehen zusätzlich direkt in der
-        Kartenansicht des Spiels.
+        OpenStreetMap, OpenFreeMap, MapLibre und OpenMapTiles.
       </p>
     </>
   );
@@ -229,12 +216,8 @@ function Datenschutz() {
         )}
       </p>
 
-      <p className="legal-footnote">
-        Hinweis: Der Quellcode ist frei verfügbar (AGPL-3.0). Wer eine eigene Instanz
-        betreibt, ist für Impressum und Datenschutzerklärung selbst verantwortlich und
-        muss die Betreiberangaben ersetzen. Diese Texte sind eine sorgfältige Vorlage,
-        keine Rechtsberatung.
-      </p>
+      <h2>11. Änderungen</h2>
+      <p>Stand: {LEGAL.updated || 'aktuelle Version'}</p>
     </>
   );
 }
