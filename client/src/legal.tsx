@@ -6,7 +6,6 @@ export interface LegalInfo {
   country: string;
   email: string;
   phone: string;
-  authority: string;
   updated: string;
 }
 
@@ -18,150 +17,49 @@ export const LEGAL: LegalInfo = {
   country: "Deutschland",
   email: "[E-Mail-Adresse eintragen]",
   phone: "",
-  authority: "",
   updated: "",
 };
 
 const PLACEHOLDER_MARKER = /\[[^\]]*\]/;
-
 export function isPlaceholder(value: string): boolean {
   return PLACEHOLDER_MARKER.test(value);
 }
 
 export const LEGAL_COMPLETE =
   LEGAL.name.trim() !== "" &&
-  !isPlaceholder(LEGAL.name) &&
   LEGAL.street.trim() !== "" &&
-  !isPlaceholder(LEGAL.street) &&
   LEGAL.postalCode.trim() !== "" &&
-  !isPlaceholder(LEGAL.postalCode) &&
   LEGAL.city.trim() !== "" &&
   !isPlaceholder(LEGAL.city) &&
   LEGAL.country.trim() !== "" &&
-  !isPlaceholder(LEGAL.country) &&
-  LEGAL.email.trim() !== "" &&
-  !isPlaceholder(LEGAL.email);
+  LEGAL.email.trim() !== "";
 
-export function LegalScreen({ page }: { page: "impressum" | "datenschutz" }) {
-  return (
-    <div className="screen legal-screen">
-      <article className="card legal">
-        <a className="legal-back" href="/">
-          ← Zurück zum Spiel
-        </a>
-
-        {!LEGAL_COMPLETE && (
-          <p className="legal-warning">
-            <strong>Hinweis für den Betreiber:</strong> In{" "}
-            <code>client/src/legal.tsx</code> stehen noch Platzhalter. Sie sind auf dieser
-            Seite gelb markiert. Solange Name, Anschrift und E-Mail-Adresse fehlen, ist
-            diese Seite kein gültiges Impressum und keine vollständige
-            Datenschutzerklärung.
-          </p>
-        )}
-
-        {page === "impressum" ? <Impressum /> : <Datenschutz />}
-      </article>
-    </div>
-  );
-}
-
-function Operator() {
-  return (
-    <p className="legal-address">
-      <Field value={LEGAL.name} label="Vor- und Nachname" />
-      <br />
-      <Field value={LEGAL.street} label="Straße und Hausnummer" />
-      <br />
-      <Field value={LEGAL.postalCode} label="Postleitzahl" />{" "}
-      <Field value={LEGAL.city} label="Ort" />
-      <br />
-      <Field value={LEGAL.country} label="Land" />
-    </p>
-  );
-}
-
-function Contact() {
-  return (
-    <p>
-      E-Mail: <Field value={LEGAL.email} label="E-Mail-Adresse" />
-      {LEGAL.phone.trim() !== "" && (
-        <>
-          <br />
-          Telefon: <Field value={LEGAL.phone} label="Telefonnummer" />
-        </>
-      )}
-    </p>
-  );
-}
-
-/**
- * Zeigt einen Wert an. Platzhalter aus `legal.tsx` werden hervorgehoben; ein
- * leerer Pflichtwert wird ebenfalls als Platzhalter ausgegeben, damit die
- * Lücke auf der Seite nicht übersehen wird.
- */
-function Field({ value, label }: { value: string; label: string }) {
-  const text = value.trim() === "" ? `[${label} eintragen]` : value;
-  if (isPlaceholder(text)) {
-    return <span className="legal-placeholder">{text}</span>;
-  }
-  return <span>{text}</span>;
+export default function LegalScreen({ page }: { page: 'impressum' | 'datenschutz' }) {
+  return <div>{page === 'impressum' ? <Impressum /> : <Datenschutz />}</div>;
 }
 
 function Impressum() {
   return (
     <>
       <h1>Impressum</h1>
+      <p>Betreiber: {LEGAL.name}</p>
+      <p>{LEGAL.street}, {LEGAL.postalCode} {LEGAL.city}, {LEGAL.country}</p>
+      <p>E-Mail: {LEGAL.email}</p>
 
-      <h2>Angaben gemäß § 5 DDG</h2>
-      <Operator />
-      <Contact />
-
-      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
-      <Operator />
+      <h2>Verantwortlich für den Inhalt</h2>
+      <p>{LEGAL.name}</p>
 
       <h2>Art und Umfang des Angebots</h2>
-      <p>
-        Fang X ist ein kostenloses, werbefreies Browser-Spiel für Gruppen, die sich
-        draußen verabreden. Es gibt keine Benutzerkonten, keine In-App-Käufe und keine
-        Werbung. Es werden keine Waren oder Dienstleistungen verkauft und keine Spenden
-        entgegengenommen.
-      </p>
+      <p>Fang X ist ein kostenloses, werbefreies Open-Source-Browser-Spiel.</p>
 
-      <h2>Verbraucherstreitbeilegung</h2>
-      <p>
-        Es besteht keine Verpflichtung und keine Bereitschaft, an einem
-        Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen
-        (§ 36 VSBG).
-      </p>
-
-      <h2>Haftung für eigene Inhalte</h2>
-      <p>
-        Die Inhalte dieses Angebots wurden mit Sorgfalt erstellt. Für Richtigkeit,
-        Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr übernommen
-        werden. Als Betreiber bin ich für eigene Inhalte nach den allgemeinen Gesetzen
-        verantwortlich. Eine Verpflichtung, übermittelte oder gespeicherte fremde
-        Informationen zu überwachen oder nach Umständen zu forschen, die auf eine
-        rechtswidrige Tätigkeit hinweisen, besteht nach §§ 8 bis 10 DDG nicht.
-      </p>
+      <h2>Haftungsausschluss</h2>
+      <p>Alle Inhalte werden mit Sorgfalt bereitgestellt, jedoch ohne Gewähr. Für Richtigkeit, Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr übernommen werden.</p>
 
       <h2>Haftung für Links</h2>
-      <p>
-        Dieses Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte ich
-        keinen Einfluss habe. Deshalb kann für diese fremden Inhalte auch keine Gewähr
-        übernommen werden. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
-        Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung waren keine
-        rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von Rechtsverstößen entferne
-        ich derartige Links unverzüglich.
-      </p>
+      <p>Für Inhalte externer Webseiten sind deren Betreiber verantwortlich. Es kann für diese fremden Inhalte auch keine Gewähr übernommen werden. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung waren keine rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von Rechtsverstössen werden derartige Links unverzüglich entfernt.</p>
 
       <h2>Quellcode und Lizenz</h2>
-      <p>
-        Der Quellcode von Fang X steht unter der GNU Affero General Public License v3
-        (AGPL-3.0). Er darf unter den Bedingungen dieser Lizenz verwendet, verändert und
-        weitergegeben werden. Wer eine eigene Instanz betreibt, ist für deren Inhalte und
-        rechtlichen Angaben selbst verantwortlich.
-      </p>
+      <p>Dieses Projekt steht unter der AGPL-3.0.</p>
 
       <h2>Kartendaten</h2>
       <p>
@@ -190,10 +88,10 @@ function Datenschutz() {
       <h1>Datenschutzerklärung</h1>
 
       <h2>1. Verantwortlicher</h2>
-      <Operator />
-      <Contact />
+      <p>{LEGAL.name}</p>
+      <p>E-Mail: {LEGAL.email}</p>
 
-      <h2>2. Das Wichtigste in Kurzform</h2>
+      <h2>2. Kurzfassung</h2>
       <ul>
         <li>Es gibt keine Konten, keine Anmeldung, keine Werbung und kein Tracking.</li>
         <li>Es werden keine Cookies zu Analyse- oder Werbezwecken gesetzt.</li>
