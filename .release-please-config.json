@@ -1,7 +1,13 @@
 {
-  "release-type": "node",
-  "package-name": "fang-x",
-  "changelog-path": "CHANGELOG.md",
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "draft": true,
   "include-v-in-tag": true,
-  "pull-request-title-pattern": "chore: release ${version}"
+  "pull-request-title-pattern": "chore: release ${version}",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "fang-x",
+      "changelog-path": "CHANGELOG.md"
+    }
+  }
 }
