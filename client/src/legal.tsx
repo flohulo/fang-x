@@ -1,23 +1,11 @@
 export interface LegalInfo {
-  name: string;
-  street: string;
-  postalCode: string;
-  city: string;
-  country: string;
   email: string;
-  phone: string;
   updated: string;
 }
 
 export const LEGAL: LegalInfo = {
-  name: "[Vor- und Nachname eintragen]",
-  street: "[Straße und Hausnummer eintragen]",
-  postalCode: "[Postleitzahl eintragen]",
-  city: "[Ort eintragen]",
-  country: "Deutschland",
   email: "[E-Mail-Adresse eintragen]",
-  phone: "",
-  updated: "",
+  updated: "20.10.2026",
 };
 
 const PLACEHOLDER_MARKER = /\[[^\]]*\]/;
@@ -26,13 +14,8 @@ export function isPlaceholder(value: string): boolean {
 }
 
 export const LEGAL_COMPLETE =
-  LEGAL.name.trim() !== "" &&
-  LEGAL.street.trim() !== "" &&
-  LEGAL.postalCode.trim() !== "" &&
-  LEGAL.city.trim() !== "" &&
-  !isPlaceholder(LEGAL.city) &&
-  LEGAL.country.trim() !== "" &&
-  LEGAL.email.trim() !== "";
+  LEGAL.email.trim() !== "" &&
+  LEGAL.updated.trim() !== "";
 
 export default function LegalScreen({ page }: { page: 'impressum' | 'datenschutz' }) {
   return <div>{page === 'impressum' ? <Impressum /> : <Datenschutz />}</div>;
@@ -42,12 +25,11 @@ function Impressum() {
   return (
     <>
       <h1>Impressum</h1>
-      <p>Betreiber: {LEGAL.name}</p>
-      <p>{LEGAL.street}, {LEGAL.postalCode} {LEGAL.city}, {LEGAL.country}</p>
+      <p>Betreiber:</p>
       <p>E-Mail: {LEGAL.email}</p>
 
       <h2>Verantwortlich für den Inhalt</h2>
-      <p>{LEGAL.name}</p>
+      <p>{LEGAL.email}</p>
 
       <h2>Art und Umfang des Angebots</h2>
       <p>Fang X ist ein kostenloses, werbefreies Open-Source-Browser-Spiel.</p>
@@ -88,8 +70,7 @@ function Datenschutz() {
       <h1>Datenschutzerklärung</h1>
 
       <h2>1. Verantwortlicher</h2>
-      <p>{LEGAL.name}</p>
-      <p>E-Mail: {LEGAL.email}</p>
+      <p>{LEGAL.email}</p>
 
       <h2>2. Kurzfassung</h2>
       <ul>
