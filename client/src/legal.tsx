@@ -4,7 +4,7 @@ export interface LegalInfo {
 }
 
 export const LEGAL: LegalInfo = {
-  email: "[E-Mail-Adresse eintragen]",
+  email: "fang-x@meine-dateien.info",
   updated: "20.10.2026",
 };
 
@@ -35,18 +35,23 @@ function Impressum() {
       <p>Fang X ist ein kostenloses, werbefreies Open-Source-Browser-Spiel.</p>
 
       <h2>Haftungsausschluss</h2>
-      <p>Alle Inhalte werden mit Sorgfalt bereitgestellt, jedoch ohne Gewähr. Für Richtigkeit, Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr übernommen werden.</p>
+      <p>
+        Alle Inhalte werden mit Sorgfalt bereitgestellt, jedoch ohne Gewähr. Für Richtigkeit,
+        Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr übernommen werden.
+      </p>
 
       <h2>Haftung für Links</h2>
       <p>Für Inhalte externer Webseiten sind deren Betreiber verantwortlich. Es kann für diese fremden Inhalte auch keine Gewähr übernommen werden. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung waren keine rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von Rechtsverstössen werden derartige Links unverzüglich entfernt.</p>
+        ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung
+        waren keine rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von Rechtsverstössen werden
+        derartige Links unverzüglich entfernt.
+      </p>
 
       <h2>Quellcode und Lizenz</h2>
       <p>Dieses Projekt steht unter der AGPL-3.0.</p>
 
       <h2>Kartendaten</h2>
-      <p>
-        OpenStreetMap, OpenFreeMap, MapLibre und OpenMapTiles.
-      </p>
+      <p>OpenStreetMap, OpenFreeMap, MapLibre und OpenMapTiles.</p>
     </>
   );
 }
@@ -61,18 +66,16 @@ function Datenschutz() {
 
       <h2>2. Kurzfassung</h2>
       <ul>
-        <li>Es gibt keine Konten, keine Anmeldung, keine Werbung und kein Tracking.</li>
-        <li>Es werden keine Cookies zu Analyse- oder Werbezwecken gesetzt.</li>
+        <li>Keine Werbung.</li>
+        <li>Kein Tracking.</li>
+        <li>Keine Benutzerkonten.</li>
         <li>
-          Dein Standort wird ausschließlich während eines laufenden Spiels übertragen und
-          nur im Arbeitsspeicher des Servers gehalten. Standortverläufe werden nicht
-          dauerhaft gespeichert.
+          Dein Standort wird ausschliesslich während eines laufenden Spiels übertragen. Standortverläufe
+          werden nicht gespeichert.
         </li>
         <li>
-          Mitspieler sehen deinen selbst gewählten Namen und – je nach Rolle und
-          Spielphase – eine zeitversetzte, optional ungenaue Sichtung deiner Position.
+          Mitspieler sehen deinen selbst gewählten Namen und – je nach Rolle und Spielphase – deinen Standort.
         </li>
-        <li>Nach dem Spielende und beim Aufräumen des Raums werden die Daten verworfen.</li>
       </ul>
 
       <h2>3. Hosting und Server-Logfiles</h2>
@@ -140,14 +143,8 @@ function Datenschutz() {
 
       <h2>4. Im Spiel verarbeitete Daten</h2>
       <p>
-        Spielbetrieb, Anzeigename und Spieler-ID: Art. 6 Abs. 1 lit. b DSGVO
-        (Bereitstellung des gewünschten Spiels). Standortzugriff: deine Einwilligung über
-        die Browser-Abfrage (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG). Du kannst sie
-        jederzeit in den Browser-Einstellungen widerrufen – dann ist das Spielen
-        allerdings nicht möglich. Sicherheit, Spam- und Missbrauchsschutz
-        (Ratenbegrenzung, Server-Logfiles): Art. 6 Abs. 1 lit. f DSGVO. Das Speichern von
-        Anzeigename, Spiel-Code und Spieler-ID im Browser ist für die gewünschte Funktion
-        erforderlich und deshalb ohne Einwilligung zulässig (§ 25 Abs. 2 TDDDG).
+        Anzeigename, Spiel-ID, technische Sitzungsdaten und Standortdaten während eines laufenden
+        Spiels.
       </p>
 
       <h2>6. Karten und externe Inhalte</h2>
