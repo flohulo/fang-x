@@ -15,12 +15,12 @@
 // einem Neustart schickt jedes Gerät beim nächsten GPS-Update wieder eine Position.
 
 import {
+  type ClientMessage,
   DEFAULT_RULESET,
   distanceMeters,
   jitterPoint,
-  mergeRuleset,
-  type ClientMessage,
   type LatLng,
+  mergeRuleset,
   type ObjectiveState,
   type PlayerInfo,
   type RevealEvent,
@@ -631,7 +631,8 @@ export class GameRoom {
 
     // Neuen Host bestimmen, wenn der Host weg ist
     if (p.isHost && this.players.size > 0) {
-      const next = [...this.players.values()].find((pl) => pl.connected) ?? [...this.players.values()][0];
+      const next =
+        [...this.players.values()].find((pl) => pl.connected) ?? [...this.players.values()][0];
       next.isHost = true;
       if (next.role === "HOST") next.role = next.wantsX ? "X" : "DETECTIVE";
     }
@@ -749,7 +750,10 @@ export class GameRoom {
     const n = this.lastRevealIndex + 1;
     switch (r.schedule) {
       case "DECREASING": {
-        const delay = Math.max(r.decreaseFloorMinutes, r.intervalMinutes - n * r.decreaseStepMinutes);
+        const delay = Math.max(
+          r.decreaseFloorMinutes,
+          r.intervalMinutes - n * r.decreaseStepMinutes,
+        );
         return delay * 60000;
       }
       case "RANDOM": {
@@ -841,11 +845,15 @@ export class GameRoom {
 
   private setObjective(player: Player | null, target: LatLng) {
     if (!player || player.role !== "X") {
-      if (player) this.sendTo(player.ws, { t: "error", message: "Nur X kann ein Missionsziel setzen." });
+      if (player)
+        this.sendTo(player.ws, { t: "error", message: "Nur X kann ein Missionsziel setzen." });
       return;
     }
     if (this.phase !== "RUNNING" || !this.ruleset.objective.enabled) {
-      this.sendTo(player.ws, { t: "error", message: "Das Missionsziel ist gerade nicht verfügbar." });
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Das Missionsziel ist gerade nicht verfügbar.",
+      });
       return;
     }
     if (!this.objective || this.objective.status !== "PENDING") {
@@ -866,7 +874,10 @@ export class GameRoom {
 
     const areaRadius = this.ruleset.map.playAreaRadiusMeters;
     if (distanceMeters(this.playAreaCenter, target) > areaRadius) {
-      this.sendTo(player.ws, { t: "error", message: "Das Ziel muss innerhalb des Spielgebiets liegen." });
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Das Ziel muss innerhalb des Spielgebiets liegen.",
+      });
       return;
     }
     const minimumDistance = Math.min(OBJECTIVE_MIN_DISTANCE_METERS, areaRadius * 0.25);
@@ -910,22 +921,20 @@ export class GameRoom {
     if (this.phase !== "RUNNING") return;
     const catchRadius = this.ruleset.catch.radiusMeters;
     const xPlayers = [...this.players.values()].filter((p) => p.role === "X" && p.position);
-    const detectives = [...this.players.values()].filter(
-      (p) => p.role !== "X" && p.position
-    );
+    const detectives = [...this.players.values()].filter((p) => p.role !== "X" && p.position);
 
     for (const x of xPlayers) {
       if (!x.position) continue;
       const xPos = x.position;
       const catching = detectives.filter(
-        (d) => d.position && distanceMeters(d.position, xPos) <= catchRadius
+        (d) => d.position && distanceMeters(d.position, xPos) <= catchRadius,
       );
 
       const required = Math.max(1, this.ruleset.catch.teamCatchRequired);
       if (catching.length >= required) {
         this.endGame(
           "DETECTIVES",
-          `X wurde nach ${this.ruleset.catch.confirmSeconds}s im Fangradius gestellt.`
+          `X wurde nach ${this.ruleset.catch.confirmSeconds}s im Fangradius gestellt.`,
         );
         return;
       }
@@ -1032,7 +1041,8 @@ export class GameRoom {
 
   private recentReveals(): RevealEvent[] {
     if (this.ruleset.reveal.showTrail === "NONE") return [];
-    const trail = this.ruleset.reveal.showTrail === "FULL" ? this.xPositions : this.xPositions.slice(-3);
+    const trail =
+      this.ruleset.reveal.showTrail === "FULL" ? this.xPositions : this.xPositions.slice(-3);
     return trail.map((entry, i) => ({
       pos: entry.pos,
       radiusMeters: entry.radius,

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import type { Ruleset } from "@fang-x/shared";
 import { DEFAULT_RULESET } from "@fang-x/shared";
+import { useEffect, useState } from "react";
 import { inviteUrl } from "../lib/invite";
 
 interface LobbyScreenProps {
@@ -229,8 +229,8 @@ export function LobbyScreen({
             Bonusmission für X aktivieren
           </label>
           <p className="config-hint">
-            X wählt während der Runde ein sicheres, öffentliches Ziel im Spielgebiet. Erreicht X
-            es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.
+            X wählt während der Runde ein sicheres, öffentliches Ziel im Spielgebiet. Erreicht X es,
+            wird die nächste Sichtung einmalig um 2 Minuten verschoben.
           </p>
 
           <button onClick={onStart} disabled={!hasX} style={{ marginTop: 16 }}>
@@ -239,8 +239,8 @@ export function LobbyScreen({
 
           {hasX && !hasDetective && (
             <p className="config-hint">
-              Probelauf ohne Detektiv — dich jagt niemand. Für eine echte Runde muss
-              mindestens ein Detektiv beitreten (Code <strong>{code}</strong>).
+              Probelauf ohne Detektiv — dich jagt niemand. Für eine echte Runde muss mindestens ein
+              Detektiv beitreten (Code <strong>{code}</strong>).
             </p>
           )}
         </div>

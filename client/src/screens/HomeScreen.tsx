@@ -127,8 +127,8 @@ export function HomeScreen({
       </div>
 
       <p className="privacy-note">
-        Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen.
-        Es werden keine Konten, E-Mails oder Standortverläufe gespeichert.
+        Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen. Es werden
+        keine Konten, E-Mails oder Standortverläufe gespeichert.
       </p>
 
       <footer className="legal-links">
@@ -136,7 +136,9 @@ export function HomeScreen({
         <span aria-hidden="true">·</span>
         <a href="/datenschutz">Datenschutz</a>
       </footer>
-      <p className="app-version">Version {__APP_VERSION__}</p>
+      <a className="app-version" href="/changelog">
+        Version {__APP_VERSION__}
+      </a>
     </div>
   );
 }

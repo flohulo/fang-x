@@ -14,9 +14,14 @@
     "dev:client": "npm run dev --workspace @fang-x/client",
     "build": "npm run build --workspace @fang-x/client",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "check": "biome check --write .",
     "test:integration": "node scripts/integration-test.mjs"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.15",
     "ws": "^8.22.0"
   }
 }

@@ -1,11 +1,5 @@
+import type { ClientMessage, LatLng, ObjectiveState, Ruleset, ServerMessage } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
-import type {
-  ClientMessage,
-  LatLng,
-  ObjectiveState,
-  Ruleset,
-  ServerMessage,
-} from "@fang-x/shared";
 import { clearPlayerId, loadPlayerId, savePlayerId } from "./session";
 
 interface Session {
@@ -41,7 +35,7 @@ export function useGame() {
   const intentionalRef = useRef(false);
   const retryTimerRef = useRef<number | null>(null);
   const attemptRef = useRef(0);
-  const connectRef = useRef<(session: Session) => void>(() => { });
+  const connectRef = useRef<(session: Session) => void>(() => {});
 
   const send = (msg: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -63,10 +57,7 @@ export function useGame() {
 
     attemptRef.current += 1;
     setReconnecting(true);
-    const delay = Math.min(
-      MAX_RECONNECT_DELAY_MS,
-      800 * 2 ** Math.min(attemptRef.current - 1, 4)
-    );
+    const delay = Math.min(MAX_RECONNECT_DELAY_MS, 800 * 2 ** Math.min(attemptRef.current - 1, 4));
     retryTimerRef.current = window.setTimeout(() => {
       retryTimerRef.current = null;
       if (intentionalRef.current) return;
@@ -94,7 +85,7 @@ export function useGame() {
           wantsX: session.wantsX,
           // Aus einer früheren Verbindung: übernimmt den alten Platz im Raum.
           playerId: loadPlayerId(session.code) ?? undefined,
-        } as ClientMessage)
+        } as ClientMessage),
       );
     };
 
@@ -122,7 +113,7 @@ export function useGame() {
           setPhase(msg.phase);
           // Server-Zeit auf lokale Uhr umrechnen, damit der Countdown auch bei abweichender Geräteuhr stimmt.
           setPhaseEndsAt(
-            msg.phaseEndsAt === null ? null : msg.phaseEndsAt - msg.serverTime + Date.now()
+            msg.phaseEndsAt === null ? null : msg.phaseEndsAt - msg.serverTime + Date.now(),
           );
           setPlayAreaCenter(msg.playAreaCenter);
           if (msg.phase === "LOBBY") {

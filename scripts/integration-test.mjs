@@ -69,10 +69,7 @@ function connect(code) {
         for (const msg of messages) {
           if (check(msg)) return res(msg);
         }
-        const timer = setTimeout(
-          () => rej(new Error("Timeout waiting for message")),
-          timeout
-        );
+        const timer = setTimeout(() => rej(new Error("Timeout waiting for message")), timeout);
         waiters.push({ check, resolve: res, timer });
       });
   });
@@ -100,16 +97,14 @@ async function run() {
   assert(detJoined.players.length === 2, "Zwei Spieler im Raum");
 
   // Host wird zu X
-  host.ws.send(
-    JSON.stringify({ t: "setRole", playerId: hostJoined.playerId, wantsX: true })
-  );
+  host.ws.send(JSON.stringify({ t: "setRole", playerId: hostJoined.playerId, wantsX: true }));
   await host.waitFor(
-    (m) => m.t === "players" && m.players.some((p) => p.id === hostJoined.playerId && p.wantsX)
+    (m) => m.t === "players" && m.players.some((p) => p.id === hostJoined.playerId && p.wantsX),
   );
   const playersAfterRole = host.messages.findLast((m) => m.t === "players");
   assert(
     playersAfterRole?.players?.some((p) => p.id === hostJoined.playerId && p.wantsX),
-    "Host-Rolle zu X gewechselt"
+    "Host-Rolle zu X gewechselt",
   );
 
   // 4. Konfiguration: kurze Zeiten für Test
@@ -123,7 +118,7 @@ async function run() {
         map: { playAreaRadiusMeters: 100 },
         objective: { enabled: true },
       },
-    })
+    }),
   );
   await host.waitFor((m) => m.t === "config");
   assert(true, "Konfiguration gesendet und bestätigt");
@@ -143,7 +138,7 @@ async function run() {
   const xPos = { lat: 47.3769, lng: 8.5417 };
   host.ws.send(JSON.stringify({ t: "position", pos: xPos }));
   const pendingObjective = await host.waitFor(
-    (m) => m.t === "objective" && m.objective?.status === "PENDING"
+    (m) => m.t === "objective" && m.objective?.status === "PENDING",
   );
   assert(pendingObjective.objective.target === null, "Bonusmission wartet auf X-Zielpunkt");
 
@@ -160,17 +155,17 @@ async function run() {
   const objectiveTarget = { lat: xPos.lat, lng: xPos.lng + 0.0008 };
   det.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
   const unauthorizedObjective = await det.waitFor(
-    (m) => m.t === "error" && m.message.includes("Nur X")
+    (m) => m.t === "error" && m.message.includes("Nur X"),
   );
   assert(unauthorizedObjective.message.includes("Nur X"), "Nur X darf ein Missionsziel setzen");
   host.ws.send(
     JSON.stringify({
       t: "setObjective",
       target: { lat: xPos.lat + 0.01, lng: xPos.lng },
-    })
+    }),
   );
   const outsideObjective = await host.waitFor(
-    (m) => m.t === "error" && m.message.includes("innerhalb")
+    (m) => m.t === "error" && m.message.includes("innerhalb"),
   );
   assert(outsideObjective.message.includes("innerhalb"), "Missionsziel außerhalb wird abgelehnt");
 
@@ -178,15 +173,15 @@ async function run() {
   await host.waitFor((m) => m.t === "objective" && m.objective?.status === "ACTIVE");
   assert(
     !det.messages.some((m) => m.t === "objective"),
-    "Bonusmissions-Ziel bleibt vor Detektiven geheim"
+    "Bonusmissions-Ziel bleibt vor Detektiven geheim",
   );
   host.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
   const completedObjective = await host.waitFor(
-    (m) => m.t === "objective" && m.objective?.status === "COMPLETED"
+    (m) => m.t === "objective" && m.objective?.status === "COMPLETED",
   );
   assert(
     completedObjective.revealDelayedUntil > Date.now() + 120_000,
-    "Bonusmission verschiebt die nächste Sichtung um zwei Minuten"
+    "Bonusmission verschiebt die nächste Sichtung um zwei Minuten",
   );
 
   // 9. Detektiv bewegt sich zu X → Fang
@@ -219,7 +214,7 @@ async function run() {
     (m) =>
       m.t === "players" &&
       m.players.some((p) => p.id === bJoined.playerId && p.connected === false),
-    5000
+    5000,
   );
   assert(true, "Getrennter Spieler bleibt im Raum (connected=false)");
 
@@ -232,16 +227,16 @@ async function run() {
       name: "B",
       wantsX: false,
       playerId: bJoined.playerId,
-    })
+    }),
   );
   const b2Joined = await b2.waitFor((m) => m.t === "joined");
   assert(
     b2Joined.playerId === bJoined.playerId,
-    `Reconnect übernimmt Spieler-ID ${bJoined.playerId}`
+    `Reconnect übernimmt Spieler-ID ${bJoined.playerId}`,
   );
   await a.waitFor(
     (m) => m.t === "players" && m.players.filter((p) => p.connected).length === 2,
-    5000
+    5000,
   );
   assert(true, "Beide Spieler wieder verbunden");
 
