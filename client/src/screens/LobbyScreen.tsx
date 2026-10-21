@@ -368,10 +368,6 @@ export function LobbyScreen({
                 onClose={() => setActiveInfoKey(null)}
               />
             )}
-            <p className="config-hint">
-              X wählt während der Runde ein sicheres, öffentliches Ziel im Spielgebiet. Erreicht X
-              es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.
-            </p>
           </div>
 
           <div className="config-wiki-footer">
@@ -479,7 +475,7 @@ const PARAM_INFOS: Record<string, ParamInfo> = {
     title: "Vorsprung für X",
     description:
       "Zeit in Minuten, die X vor Spielbeginn alleine hat, um Distanz aufzubauen. Detektive müssen währenddessen am Startpunkt warten.",
-    recommendation: "Standard: 0 Min. (bei großem Spielgebiet 2–5 Min. empfohlen)",
+    recommendation: "Standard: 0 Min. (bei großem Spielgebiet 2–20 Min. empfohlen)",
     wikiAnchor: "vorsprung",
   },
   interval: {
