@@ -72,23 +72,24 @@ function Datenschutz() {
         <li>Kein Tracking.</li>
         <li>Keine Benutzerkonten.</li>
         <li>
-          Dein Standort wird ausschliesslich während eines laufenden Spiels übertragen. Standortverläufe
-          werden nicht gespeichert.
+          Dein Standort wird ausschliesslich während eines laufenden Spiels übertragen.
+          Standortverläufe werden nicht gespeichert.
         </li>
         <li>
-          Mitspieler sehen deinen selbst gewählten Namen und – je nach Rolle und Spielphase – deinen Standort.
+          Mitspieler sehen deinen selbst gewählten Namen und – je nach Rolle und Spielphase – deinen
+          Standort.
         </li>
       </ul>
 
       <h2>3. Hosting und Logdaten</h2>
-      <p>Für den Betrieb werden technisch notwendige Verbindungsdaten verarbeitet.
-        Das Angebot wird bei Cloudflare gehostet (Cloudflare, Inc., 101 Townsend St.,
-        San Francisco, CA 94107, USA; für den europäischen Raum Cloudflare Germany GmbH,
-        München). Cloudflare verarbeitet als Hosting-Anbieter technisch notwendige
-        Verbindungsdaten: IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Adresse,
-        übertragene Datenmenge, Browser- und Betriebssystemangaben sowie Fehlermeldungen.
-        Diese Verarbeitung ist für die sichere und stabile Auslieferung des Angebots
-        erforderlich. Weitere Informationen findest du in den
+      <p>
+        Für den Betrieb werden technisch notwendige Verbindungsdaten verarbeitet. Das Angebot wird
+        bei Cloudflare gehostet (Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA;
+        für den europäischen Raum Cloudflare Germany GmbH, München). Cloudflare verarbeitet als
+        Hosting-Anbieter technisch notwendige Verbindungsdaten: IP-Adresse, Datum und Uhrzeit des
+        Zugriffs, aufgerufene Adresse, übertragene Datenmenge, Browser- und Betriebssystemangaben
+        sowie Fehlermeldungen. Diese Verarbeitung ist für die sichere und stabile Auslieferung des
+        Angebots erforderlich. Weitere Informationen findest du in den
         <a
           href="https://www.cloudflare.com/privacypolicy/"
           target="_blank"
@@ -111,11 +112,13 @@ function Datenschutz() {
       <p>Zur Kartenanzeige werden externe Kartendienste verwendet.</p>
 
       <h2>7. Empfänger von Daten</h2>
-      <p>Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten sind der Hosting-Anbieter Cloudflare und der Kartenanbieter
-        OpenFreeMap, jeweils im Rahmen der oben beschriebenen Zwecke. Eine Weitergabe an
-        sonstige Dritte, ein Verkauf von Daten oder eine Nutzung zu Werbezwecken findet
-        nicht statt. Weitere Drittlandübermittlungen als die beim Hosting und bei den
-        Karten beschriebenen sind nicht vorgesehen.</p>
+      <p>
+        Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten
+        sind der Hosting-Anbieter Cloudflare und der Kartenanbieter OpenFreeMap, jeweils im Rahmen
+        der oben beschriebenen Zwecke. Eine Weitergabe an sonstige Dritte, ein Verkauf von Daten
+        oder eine Nutzung zu Werbezwecken findet nicht statt. Weitere Drittlandübermittlungen als
+        die beim Hosting und bei den Karten beschriebenen sind nicht vorgesehen.
+      </p>
 
       <h2>8. Speicherdauer</h2>
       <p>Spieldaten werden nach Ende des Spiels gelöscht.</p>
