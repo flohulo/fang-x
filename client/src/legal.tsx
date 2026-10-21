@@ -41,7 +41,9 @@ function Impressum() {
       </p>
 
       <h2>Haftung für Links</h2>
-      <p>Für Inhalte externer Webseiten sind deren Betreiber verantwortlich. Es kann für diese fremden Inhalte auch keine Gewähr übernommen werden. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung waren keine rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von Rechtsverstössen werden derartige Links unverzüglich entfernt.</p>
+      <p>
+        Für Inhalte externer Webseiten sind deren Betreiber verantwortlich. Es kann für diese
+        fremden Inhalte auch keine Gewähr übernommen werden. Für die Inhalte der verlinkten Seiten
         ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt der Verlinkung
         waren keine rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von Rechtsverstössen werden
         derartige Links unverzüglich entfernt.
