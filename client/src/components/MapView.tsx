@@ -12,6 +12,8 @@ import { circlePolygon } from "@fang-x/shared";
 import type { Feature, Polygon } from "geojson";
 
 const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+const MAP_MAX_ZOOM = 14;
+const MAP_INITIAL_ZOOM = 13;
 
 interface PlayerMarker {
   id: string;
@@ -53,7 +55,8 @@ export function MapView({
       container: containerRef.current,
       style: MAP_STYLE_URL,
       center: [center.lng, center.lat],
-      zoom: 14,
+      zoom: MAP_INITIAL_ZOOM,
+      maxZoom: MAP_MAX_ZOOM,
       attributionControl: false,
     });
 
@@ -273,7 +276,7 @@ export function MapView({
 
   // Karte zentrieren wenn sich Zentrum ändert
   useEffect(() => {
-    mapRef.current?.flyTo({ center: [center.lng, center.lat], zoom: 14 });
+    mapRef.current?.flyTo({ center: [center.lng, center.lat], zoom: MAP_INITIAL_ZOOM });
   }, [center.lat, center.lng]);
 
   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
