@@ -149,18 +149,14 @@ function Datenschutz() {
         Spiels.
       </p>
 
-      <h2>6. Karten und externe Inhalte</h2>
-      <p>
-        Die Karte lädt Vektor-Kacheln, Stildefinitionen und Schriftarten von OpenFreeMap
-        und basiert auf Daten von OpenStreetMap. Beim Laden werden deine IP-Adresse und
-        der sichtbare Kartenausschnitt an den Anbieter übertragen. Rechtsgrundlage ist die
-        Bereitstellung der Kartenfunktion (Art. 6 Abs. 1 lit. b DSGVO). Es werden keine
-        Analyse-, Werbe- oder Social-Media-Dienste eingesetzt.
-      </p>
+      <h2>5. Zweck der Datenbearbeitung</h2>
+      <p>Bereitstellung des Spiels und Sicherstellung eines stabilen Betriebs.</p>
 
-      <h2>7. Empfänger und Drittlandübermittlung</h2>
-      <p>
-        Empfänger der Daten sind der Hosting-Anbieter Cloudflare und der Kartenanbieter
+      <h2>6. Karten und externe Dienste</h2>
+      <p>Zur Kartenanzeige werden externe Kartendienste verwendet.</p>
+
+      <h2>7. Empfänger von Daten</h2>
+      <p>Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten sind der Hosting-Anbieter Cloudflare und der Kartenanbieter
         OpenFreeMap, jeweils im Rahmen der oben beschriebenen Zwecke. Eine Weitergabe an
         sonstige Dritte, ein Verkauf von Daten oder eine Nutzung zu Werbezwecken findet
         nicht statt. Weitere Drittlandübermittlungen als die beim Hosting und bei den
