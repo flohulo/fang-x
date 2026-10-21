@@ -80,68 +80,8 @@ function Datenschutz() {
         </li>
       </ul>
 
-      <h2>3. Hosting und Server-Logfiles</h2>
-      <p>
-        Das Angebot wird bei Cloudflare gehostet (Cloudflare, Inc., 101 Townsend St.,
-        San Francisco, CA 94107, USA; für den europäischen Raum Cloudflare Germany GmbH,
-        München). Cloudflare verarbeitet als Hosting-Anbieter technisch notwendige
-        Verbindungsdaten: IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Adresse,
-        übertragene Datenmenge, Browser- und Betriebssystemangaben sowie Fehlermeldungen.
-        Diese Verarbeitung ist für die sichere und stabile Auslieferung des Angebots
-        erforderlich (Art. 6 Abs. 1 lit. f DSGVO).
-      </p>
-      <p>
-        Cloudflare stellt einen Vertrag über die Auftragsverarbeitung nach Art. 28 DSGVO
-        bereit. Soweit personenbezogene Daten in die USA übermittelt werden, stützt sich
-        die Übermittlung auf das EU-US Data Privacy Framework (Cloudflare ist dort
-        zertifiziert) und ergänzend auf die Standardvertragsklauseln der EU-Kommission.
-        Weitere Informationen findest du in den{" "}
-        <a
-          href="https://www.cloudflare.com/privacypolicy/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Cloudflare-Datenschutzhinweisen
-        </a>
-        .
-      </p>
-
-      <h2>4. Daten, die im Spiel verarbeitet werden</h2>
-      <ul>
-        <li>
-          <strong>Anzeigename</strong> (freiwillig, kein Klarname erforderlich, maximal 24
-          Zeichen): wird im Spielraum gespeichert, damit Mitspieler wissen, wer wer ist.
-        </li>
-        <li>
-          <strong>Spiel-Code, Rolle und Spieler-ID</strong>: technisch erforderlich, um
-          dich dem richtigen Raum und Platz zuzuordnen.
-        </li>
-        <li>
-          <strong>Standort (Breiten- und Längengrad)</strong>: wird nur während der Phasen
-          Vorsprung und Spiel angenommen. Detektive erhalten Sichtungen von X –
-          zeitversetzt und je nach Regelwerk mit Ungenauigkeit. X erhält keine Standorte
-          der Detektive. Verlässt X das Spielgebiet, wird der Standort live an die
-          Detektive geteilt. Standorte werden nur im Arbeitsspeicher gehalten und nicht in
-          der Datenbank gespeichert.
-        </li>
-        <li>
-          <strong>Mittelpunkt des Spielgebiets</strong>: einmalig aus der Startposition von
-          X berechnet, damit der Kreis auf allen Geräten gleich liegt. Er wird bis zum
-          Aufräumen des Raums gespeichert (spätestens 6 Stunden nach dem letzten
-          Beitritt).
-        </li>
-        <li>
-          <strong>Lokaler Speicher im Browser</strong>: Anzeigename, Spiel-Code und die
-          vom Server vergebene Spieler-ID, damit ein Reload dich zurück in den Raum
-          bringt. Dazu der Offline-Cache der installierbaren App. Diese Speicherung ist
-          für die gewünschte Funktion erforderlich (§ 25 Abs. 2 TDDDG).
-        </li>
-        <li>
-          <strong>Ratenbegrenzung</strong>: Zur Abwehr von Missbrauch zählt der Server
-          Anfragen pro IP-Adresse in einem kurzlebigen Zähler im Arbeitsspeicher. Der
-          Zähler wird nach Ablauf des Zeitfensters (höchstens 10 Minuten) verworfen.
-        </li>
-      </ul>
+      <h2>3. Hosting und Logdaten</h2>
+      <p>Für den Betrieb werden technisch notwendige Verbindungsdaten verarbeitet.</p>
 
       <h2>4. Im Spiel verarbeitete Daten</h2>
       <p>
