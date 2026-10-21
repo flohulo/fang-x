@@ -8,9 +8,12 @@ Voraussetzungen: Node.js 22 und npm.
 
 ```bash
 npm ci
+npm run check
 npm run typecheck
 npm run build
 ```
+
+Code-Formatierung und Linting werden mit [Biome](https://biomejs.dev/) geprüft (`npm run check` bzw. `npm run format`).
 
 Für den Integrationstest den Worker in einem Terminal starten:
 
@@ -31,7 +34,7 @@ npm run test:integration
 - Halte Änderungen fokussiert und ergänze Tests für geändertes Verhalten.
 - Verwende für den PR-Titel Conventional Commits, z. B. `feat: Bonusmission ergänzen`, `fix: Fangradius korrigieren` oder `docs: Spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
 - Teile keine echten GPS-Koordinaten, privaten Spielcodes, Zugangsdaten oder persönlichen Daten.
-- Vor einem Pull Request müssen Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
+- Vor einem Pull Request müssen Biome-Check (`npm run check`), Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
 
 ## Sicherheit und Standortdaten
 

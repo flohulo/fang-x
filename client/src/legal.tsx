@@ -13,13 +13,13 @@ export function isPlaceholder(value: string): boolean {
   return PLACEHOLDER_MARKER.test(value);
 }
 
-export const LEGAL_COMPLETE =
-  LEGAL.email.trim() !== "" &&
-  LEGAL.updated.trim() !== "";
+export const LEGAL_COMPLETE = LEGAL.email.trim() !== "" && LEGAL.updated.trim() !== "";
 
-export default function LegalScreen({ page }: { page: 'impressum' | 'datenschutz' }) {
-  return <div>{page === 'impressum' ? <Impressum /> : <Datenschutz />}</div>;
+export function LegalScreen({ page }: { page: "impressum" | "datenschutz" }) {
+  return <div>{page === "impressum" ? <Impressum /> : <Datenschutz />}</div>;
 }
+
+export default LegalScreen;
 
 function Impressum() {
   return (
@@ -138,7 +138,7 @@ function Datenschutz() {
         </li>
       </ul>
 
-      <h2>5. Rechtsgrundlagen</h2>
+      <h2>4. Im Spiel verarbeitete Daten</h2>
       <p>
         Spielbetrieb, Anzeigename und Spieler-ID: Art. 6 Abs. 1 lit. b DSGVO
         (Bereitstellung des gewünschten Spiels). Standortzugriff: deine Einwilligung über
@@ -217,7 +217,7 @@ function Datenschutz() {
       </p>
 
       <h2>11. Änderungen</h2>
-      <p>Stand: {LEGAL.updated || 'aktuelle Version'}</p>
+      <p>Stand: {LEGAL.updated || "aktuelle Version"}</p>
     </>
   );
 }

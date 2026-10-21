@@ -7,7 +7,10 @@ const CODE_LENGTH = 6;
 export function parseInviteCode(search: string): string {
   const query = search.startsWith("?") ? search.slice(1) : search;
   const raw = new URLSearchParams(query).get("code") ?? "";
-  return raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, CODE_LENGTH);
+  return raw
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, CODE_LENGTH);
 }
 
 /** Vollständiger Einladungslink für einen Spiel-Code. */
@@ -17,5 +20,8 @@ export function inviteUrl(code: string, origin: string): string {
 
 /** Normalisiert eine Eingabe im Code-Feld (Großbuchstaben, nur erlaubte Zeichen). */
 export function normalizeCodeInput(value: string): string {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, CODE_LENGTH);
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, CODE_LENGTH);
 }

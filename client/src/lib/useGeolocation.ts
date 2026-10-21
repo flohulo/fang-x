@@ -1,10 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import type { LatLng } from "@fang-x/shared";
+import { useEffect, useRef, useState } from "react";
 
-export function useGeolocation(
-  enabled: boolean,
-  onPosition: (pos: LatLng) => void
-) {
+export function useGeolocation(enabled: boolean, onPosition: (pos: LatLng) => void) {
   const [position, setPosition] = useState<LatLng | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [simulated, setSimulated] = useState(false);
@@ -40,7 +37,7 @@ export function useGeolocation(
         enableHighAccuracy: true,
         maximumAge: 5000,
         timeout: 15000,
-      }
+      },
     );
 
     return () => {

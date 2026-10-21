@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import type { LatLng, ObjectiveState } from "@fang-x/shared";
 import { distanceMeters } from "@fang-x/shared";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MapView } from "../components/MapView";
 import { useGeolocation } from "../lib/useGeolocation";
 
@@ -82,11 +82,13 @@ export function GameScreen({
       }
       if (!mapCenter) setMapCenter(pos);
     },
-    [onPosition, mapCenter, ruleset]
+    [onPosition, mapCenter, ruleset],
   );
 
-  const { position, error, simulated, setSimulatedPosition, enableRealGps } =
-    useGeolocation(phase === "HEADSTART" || phase === "RUNNING", handlePosition);
+  const { position, error, simulated, setSimulatedPosition, enableRealGps } = useGeolocation(
+    phase === "HEADSTART" || phase === "RUNNING",
+    handlePosition,
+  );
 
   // Countdown-Timer (phaseEndsAt kommt bereits auf die lokale Uhr umgerechnet an)
   useEffect(() => {
@@ -146,10 +148,7 @@ export function GameScreen({
     phaseActive: phase === "HEADSTART" || phase === "RUNNING",
   });
   const canChooseObjective =
-    phase === "RUNNING" &&
-    isX &&
-    ruleset?.objective?.enabled &&
-    objective?.status === "PENDING";
+    phase === "RUNNING" && isX && ruleset?.objective?.enabled && objective?.status === "PENDING";
 
   if (gameResult) {
     return (
@@ -181,9 +180,7 @@ export function GameScreen({
 
         <div className="map-overlay">
           <div className="map-overlay-row">
-            <span className={`phase-badge phase-${phase}`}>
-              {PHASE_LABEL[phase] ?? phase}
-            </span>
+            <span className={`phase-badge phase-${phase}`}>{PHASE_LABEL[phase] ?? phase}</span>
             {timeLeft !== null && <span className="map-timer">{formatDuration(timeLeft)}</span>}
             <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
               {isX ? "Du bist X" : "Du bist Detektiv"}
@@ -305,8 +302,14 @@ function buildHint({
   switch (phase) {
     case "COUNTDOWN":
       return isX
-        ? { title: PHASE_TITLE.COUNTDOWN + ".", text: "Prüfe kurz deinen Standort – gleich startet dein Vorsprung." }
-        : { title: PHASE_TITLE.COUNTDOWN + ".", text: "X bekommt gleich Vorsprung. Mach dich bereit." };
+        ? {
+            title: PHASE_TITLE.COUNTDOWN + ".",
+            text: "Prüfe kurz deinen Standort – gleich startet dein Vorsprung.",
+          }
+        : {
+            title: PHASE_TITLE.COUNTDOWN + ".",
+            text: "X bekommt gleich Vorsprung. Mach dich bereit.",
+          };
 
     case "HEADSTART":
       return isX
@@ -316,7 +319,10 @@ function buildHint({
               ? "Kein Detektiv im Raum – du kannst in Ruhe das Gebiet erkunden."
               : "Bewege dich in Deckung und bleib im Spielgebiet.",
           }
-        : { title: PHASE_TITLE.HEADSTART + ".", text: "X läuft los – warte auf die erste Sichtung." };
+        : {
+            title: PHASE_TITLE.HEADSTART + ".",
+            text: "X läuft los – warte auf die erste Sichtung.",
+          };
 
     case "RUNNING":
       if (isX) {
@@ -350,7 +356,10 @@ function buildHint({
             title: "Letzte Sichtung.",
             text: `Vor ${Math.max(0, Math.round((Date.now() - lastReveal.at) / 1000))} s im roten Kreis – der Radius zeigt den Suchbereich.`,
           }
-        : { title: "Noch keine Sichtung.", text: "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets." };
+        : {
+            title: "Noch keine Sichtung.",
+            text: "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets.",
+          };
 
     default:
       return { title: "Spiel läuft.", text: "Halte dich bereit." };

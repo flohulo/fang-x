@@ -36,13 +36,13 @@ export function destinationPoint(from: LatLng, bearingDeg: number, meters: numbe
   const lat1 = toRad(from.lat);
   const lng1 = toRad(from.lng);
   const lat2 = Math.asin(
-    Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(brg)
+    Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(brg),
   );
   const lng2 =
     lng1 +
     Math.atan2(
       Math.sin(brg) * Math.sin(d) * Math.cos(lat1),
-      Math.cos(d) - Math.sin(lat1) * Math.sin(lat2)
+      Math.cos(d) - Math.sin(lat1) * Math.sin(lat2),
     );
   return { lat: (lat2 * 180) / Math.PI, lng: (lng2 * 180) / Math.PI };
 }

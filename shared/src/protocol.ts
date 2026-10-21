@@ -58,7 +58,14 @@ export interface ObjectiveState {
 }
 
 export type ServerMessage =
-  | { t: "joined"; playerId: string; phase: Phase; players: PlayerInfo[]; ruleset: Ruleset; youAreHost: boolean }
+  | {
+      t: "joined";
+      playerId: string;
+      phase: Phase;
+      players: PlayerInfo[];
+      ruleset: Ruleset;
+      youAreHost: boolean;
+    }
   | { t: "players"; players: PlayerInfo[] }
   | {
       t: "phase";

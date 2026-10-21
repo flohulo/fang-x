@@ -127,8 +127,8 @@ export function HomeScreen({
       </div>
 
       <p className="privacy-note">
-        Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen.
-        Es werden keine Konten, E-Mails oder Standortverläufe gespeichert.
+        Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen. Es werden
+        keine Konten, E-Mails oder Standortverläufe gespeichert.
       </p>
 
       <footer className="legal-links">

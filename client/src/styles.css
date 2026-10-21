@@ -10,9 +10,13 @@
   --radius: 12px;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
@@ -250,7 +254,9 @@ label {
   height: 18px;
   border-radius: 50%;
   background: #cbd5e1;
-  transition: transform 0.18s ease, background 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
 }
 
 .role-toggle input:checked ~ .role-track {
@@ -525,11 +531,26 @@ label {
   letter-spacing: 0.5px;
 }
 
-.phase-LOBBY { background: var(--surface-2); color: var(--text-dim); }
-.phase-COUNTDOWN { background: #f59e0b; color: #0f172a; }
-.phase-HEADSTART { background: #8b5cf6; color: white; }
-.phase-RUNNING { background: var(--success); color: #0f172a; }
-.phase-ENDED { background: var(--surface-2); color: var(--text); }
+.phase-LOBBY {
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+.phase-COUNTDOWN {
+  background: #f59e0b;
+  color: #0f172a;
+}
+.phase-HEADSTART {
+  background: #8b5cf6;
+  color: white;
+}
+.phase-RUNNING {
+  background: var(--success);
+  color: #0f172a;
+}
+.phase-ENDED {
+  background: var(--surface-2);
+  color: var(--text);
+}
 
 .map-bottom-controls {
   position: absolute;

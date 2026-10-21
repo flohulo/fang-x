@@ -20,15 +20,13 @@ function safeRead(key: string): string | null {
 function safeWrite(key: string, value: string) {
   try {
     localStorage.setItem(key, value);
-  } catch {
-  }
+  } catch {}
 }
 
 function safeRemove(key: string) {
   try {
     localStorage.removeItem(key);
-  } catch {
-  }
+  } catch {}
 }
 
 export function loadSession(): StoredSession | null {

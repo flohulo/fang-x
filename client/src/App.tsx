@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useGame } from "./lib/useGame";
+import { ChangelogScreen } from "./changelog";
+import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
 import { clearSession, loadSession, saveSession } from "./lib/session";
+import { useGame } from "./lib/useGame";
+import { GameScreen } from "./screens/GameScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LobbyScreen } from "./screens/LobbyScreen";
-import { GameScreen } from "./screens/GameScreen";
-import { LegalScreen } from "./legal";
-import { ChangelogScreen } from "./changelog";
 
 type Screen = "home" | "lobby" | "game";
 
@@ -59,7 +59,7 @@ export default function App() {
         setCheckingCode(false);
       }
     },
-    [game]
+    [game],
   );
 
   const joinGame = useCallback(
@@ -77,7 +77,7 @@ export default function App() {
         const { exists } = (await res.json()) as { exists: boolean };
         if (!exists) {
           setJoinError(
-            `Kein Spiel mit dem Code ${code}. Prüfe den Code oder starte ein neues Spiel.`
+            `Kein Spiel mit dem Code ${code}. Prüfe den Code oder starte ein neues Spiel.`,
           );
           return;
         }
@@ -93,7 +93,7 @@ export default function App() {
         setCheckingCode(false);
       }
     },
-    [game]
+    [game],
   );
 
   const handleLeave = useCallback(() => {

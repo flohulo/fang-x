@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
 import {
+  type GeoJSONSource,
   Map as MapLibreMap,
   Marker,
   NavigationControl,
   Popup,
-  type GeoJSONSource,
 } from "maplibre-gl";
+import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LatLng, ObjectiveState, RevealEvent } from "@fang-x/shared";
 import { circlePolygon } from "@fang-x/shared";
@@ -83,9 +83,10 @@ export function MapView({
           geometry: {
             type: "Polygon",
             coordinates: [
-              circlePolygon(center, playAreaRadiusMeters).map(
-                (p): [number, number] => [p.lng, p.lat]
-              ),
+              circlePolygon(center, playAreaRadiusMeters).map((p): [number, number] => [
+                p.lng,
+                p.lat,
+              ]),
             ],
           },
           properties: {},
@@ -98,9 +99,10 @@ export function MapView({
             geometry: {
               type: "Polygon",
               coordinates: [
-                circlePolygon(center, playAreaRadiusMeters).map(
-                  (p): [number, number] => [p.lng, p.lat]
-                ),
+                circlePolygon(center, playAreaRadiusMeters).map((p): [number, number] => [
+                  p.lng,
+                  p.lat,
+                ]),
               ],
             },
             properties: {},
@@ -146,9 +148,10 @@ export function MapView({
         geometry: {
           type: "Polygon",
           coordinates: [
-            circlePolygon(lastReveal.pos, lastReveal.radiusMeters).map(
-              (p): [number, number] => [p.lng, p.lat]
-            ),
+            circlePolygon(lastReveal.pos, lastReveal.radiusMeters).map((p): [number, number] => [
+              p.lng,
+              p.lat,
+            ]),
           ],
         },
         properties: {},
@@ -232,11 +235,13 @@ export function MapView({
       marker.setLngLat([target.lng, target.lat]);
       marker.getElement().style.background =
         objective.status === "COMPLETED" ? "#22c55e" : "#f59e0b";
-      marker.getPopup()?.setText(
-        objective.status === "COMPLETED"
-          ? "Missionsziel erreicht"
-          : `Missionsziel · ${objective.radiusMeters} m`
-      );
+      marker
+        .getPopup()
+        ?.setText(
+          objective.status === "COMPLETED"
+            ? "Missionsziel erreicht"
+            : `Missionsziel · ${objective.radiusMeters} m`,
+        );
       return;
     }
 
@@ -260,8 +265,8 @@ export function MapView({
         new Popup().setText(
           objective.status === "COMPLETED"
             ? "Missionsziel erreicht"
-            : `Missionsziel · ${objective.radiusMeters} m`
-        )
+            : `Missionsziel · ${objective.radiusMeters} m`,
+        ),
       )
       .addTo(map);
   }, [objective]);

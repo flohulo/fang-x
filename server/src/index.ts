@@ -2,8 +2,8 @@
 // Statische Assets (Client-PWA) + HTTP-Routen fürs Spielraum-Matchmaking.
 // Die eigentliche Spiellogik lebt in der GameRoom-Durable-Object.
 
-import { GameRoom } from "./room";
 import { RateLimiter } from "./rate-limit";
+import { GameRoom } from "./room";
 
 export interface Env {
   GAME_ROOM: DurableObjectNamespace;
@@ -42,7 +42,7 @@ async function checkRateLimit(
   request: Request,
   scope: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
 ): Promise<Response | null> {
   const stub = env.RATE_LIMIT.get(env.RATE_LIMIT.idFromName("global"));
   const result = await stub
@@ -50,7 +50,7 @@ async function checkRateLimit(
       new Request("http://internal/check", {
         method: "POST",
         body: JSON.stringify({ key: `${scope}:${clientKey(request)}`, limit, windowMs }),
-      })
+      }),
     )
     .then((r) => r.json() as Promise<{ allowed: boolean; retryAfterSeconds: number }>);
 
@@ -64,7 +64,7 @@ async function checkRateLimit(
         "Retry-After": String(result.retryAfterSeconds),
         "Cache-Control": "no-store",
       },
-    }
+    },
   );
 }
 
@@ -76,13 +76,7 @@ export default {
 
     // Neues Spiel anlegen → liefert Spiel-Code
     if (url.pathname === "/api/games" && request.method === "POST") {
-      const limited = await checkRateLimit(
-        env,
-        request,
-        "create",
-        CREATE_LIMIT,
-        CREATE_WINDOW_MS
-      );
+      const limited = await checkRateLimit(env, request, "create", CREATE_LIMIT, CREATE_WINDOW_MS);
       if (limited) return limited;
 
       // Code suchen, der noch frei ist
@@ -102,7 +96,7 @@ export default {
       }
       return Response.json(
         { error: "Konnte keinen freien Code finden" },
-        { status: 503, headers: NO_STORE }
+        { status: 503, headers: NO_STORE },
       );
     }
 
@@ -110,13 +104,7 @@ export default {
     // damit ein Tippfehler eine klare Meldung gibt statt einen leeren Raum.
     const codeCheck = url.pathname.match(/^\/api\/games\/([A-Z0-9]{6})$/);
     if (codeCheck && request.method === "GET") {
-      const limited = await checkRateLimit(
-        env,
-        request,
-        "lookup",
-        LOOKUP_LIMIT,
-        LOOKUP_WINDOW_MS
-      );
+      const limited = await checkRateLimit(env, request, "lookup", LOOKUP_LIMIT, LOOKUP_WINDOW_MS);
       if (limited) return limited;
 
       const stub = env.GAME_ROOM.get(env.GAME_ROOM.idFromName(codeCheck[1]));
