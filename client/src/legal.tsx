@@ -164,8 +164,7 @@ function Datenschutz() {
         OpenFreeMap, jeweils im Rahmen der oben beschriebenen Zwecke. Eine Weitergabe an
         sonstige Dritte, ein Verkauf von Daten oder eine Nutzung zu Werbezwecken findet
         nicht statt. Weitere Drittlandübermittlungen als die beim Hosting und bei den
-        Karten beschriebenen sind nicht vorgesehen.
-      </p>
+        Karten beschriebenen sind nicht vorgesehen.</p>
 
       <h2>8. Speicherdauer</h2>
       <p>
