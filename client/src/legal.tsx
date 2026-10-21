@@ -81,7 +81,22 @@ function Datenschutz() {
       </ul>
 
       <h2>3. Hosting und Logdaten</h2>
-      <p>Für den Betrieb werden technisch notwendige Verbindungsdaten verarbeitet.</p>
+      <p>Für den Betrieb werden technisch notwendige Verbindungsdaten verarbeitet.
+        Das Angebot wird bei Cloudflare gehostet (Cloudflare, Inc., 101 Townsend St.,
+        San Francisco, CA 94107, USA; für den europäischen Raum Cloudflare Germany GmbH,
+        München). Cloudflare verarbeitet als Hosting-Anbieter technisch notwendige
+        Verbindungsdaten: IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Adresse,
+        übertragene Datenmenge, Browser- und Betriebssystemangaben sowie Fehlermeldungen.
+        Diese Verarbeitung ist für die sichere und stabile Auslieferung des Angebots
+        erforderlich. Weitere Informationen findest du in den
+        <a
+          href="https://www.cloudflare.com/privacypolicy/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Cloudflare-Datenschutzhinweisen
+        </a>
+      </p>
 
       <h2>4. Im Spiel verarbeitete Daten</h2>
       <p>
