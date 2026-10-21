@@ -113,39 +113,155 @@ function renderInline(text: string): ReactNode[] {
   return nodes;
 }
 
+function getCategoryBadge(title: string) {
+  let icon = "📦";
+  let className = "cat-misc";
+
+  switch (title) {
+    case "Neu":
+    case "Features":
+      icon = "✨";
+      className = "cat-feature";
+      break;
+    case "Fehlerbehebungen":
+    case "Bug Fixes":
+      icon = "🛠️";
+      className = "cat-fix";
+      break;
+    case "Leistung":
+    case "Performance Improvements":
+      icon = "⚡";
+      className = "cat-perf";
+      break;
+    case "Darstellung":
+    case "Styles":
+      icon = "🎨";
+      className = "cat-style";
+      break;
+    case "Dokumentation":
+    case "Documentation":
+      icon = "📝";
+      className = "cat-docs";
+      break;
+    case "CI":
+    case "Continuous Integration":
+    case "Build":
+    case "Build System":
+      icon = "⚙️";
+      className = "cat-build";
+      break;
+  }
+
+  return (
+    <span className={`changelog-cat-badge ${className}`}>
+      <span aria-hidden="true">{icon}</span>
+      {title}
+    </span>
+  );
+}
+
 export function ChangelogScreen() {
   return (
     <div className="screen legal-screen">
       <article className="card legal changelog">
-        <a className="legal-back" href="/">
-          ← Zurück zum Spiel
-        </a>
+        <div className="legal-top-bar">
+          <a className="legal-back" href="/">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Zurück zum Spiel
+          </a>
 
-        <h1>Changelog</h1>
+          <div className="legal-nav-tabs">
+            <a href="/impressum" className="legal-tab-btn">
+              Impressum
+            </a>
+            <a href="/datenschutz" className="legal-tab-btn">
+              Datenschutz
+            </a>
+            <span className="legal-tab-btn is-active">Changelog</span>
+          </div>
+        </div>
 
-        {RELEASES.length === 0 && <p>Noch keine Einträge vorhanden.</p>}
+        <header className="legal-header">
+          <span className="legal-badge">Versionsgeschichte</span>
+          <h1>Changelog</h1>
+          <p className="legal-subtitle">
+            Alle Neuerungen, Verbesserungen und Aktualisierungen von Fang X im Überblick.
+          </p>
+        </header>
 
-        {RELEASES.map((release) => (
-          <section key={release.version} className="changelog-release">
-            <h2>
-              Version {release.version}
-              {release.date && (
-                <span className="changelog-date"> · {formatDate(release.date)}</span>
-              )}
-            </h2>
+        {RELEASES.length === 0 && <p className="card-text">Noch keine Einträge vorhanden.</p>}
+
+        {RELEASES.map((release, releaseIdx) => (
+          <section key={release.version} className="changelog-release-card">
+            <div className="changelog-release-head">
+              <div className="changelog-version-tag">
+                <span>Version {release.version}</span>
+                {releaseIdx === 0 && <span className="changelog-latest-pill">Aktuell</span>}
+              </div>
+
+              <div className="changelog-meta">
+                {release.date && (
+                  <span className="changelog-date">📅 {formatDate(release.date)}</span>
+                )}
+                {release.url && (
+                  <a
+                    href={release.url}
+                    className="changelog-github-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    GitHub Release ↗
+                  </a>
+                )}
+              </div>
+            </div>
 
             {release.sections.map((section) => (
-              <div key={section.title}>
-                <h3>{section.title}</h3>
-                <ul>
-                  {section.items.map((item, index) => (
-                    <li key={index}>{renderInline(item)}</li>
+              <div key={section.title} className="changelog-section-group">
+                {getCategoryBadge(section.title)}
+                <ul className="changelog-list">
+                  {section.items.map((item, itemIdx) => (
+                    <li key={itemIdx} className="changelog-item">
+                      <span className="changelog-bullet-dot" aria-hidden="true">
+                        •
+                      </span>
+                      <span className="changelog-item-content">{renderInline(item)}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
             ))}
           </section>
         ))}
+
+        <footer className="legal-footer">
+          <div className="legal-footer-links">
+            <a href="/impressum">Impressum</a>
+            <span aria-hidden="true">·</span>
+            <a href="/datenschutz">Datenschutz</a>
+            <span aria-hidden="true">·</span>
+            <a href="/changelog">Changelog</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://github.com/flohulo/fang-x" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </div>
+          <span className="legal-stand">
+            Aktuelle Version: {RELEASES[0]?.version ? `v${RELEASES[0].version}` : "v0.1.1"}
+          </span>
+        </footer>
       </article>
     </div>
   );
