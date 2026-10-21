@@ -167,52 +167,7 @@ function Datenschutz() {
         Karten beschriebenen sind nicht vorgesehen.</p>
 
       <h2>8. Speicherdauer</h2>
-      <p>
-        Standorte und Sichtungen werden nur im Arbeitsspeicher gehalten und verfallen,
-        sobald sie nicht mehr aktualisiert werden, spätestens mit dem Spielende. Name,
-        Rolle und Spieler-ID bleiben zusammen mit dem Raum gespeichert, bis dieser leer
-        ist und aufgeräumt wird (spätestens 6 Stunden nach dem letzten Beitritt; beendete
-        Spiele nach 30 Minuten). Danach werden die Daten gelöscht. Eine Sicherung,
-        Auswertung oder Profilbildung findet nicht statt. Angaben im lokalen Speicher
-        deines Browsers kannst du jederzeit selbst löschen.
-      </p>
-
-      <h2>9. Deine Rechte</h2>
-      <p>
-        Du hast nach der DSGVO das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16),
-        Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18),
-        Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage
-        berechtigter Interessen (Art. 21). Eine erteilte Einwilligung kannst du jederzeit
-        widerrufen. Wende dich dazu an die oben genannte E-Mail-Adresse. Außerdem steht
-        dir ein Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde zu, insbesondere
-        bei der Behörde deines Wohnsitzes oder unseres Sitzes.
-      </p>
-      {LEGAL.authority.trim() !== "" && (
-        <p>
-          Zuständige Aufsichtsbehörde:{" "}
-          <strong>
-            <Field value={LEGAL.authority} label="Aufsichtsbehörde" />
-          </strong>
-        </p>
-      )}
-
-      <h2>10. Keine automatisierte Entscheidungsfindung</h2>
-      <p>
-        Es findet kein Profiling und keine automatisierte Entscheidungsfindung im Sinne
-        des Art. 22 DSGVO statt.
-      </p>
-
-      <h2>11. Änderungen dieser Erklärung</h2>
-      <p>
-        Diese Erklärung wird angepasst, wenn sich die Verarbeitung oder das Angebot
-        ändert. Es gilt die jeweils auf dieser Seite veröffentlichte Fassung.
-        {LEGAL.updated.trim() !== "" && (
-          <>
-            {" "}
-            Stand: <Field value={LEGAL.updated} label="Stand" />.
-          </>
-        )}
-      </p>
+      <p>Spieldaten werden nach Ende des Spiels gelöscht.</p>
 
       <h2>9. Änderungen</h2>
       <p>Stand: {LEGAL.updated || "aktuelle Version"}</p>
