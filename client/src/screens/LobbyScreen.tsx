@@ -28,6 +28,21 @@ export function LobbyScreen({
 }: LobbyScreenProps) {
   const [localRuleset, setLocalRuleset] = useState<Ruleset>(ruleset ?? DEFAULT_RULESET);
   const [copied, setCopied] = useState<null | "link" | "code">(null);
+  const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activeInfoKey) return;
+    const handleDocClick = () => setActiveInfoKey(null);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveInfoKey(null);
+    };
+    window.addEventListener("click", handleDocClick);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("click", handleDocClick);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeInfoKey]);
 
   useEffect(() => {
     if (ruleset) setLocalRuleset(ruleset);
@@ -140,9 +155,19 @@ export function LobbyScreen({
         <div className="card">
           <h3>Spieleinstellungen</h3>
           <div className="config-grid">
-            <div>
-              <label>Spieldauer (Minuten)</label>
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-duration">Spieldauer (Minuten)</label>
+                <ParamInfoButton
+                  paramKey="duration"
+                  isOpen={activeInfoKey === "duration"}
+                  onToggle={() =>
+                    setActiveInfoKey((prev) => (prev === "duration" ? null : "duration"))
+                  }
+                />
+              </div>
               <input
+                id="cfg-duration"
                 type="text"
                 inputMode="numeric"
                 value={localRuleset.game.durationMinutes}
@@ -152,10 +177,28 @@ export function LobbyScreen({
                   })
                 }
               />
+              {activeInfoKey === "duration" && (
+                <ParamPopover
+                  paramKey="duration"
+                  align="left"
+                  onClose={() => setActiveInfoKey(null)}
+                />
+              )}
             </div>
-            <div>
-              <label>Vorsprung (Minuten)</label>
+
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-headstart">Vorsprung (Minuten)</label>
+                <ParamInfoButton
+                  paramKey="headStart"
+                  isOpen={activeInfoKey === "headStart"}
+                  onToggle={() =>
+                    setActiveInfoKey((prev) => (prev === "headStart" ? null : "headStart"))
+                  }
+                />
+              </div>
               <input
+                id="cfg-headstart"
                 type="text"
                 inputMode="numeric"
                 value={localRuleset.game.headStartMinutes}
@@ -165,10 +208,28 @@ export function LobbyScreen({
                   })
                 }
               />
+              {activeInfoKey === "headStart" && (
+                <ParamPopover
+                  paramKey="headStart"
+                  align="right"
+                  onClose={() => setActiveInfoKey(null)}
+                />
+              )}
             </div>
-            <div>
-              <label>Reveal-Intervall (Minuten)</label>
+
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-interval">Reveal-Intervall (Minuten)</label>
+                <ParamInfoButton
+                  paramKey="interval"
+                  isOpen={activeInfoKey === "interval"}
+                  onToggle={() =>
+                    setActiveInfoKey((prev) => (prev === "interval" ? null : "interval"))
+                  }
+                />
+              </div>
               <input
+                id="cfg-interval"
                 type="text"
                 inputMode="numeric"
                 value={localRuleset.reveal.intervalMinutes}
@@ -178,10 +239,28 @@ export function LobbyScreen({
                   })
                 }
               />
+              {activeInfoKey === "interval" && (
+                <ParamPopover
+                  paramKey="interval"
+                  align="left"
+                  onClose={() => setActiveInfoKey(null)}
+                />
+              )}
             </div>
-            <div>
-              <label>Sichtradius (Meter)</label>
+
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-revealradius">Sichtradius (Meter)</label>
+                <ParamInfoButton
+                  paramKey="revealRadius"
+                  isOpen={activeInfoKey === "revealRadius"}
+                  onToggle={() =>
+                    setActiveInfoKey((prev) => (prev === "revealRadius" ? null : "revealRadius"))
+                  }
+                />
+              </div>
               <input
+                id="cfg-revealradius"
                 type="text"
                 inputMode="numeric"
                 value={localRuleset.reveal.revealRadiusMeters}
@@ -191,10 +270,28 @@ export function LobbyScreen({
                   })
                 }
               />
+              {activeInfoKey === "revealRadius" && (
+                <ParamPopover
+                  paramKey="revealRadius"
+                  align="right"
+                  onClose={() => setActiveInfoKey(null)}
+                />
+              )}
             </div>
-            <div>
-              <label>Fangradius (Meter)</label>
+
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-catchradius">Fangradius (Meter)</label>
+                <ParamInfoButton
+                  paramKey="catchRadius"
+                  isOpen={activeInfoKey === "catchRadius"}
+                  onToggle={() =>
+                    setActiveInfoKey((prev) => (prev === "catchRadius" ? null : "catchRadius"))
+                  }
+                />
+              </div>
               <input
+                id="cfg-catchradius"
                 type="text"
                 inputMode="numeric"
                 value={localRuleset.catch.radiusMeters}
@@ -204,10 +301,28 @@ export function LobbyScreen({
                   })
                 }
               />
+              {activeInfoKey === "catchRadius" && (
+                <ParamPopover
+                  paramKey="catchRadius"
+                  align="left"
+                  onClose={() => setActiveInfoKey(null)}
+                />
+              )}
             </div>
-            <div>
-              <label>Spielgebiet (Radius, Meter)</label>
+
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-playarea">Spielgebiet (Radius, Meter)</label>
+                <ParamInfoButton
+                  paramKey="playArea"
+                  isOpen={activeInfoKey === "playArea"}
+                  onToggle={() =>
+                    setActiveInfoKey((prev) => (prev === "playArea" ? null : "playArea"))
+                  }
+                />
+              </div>
               <input
+                id="cfg-playarea"
                 type="text"
                 inputMode="numeric"
                 value={localRuleset.map.playAreaRadiusMeters}
@@ -217,21 +332,59 @@ export function LobbyScreen({
                   })
                 }
               />
+              {activeInfoKey === "playArea" && (
+                <ParamPopover
+                  paramKey="playArea"
+                  align="right"
+                  onClose={() => setActiveInfoKey(null)}
+                />
+              )}
             </div>
           </div>
 
-          <label className="objective-option">
-            <input
-              type="checkbox"
-              checked={localRuleset.objective.enabled}
-              onChange={(e) => updateNested("objective", { enabled: e.target.checked })}
-            />
-            Bonusmission für X aktivieren
-          </label>
-          <p className="config-hint">
-            X wählt während der Runde ein sicheres, öffentliches Ziel im Spielgebiet. Erreicht X es,
-            wird die nächste Sichtung einmalig um 2 Minuten verschoben.
-          </p>
+          <div className="objective-field">
+            <div className="objective-label-row">
+              <label className="objective-option" htmlFor="cfg-objective">
+                <input
+                  id="cfg-objective"
+                  type="checkbox"
+                  checked={localRuleset.objective.enabled}
+                  onChange={(e) => updateNested("objective", { enabled: e.target.checked })}
+                />
+                Bonusmission für X aktivieren
+              </label>
+              <ParamInfoButton
+                paramKey="objective"
+                isOpen={activeInfoKey === "objective"}
+                onToggle={() =>
+                  setActiveInfoKey((prev) => (prev === "objective" ? null : "objective"))
+                }
+              />
+            </div>
+            {activeInfoKey === "objective" && (
+              <ParamPopover
+                paramKey="objective"
+                align="right"
+                onClose={() => setActiveInfoKey(null)}
+              />
+            )}
+            <p className="config-hint">
+              X wählt während der Runde ein sicheres, öffentliches Ziel im Spielgebiet. Erreicht X
+              es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.
+            </p>
+          </div>
+
+          <div className="config-wiki-footer">
+            <span className="config-wiki-footer-text">💡 Fragen zu Taktiken & Einstellungen?</span>
+            <a
+              href={WIKI_BASE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="config-wiki-footer-link"
+            >
+              Handbuch im Wiki öffnen ↗
+            </a>
+          </div>
 
           <button onClick={onStart} disabled={!hasX} style={{ marginTop: 16 }}>
             {hasX ? "Spiel starten" : "Mindestens 1 X nötig"}
@@ -302,5 +455,138 @@ function PlayerRow({
         <span className={`role-pill${player.wantsX ? " is-x" : " is-det"}`}>{roleText}</span>
       )}
     </li>
+  );
+}
+
+const WIKI_BASE_URL = "https://github.com/flohulo/fang-x/wiki/Spieleinstellungen";
+
+interface ParamInfo {
+  title: string;
+  description: string;
+  recommendation: string;
+  wikiAnchor: string;
+}
+
+const PARAM_INFOS: Record<string, ParamInfo> = {
+  duration: {
+    title: "Spieldauer",
+    description:
+      "Gesamte Spielzeit der Runde. Schaffen die Detektive es innerhalb dieser Zeit nicht, X zu fangen, gewinnt X das Spiel.",
+    recommendation: "Standard: 30 Min.",
+    wikiAnchor: "spieldauer",
+  },
+  headStart: {
+    title: "Vorsprung für X",
+    description:
+      "Zeit in Minuten, die X vor Spielbeginn alleine hat, um Distanz aufzubauen. Detektive müssen währenddessen am Startpunkt warten.",
+    recommendation: "Standard: 0 Min. (bei großem Spielgebiet 2–5 Min. empfohlen)",
+    wikiAnchor: "vorsprung",
+  },
+  interval: {
+    title: "Reveal-Intervall",
+    description:
+      "Takt in Minuten, in dem der Standort von X automatisch für alle Detektive auf der Karte aufgedeckt wird.",
+    recommendation: "Standard: 3 Min. (kürzere Abstände erleichtern Detektiven die Jagd)",
+    wikiAnchor: "reveal-intervall",
+  },
+  revealRadius: {
+    title: "Sichtradius",
+    description:
+      "Unschärfe der Aufdeckung auf der Karte. Detektive sehen keinen exakten Punkt, sondern einen Kreis mit diesem Radius, in dem sich X aufhält.",
+    recommendation: "Standard: 5 m (quasi exakter Punkt; 50–100 m für mehr Versteckspiel)",
+    wikiAnchor: "sichtradius",
+  },
+  catchRadius: {
+    title: "Fangradius",
+    description:
+      "Maximaler GPS-Abstand zwischen Detektiv und X in Metern, bei dem der Fangversuch erfolgreich ausgelöst werden kann.",
+    recommendation: "Standard: 30 m (gleicht normale Smartphone-GPS-Schwankungen aus)",
+    wikiAnchor: "fangradius",
+  },
+  playArea: {
+    title: "Spielgebiet (Radius)",
+    description:
+      "Aktionsradius um den gemeinsamen Startpunkt. Verlässt X das Gebiet, wird zur Strafe der exakte Live-Standort übertragen!",
+    recommendation: "Standard: 700 m",
+    wikiAnchor: "spielgebiet",
+  },
+  objective: {
+    title: "Bonusmission für X",
+    description:
+      "X wählt während der Runde ein sicheres Ziel im Spielgebiet. Erreicht X es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.",
+    recommendation: "Optional: Taktisches Zusatzziel für X",
+    wikiAnchor: "bonusmission",
+  },
+};
+
+function ParamInfoButton({
+  paramKey,
+  isOpen,
+  onToggle,
+}: {
+  paramKey: keyof typeof PARAM_INFOS;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const info = PARAM_INFOS[paramKey];
+  if (!info) return null;
+
+  return (
+    <button
+      type="button"
+      className={`param-info-btn${isOpen ? " is-active" : ""}`}
+      aria-label={`Erklärung zu ${info.title}`}
+      aria-expanded={isOpen}
+      title={`Info zu ${info.title}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
+    >
+      i
+    </button>
+  );
+}
+
+function ParamPopover({
+  paramKey,
+  align = "left",
+  onClose,
+}: {
+  paramKey: keyof typeof PARAM_INFOS;
+  align?: "left" | "right";
+  onClose: () => void;
+}) {
+  const info = PARAM_INFOS[paramKey];
+  if (!info) return null;
+
+  return (
+    <div
+      className={`param-popover align-${align}`}
+      role="tooltip"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="param-popover-header">
+        <span className="param-popover-title">{info.title}</span>
+        <button
+          type="button"
+          className="param-popover-close"
+          aria-label="Schließen"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </div>
+      <p className="param-popover-desc">{info.description}</p>
+      <div className="param-popover-badge">{info.recommendation}</div>
+      <a
+        href={`${WIKI_BASE_URL}#${info.wikiAnchor}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="param-popover-wiki"
+      >
+        Im Wiki nachlesen ↗
+      </a>
+    </div>
   );
 }
