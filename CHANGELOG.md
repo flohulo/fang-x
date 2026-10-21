@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.1.1...fang-x-v0.2.0) (2026-10-21)
+
+
+### Features
+
+* parameter-label hilfe ([#18](https://github.com/flohulo/fang-x/issues/18)) ([497d9bc](https://github.com/flohulo/fang-x/commit/497d9bc4a60261125c4efa571f5f3a431555e24d))
+
+
+### Bug Fixes
+
+* workflows, legal and changelog-page ([#17](https://github.com/flohulo/fang-x/issues/17)) ([a3c3312](https://github.com/flohulo/fang-x/commit/a3c33125fdc520ffffff91fa1c6787b31b695659))
+
 ## [0.1.1](https://github.com/flohulo/fang-x/compare/fang-x-v0.1.0...fang-x-v0.1.1) (2026-10-20)
 
 
