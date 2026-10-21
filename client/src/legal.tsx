@@ -215,7 +215,7 @@ function Datenschutz() {
         )}
       </p>
 
-      <h2>11. Änderungen</h2>
+      <h2>9. Änderungen</h2>
       <p>Stand: {LEGAL.updated || "aktuelle Version"}</p>
     </>
   );
