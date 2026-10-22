@@ -387,58 +387,6 @@ export default function App() {
     );
   }
 
-  if (!locationReady) {
-    return (
-      <>
-        <AppMenu
-          alertsEnabled={alertsEnabled}
-          notificationPermission={notificationPermission}
-          onEnableAlerts={enableAlerts}
-          onDisableAlerts={disableAlerts}
-          isGame={false}
-        />
-        <div className="screen permission-screen">
-          <section className="card permission-card">
-            <div className="permission-icon" aria-hidden="true">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-                <circle cx="12" cy="10" r="2.5" />
-              </svg>
-            </div>
-            <span className="legal-badge">Einmalige Vorbereitung</span>
-            <h1>Standort freigeben</h1>
-            <p className="permission-description">
-              Fang X braucht deinen Standort, damit du auf der Karte angezeigt wirst. Die Freigabe
-              wird vor dem Beitritt zum Spiel angefragt. Übertragen wird dein Standort erst während
-              eines aktiven Spiels.
-            </p>
-            {locationError && (
-              <p className="permission-error" role="alert">
-                {locationError}
-              </p>
-            )}
-            <button type="button" onClick={requestLocationAccess} disabled={requestingLocation}>
-              {requestingLocation ? "Standort wird geprüft …" : "Standort erlauben und fortfahren"}
-            </button>
-            <a className="permission-privacy-link" href="/datenschutz">
-              Mehr zum Datenschutz
-            </a>
-          </section>
-        </div>
-        <PwaUpdatePrompt />
-      </>
-    );
-  }
-
   const content =
     screen === "home" || !game.myId ? (
       <HomeScreen
@@ -488,13 +436,6 @@ export default function App() {
         </div>
       )}
       {content}
-      <AppMenu
-        alertsEnabled={alertsEnabled}
-        notificationPermission={notificationPermission}
-        onEnableAlerts={enableAlerts}
-        onDisableAlerts={disableAlerts}
-        isGame={screen === "game" && game.phase !== "LOBBY"}
-      />
       <PwaUpdatePrompt />
     </>
   );
