@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type AlertNotificationPermission, AlertSettings } from "./AlertSettings";
 
 interface AppMenuProps {
@@ -17,6 +17,9 @@ export function AppMenu({
   isGame,
 }: AppMenuProps) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -27,26 +30,32 @@ export function AppMenu({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      closeRef.current?.focus();
+    } else if (wasOpenRef.current) {
+      triggerRef.current?.focus();
+    }
+    wasOpenRef.current = open;
+  }, [open]);
+
   return (
     <>
-      <button
-        className={`app-menu-trigger${isGame ? " is-game" : ""}`}
-        type="button"
-        aria-label={open ? "Menü schließen" : "Menü öffnen"}
-        aria-expanded={open}
-        aria-controls="app-menu-panel"
-        onClick={() => setOpen((value) => !value)}
-      >
-        {open ? (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 6 12 12M18 6 6 18" />
-          </svg>
-        ) : (
+      {!open && (
+        <button
+          ref={triggerRef}
+          className={`app-menu-trigger${isGame ? " is-game" : ""}`}
+          type="button"
+          aria-label="Menü öffnen"
+          aria-expanded={false}
+          aria-controls="app-menu-panel"
+          onClick={() => setOpen(true)}
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-        )}
-      </button>
+        </button>
+      )}
 
       {open && (
         <div className="app-menu-backdrop" onClick={() => setOpen(false)}>
@@ -64,6 +73,7 @@ export function AppMenu({
                 <h2 id="app-menu-title">Menü</h2>
               </div>
               <button
+                ref={closeRef}
                 className="app-menu-close"
                 type="button"
                 aria-label="Menü schließen"
