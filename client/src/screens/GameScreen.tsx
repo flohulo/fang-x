@@ -23,6 +23,11 @@ interface GameScreenProps {
     train: number;
     at: number;
   } | null;
+  revealTimer: {
+    nextRevealAt: number | null;
+    intervalStartedAt: number;
+    indeterminate: boolean;
+  } | null;
   chatMessages: ChatMessage[];
   catchPending: boolean;
   serverError: string | null;
@@ -74,6 +79,7 @@ export function GameScreen({
   objective,
   transitStops,
   transitNotice,
+  revealTimer,
   chatMessages,
   catchPending,
   serverError,
@@ -95,6 +101,7 @@ export function GameScreen({
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
+  const [clockNow, setClockNow] = useState(() => Date.now());
   const lastSentRef = useRef<number>(0);
 
   const me = players.find((p) => p.id === myId);
@@ -158,8 +165,34 @@ export function GameScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [transitDialogOpen]);
 
+  useEffect(() => {
+    if (!revealTimer || phase !== "RUNNING") return;
+    const update = () => setClockNow(Date.now());
+    update();
+    const id = window.setInterval(update, 500);
+    return () => window.clearInterval(id);
+  }, [revealTimer, phase]);
+
   const detectiveCount = players.filter((p) => p.role === "DETECTIVE").length;
   const isSolo = players.length > 0 && detectiveCount === 0 && isX;
+
+  const revealRemainingMs =
+    revealTimer?.nextRevealAt != null ? Math.max(0, revealTimer.nextRevealAt - clockNow) : null;
+  const revealIntervalMs =
+    revealTimer?.nextRevealAt != null
+      ? Math.max(1, revealTimer.nextRevealAt - revealTimer.intervalStartedAt)
+      : null;
+  const revealProgress =
+    revealRemainingMs !== null && revealIntervalMs !== null
+      ? Math.min(
+          100,
+          Math.max(0, ((revealIntervalMs - revealRemainingMs) / revealIntervalMs) * 100),
+        )
+      : 0;
+  const showRevealTimer =
+    phase === "RUNNING" &&
+    revealTimer !== null &&
+    (revealTimer.indeterminate || revealTimer.nextRevealAt !== null);
 
   const center = playAreaCenter ?? mapCenter ?? FALLBACK_CENTER;
   const distanceFromCenter = position ? distanceMeters(position, center) : null;
@@ -263,6 +296,41 @@ export function GameScreen({
             </span>
           </div>
         </div>
+
+        {showRevealTimer && (
+          <div
+            className={`reveal-progress${revealTimer.indeterminate ? " is-indeterminate" : ""}${
+              revealRemainingMs !== null && revealRemainingMs <= 10_000 ? " is-imminent" : ""
+            }`}
+            role="status"
+            aria-live="off"
+          >
+            <div className="reveal-progress-head">
+              <span>Nächste Sichtung</span>
+              <span>
+                {revealTimer.indeterminate ? "bald" : formatDuration(revealRemainingMs ?? 0)}
+              </span>
+            </div>
+            <div
+              className="reveal-progress-track"
+              role="progressbar"
+              aria-label="Nächste Sichtung"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={revealTimer.indeterminate ? undefined : Math.round(revealProgress)}
+              aria-valuetext={
+                revealTimer.indeterminate
+                  ? "Zeitpunkt unbestimmt"
+                  : `Noch ${formatDuration(revealRemainingMs ?? 0)}`
+              }
+            >
+              <div
+                className="reveal-progress-fill"
+                style={revealTimer.indeterminate ? undefined : { width: `${revealProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {yourPositionIsShared && (
           <div className="alert-banner" style={{ top: 64 }}>

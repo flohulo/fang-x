@@ -29,6 +29,11 @@ export function useGame() {
   const [youAreHost, setYouAreHost] = useState(false);
   const [ruleset, setRuleset] = useState<Ruleset | null>(null);
   const [transitStops, setTransitStops] = useState({ bus: 0, train: 0 });
+  const [revealTimer, setRevealTimer] = useState<{
+    nextRevealAt: number | null;
+    intervalStartedAt: number;
+    indeterminate: boolean;
+  } | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [transitNotice, setTransitNotice] = useState<{
     mode: "bus" | "train";
@@ -126,6 +131,7 @@ export function useGame() {
           setPlayers(msg.players);
           setRuleset(msg.ruleset);
           setTransitStops(msg.transitStops);
+          setRevealTimer(null);
           setChatMessages(msg.chat ?? []);
           setCatchPending(msg.catchPending);
           setYouAreHost(msg.youAreHost);
@@ -146,6 +152,7 @@ export function useGame() {
             msg.phaseEndsAt === null ? null : msg.phaseEndsAt - msg.serverTime + Date.now(),
           );
           setPlayAreaCenter(msg.playAreaCenter);
+          if (msg.phase !== "RUNNING") setRevealTimer(null);
           if (msg.phase === "LOBBY") {
             setReveals([]);
             setLastReveal(null);
@@ -169,6 +176,16 @@ export function useGame() {
         case "transitStops":
           setTransitStops({ bus: msg.bus, train: msg.train });
           break;
+        case "revealTimer": {
+          const receivedAt = Date.now();
+          const toLocal = (at: number) => at - msg.serverTime + receivedAt;
+          setRevealTimer({
+            nextRevealAt: msg.nextRevealAt === null ? null : toLocal(msg.nextRevealAt),
+            intervalStartedAt: toLocal(msg.intervalStartedAt),
+            indeterminate: msg.indeterminate,
+          });
+          break;
+        }
         case "chat":
           setChatMessages((current) => [...current, msg.message].slice(-100));
           break;
@@ -207,6 +224,7 @@ export function useGame() {
         case "end":
           setGameResult({ winner: msg.winner, reason: msg.reason });
           setPlayers(msg.players);
+          setRevealTimer(null);
           setChatMessages([]);
           setPhase("ENDED");
           break;
@@ -246,6 +264,7 @@ export function useGame() {
     setLastPositionShared(null);
     setTransitStops({ bus: 0, train: 0 });
     setTransitNotice(null);
+    setRevealTimer(null);
     setChatMessages([]);
     setCatchPending(false);
     sessionRef.current = { code, name, wantsX };
@@ -303,6 +322,7 @@ export function useGame() {
     setConnected(false);
     setReconnecting(false);
     setObjective(null);
+    setRevealTimer(null);
     setChatMessages([]);
   };
 
@@ -325,6 +345,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    revealTimer,
     chatMessages,
     catchPending,
     reveals,

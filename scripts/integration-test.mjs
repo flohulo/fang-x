@@ -142,6 +142,16 @@ async function run() {
   await host.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
   assert(true, "Phase RUNNING erreicht");
 
+  // 5a. Countdown bis zur nächsten Sichtung
+  const initialRevealTimer = await host.waitFor(
+    (m) => m.t === "revealTimer" && m.nextRevealAt !== null,
+    5000,
+  );
+  assert(
+    !initialRevealTimer.indeterminate && initialRevealTimer.nextRevealAt > Date.now(),
+    "Client erhält den Zeitpunkt der nächsten Sichtung",
+  );
+
   // 5b. Chat im laufenden Spiel: alle Spielenden sehen die Nachrichten
   host.ws.send(JSON.stringify({ t: "chat", text: "Treffpunkt Bahnhof" }));
   const chatToDetective = await det.waitFor(
@@ -172,6 +182,17 @@ async function run() {
   const reveal = await det.waitFor((m) => m.t === "reveal", 15000);
   assert(reveal.reveal.pos.lat === xPos.lat, `Reveal empfangen: X bei ${reveal.reveal.pos.lat}`);
   assert(reveal.reveal.radiusMeters > 0, `Sichtradius: ${reveal.reveal.radiusMeters}m`);
+  const nextRevealTimer = await host.waitFor(
+    (m) =>
+      m.t === "revealTimer" &&
+      m.nextRevealAt !== null &&
+      m.nextRevealAt > initialRevealTimer.nextRevealAt,
+    15000,
+  );
+  assert(
+    nextRevealTimer.intervalStartedAt >= initialRevealTimer.intervalStartedAt,
+    "Nach einer Sichtung startet der nächste Countdown",
+  );
   const revealNotice = await host.waitFor((m) => m.t === "positionShared" && !m.live);
   assert(
     revealNotice.index === reveal.reveal.index,
@@ -421,6 +442,49 @@ async function run() {
 
   mrX.ws.close();
   detective2.ws.close();
+
+  // 14. Zufallsintervall: Der genaue Zeitpunkt bleibt verborgen
+  console.log("\n=== Zufälliger Sichtungsabstand ===");
+  const code4 = await createGame();
+  const randomX = await connect(code4);
+  randomX.ws.send(JSON.stringify({ t: "join", code: code4, name: "Zufalls-X", wantsX: true }));
+  await randomX.waitFor((m) => m.t === "joined");
+  const randomDetective = await connect(code4);
+  randomDetective.ws.send(
+    JSON.stringify({ t: "join", code: code4, name: "Zufalls-Detektiv", wantsX: false }),
+  );
+  await randomDetective.waitFor((m) => m.t === "joined");
+
+  randomX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        reveal: {
+          schedule: "RANDOM",
+          firstRevealAfterMinutes: 0.05,
+          intervalMinutes: 0.1,
+          randomMinMinutes: 0.05,
+          randomMaxMinutes: 0.1,
+        },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await randomX.waitFor((m) => m.t === "config");
+  randomX.ws.send(JSON.stringify({ t: "start" }));
+  await randomDetective.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  const randomTimer = await randomDetective.waitFor(
+    (m) => m.t === "revealTimer" && m.indeterminate,
+    5000,
+  );
+  assert(
+    randomTimer.nextRevealAt === null,
+    "Zufallsintervall verbirgt den genauen Sichtungszeitpunkt",
+  );
+
+  randomX.ws.close();
+  randomDetective.ws.close();
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);

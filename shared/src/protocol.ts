@@ -101,6 +101,16 @@ export type ServerMessage =
       reveals?: RevealEvent[];
     }
   | { t: "config"; ruleset: Ruleset }
+  | {
+      t: "revealTimer";
+      serverTime: number;
+      /** Nächste Sichtung; null bei Zufallsintervall oder außerhalb der Laufzeit. */
+      nextRevealAt: number | null;
+      /** Beginn des aktuellen Intervalls (letzte Sichtung bzw. Laufzeitstart). */
+      intervalStartedAt: number;
+      /** true, wenn der Zeitpunkt bewusst verborgen bleibt (RANDOM). */
+      indeterminate: boolean;
+    }
   | { t: "transitStops"; bus: number; train: number }
   | { t: "chat"; message: ChatMessage }
   | {

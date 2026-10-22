@@ -496,6 +496,7 @@ export class GameRoom {
           // Phase/Zeit/Reveals nachliefern — nach einem Reload fehlt dem
           // Client sonst der komplette Spielzustand.
           this.sendTo(ws, this.phaseMessage());
+          this.sendTo(ws, this.revealTimerMessage());
           this.sendObjective(player);
           if (this.ruleset.movement.detectivesShareLiveLocation && this.phase === "RUNNING") {
             for (const other of this.players.values()) {
@@ -816,6 +817,7 @@ export class GameRoom {
     this.nextRevealAt = startedAt + this.ruleset.reveal.firstRevealAfterMinutes * 60000;
 
     this.broadcastPhase();
+    this.broadcastRevealTimer();
     this.broadcastPlayers();
     this.ensureTick();
     this.persist();
@@ -866,6 +868,7 @@ export class GameRoom {
         });
       }
       this.nextRevealAt = now + 5_000;
+      this.broadcastRevealTimer();
       this.persist();
       this.scheduleAlarm();
       return;
@@ -914,6 +917,7 @@ export class GameRoom {
     }
 
     this.nextRevealAt = now + this.computeNextRevealDelay();
+    this.broadcastRevealTimer();
     this.persist();
     this.scheduleAlarm();
   }
@@ -1025,6 +1029,7 @@ export class GameRoom {
     const now = Date.now();
     this.nextRevealAt = Math.max(this.nextRevealAt ?? now, now) + OBJECTIVE_REVEAL_DELAY_MS;
     this.broadcastObjectiveToX(this.nextRevealAt);
+    this.broadcastRevealTimer();
     this.persist();
     this.scheduleAlarm();
   }
@@ -1279,6 +1284,23 @@ export class GameRoom {
       // Wer gerade erst (wieder) dazukommt, soll den Verlauf sehen können.
       reveals: this.recentReveals(),
     };
+  }
+
+  /** Zeit bis zur nächsten Sichtung; bei RANDOM bleibt der genaue Zeitpunkt geheim. */
+  private revealTimerMessage(): ServerMessage {
+    const running = this.phase === "RUNNING";
+    const indeterminate = running && this.ruleset.reveal.schedule === "RANDOM";
+    return {
+      t: "revealTimer",
+      serverTime: Date.now(),
+      nextRevealAt: running && !indeterminate ? this.nextRevealAt : null,
+      intervalStartedAt: this.lastRevealAt || this.gameStartedAt || Date.now(),
+      indeterminate,
+    };
+  }
+
+  private broadcastRevealTimer() {
+    this.broadcast(this.revealTimerMessage());
   }
 
   private recentReveals(): RevealEvent[] {

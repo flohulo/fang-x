@@ -421,6 +421,7 @@ export default function App() {
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
+        revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
         catchPending={game.catchPending}
         serverError={game.error}

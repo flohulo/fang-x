@@ -87,6 +87,9 @@ Einstellungen überschreibt.
 > Original ist nicht öffentlich dokumentiert; Default ist **5 m** (quasi exakter Punkt)
 > und jederzeit im Regelwerk anpassbar.
 
+Während der Laufzeit zeigt die App einen Fortschrittsbalken bis zur nächsten Sichtung. Im
+`RANDOM`-Modus bleibt er unbestimmt, damit der gezogene Zeitpunkt nicht vorzeitig verraten wird.
+
 ### 3.3 Fanglogik
 
 | Key | Typ | Bereich | Default | Bedeutung |

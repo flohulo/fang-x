@@ -557,6 +557,83 @@ label {
   gap: 8px;
 }
 
+.reveal-progress {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  z-index: 9;
+  width: min(240px, calc(100vw - 128px));
+  padding: 6px 10px 7px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  color: var(--text-dim);
+  font-size: 0.66rem;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.reveal-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.reveal-progress-head span:last-child {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.reveal-progress-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+}
+
+.reveal-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #38bdf8, #22c55e);
+  transition: width 0.4s linear;
+}
+
+.reveal-progress.is-imminent {
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+.reveal-progress.is-imminent .reveal-progress-fill {
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.65);
+}
+
+.reveal-progress.is-indeterminate .reveal-progress-fill {
+  width: 35%;
+  animation: reveal-progress-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes reveal-progress-sweep {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-progress.is-indeterminate .reveal-progress-fill {
+    width: 100%;
+    animation: none;
+    opacity: 0.45;
+  }
+}
+
 .map-timer {
   font-size: 1.5rem;
   font-weight: 700;
