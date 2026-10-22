@@ -23,6 +23,11 @@ export function useGame() {
   const [ruleset, setRuleset] = useState<Ruleset | null>(null);
   const [reveals, setReveals] = useState<any[]>([]);
   const [lastReveal, setLastReveal] = useState<any>(null);
+  const [lastPositionShared, setLastPositionShared] = useState<{
+    at: number;
+    index: number;
+    live: boolean;
+  } | null>(null);
   const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
   const [gameResult, setGameResult] = useState<{ winner: string; reason: string } | null>(null);
@@ -119,6 +124,7 @@ export function useGame() {
           if (msg.phase === "LOBBY") {
             setReveals([]);
             setLastReveal(null);
+            setLastPositionShared(null);
             setGameResult(null);
             setYourPositionIsShared(false);
             setObjective(null);
@@ -134,6 +140,9 @@ export function useGame() {
         case "reveal":
           setLastReveal(msg.reveal);
           setReveals((prev) => [...prev, msg.reveal]);
+          break;
+        case "positionShared":
+          setLastPositionShared({ at: msg.at, index: msg.index, live: msg.live });
           break;
         case "objective":
           setObjective(msg.objective);
@@ -179,6 +188,7 @@ export function useGame() {
     intentionalRef.current = false;
     attemptRef.current = 0;
     setObjective(null);
+    setLastPositionShared(null);
     sessionRef.current = { code, name, wantsX };
     wsRef.current?.close();
     connect({ code, name, wantsX });
@@ -239,6 +249,7 @@ export function useGame() {
     ruleset,
     reveals,
     lastReveal,
+    lastPositionShared,
     objective,
     yourPositionIsShared,
     gameResult,

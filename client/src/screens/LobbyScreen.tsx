@@ -473,7 +473,7 @@ interface ParamInfo {
   title: string;
   description: string;
   recommendation: string;
-  wikiAnchor: string;
+  wikiPage: string;
 }
 
 const PARAM_INFOS: Record<string, ParamInfo> = {
@@ -482,49 +482,49 @@ const PARAM_INFOS: Record<string, ParamInfo> = {
     description:
       "Gesamte Spielzeit der Runde. Schaffen die Detektive es innerhalb dieser Zeit nicht, X zu fangen, gewinnt X das Spiel.",
     recommendation: "Standard: 30 Min.",
-    wikiAnchor: "spieldauer",
+    wikiPage: "Spieldauer",
   },
   headStart: {
     title: "Vorsprung für X",
     description:
       "Zeit in Minuten, die X vor Spielbeginn alleine hat, um Distanz aufzubauen. Detektive müssen währenddessen am Startpunkt warten.",
     recommendation: "Standard: 0 Min. (bei großem Spielgebiet 2–20 Min. empfohlen)",
-    wikiAnchor: "vorsprung",
+    wikiPage: "Vorsprung-fuer-X",
   },
   interval: {
     title: "Reveal-Intervall",
     description:
       "Takt in Minuten, in dem der Standort von X automatisch für alle Detektive auf der Karte aufgedeckt wird.",
     recommendation: "Standard: 3 Min. (kürzere Abstände erleichtern Detektiven die Jagd)",
-    wikiAnchor: "reveal-intervall",
+    wikiPage: "Reveal-Intervall",
   },
   revealRadius: {
     title: "Sichtradius",
     description:
       "Unschärfe der Aufdeckung auf der Karte. Detektive sehen keinen exakten Punkt, sondern einen Kreis mit diesem Radius, in dem sich X aufhält.",
     recommendation: "Standard: 5 m (quasi exakter Punkt; 50–100 m für mehr Versteckspiel)",
-    wikiAnchor: "sichtradius",
+    wikiPage: "Sichtradius",
   },
   catchRadius: {
     title: "Fangradius",
     description:
       "Maximaler GPS-Abstand zwischen Detektiv und X in Metern, bei dem der Fangversuch erfolgreich ausgelöst werden kann.",
     recommendation: "Standard: 30 m (gleicht normale Smartphone-GPS-Schwankungen aus)",
-    wikiAnchor: "fangradius",
+    wikiPage: "Fangradius",
   },
   playArea: {
     title: "Spielgebiet (Radius)",
     description:
       "Aktionsradius um den gemeinsamen Startpunkt. Verlässt X das Gebiet, wird zur Strafe der exakte Live-Standort übertragen!",
     recommendation: "Standard: 700 m",
-    wikiAnchor: "spielgebiet",
+    wikiPage: "Spielgebiet",
   },
   objective: {
     title: "Bonusmission für X",
     description:
       "X wählt während der Runde ein sicheres Ziel im Spielgebiet. Erreicht X es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.",
     recommendation: "Optional: Taktisches Zusatzziel für X",
-    wikiAnchor: "bonusmission",
+    wikiPage: "Bonusmission-fuer-X",
   },
 };
 
@@ -589,7 +589,7 @@ function ParamPopover({
       <p className="param-popover-desc">{info.description}</p>
       <div className="param-popover-badge">{info.recommendation}</div>
       <a
-        href={`${WIKI_BASE_URL}#${info.wikiAnchor}`}
+        href={`https://github.com/flohulo/fang-x/wiki/${info.wikiPage}`}
         target="_blank"
         rel="noopener noreferrer"
         className="param-popover-wiki"

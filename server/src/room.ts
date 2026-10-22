@@ -805,6 +805,14 @@ export class GameRoom {
       };
 
       this.broadcastToDetectives({ t: "reveal", reveal });
+      if (!this.xCurrentlyOutOfBounds) {
+        this.sendTo(x.ws, {
+          t: "positionShared",
+          at: now,
+          index: this.lastRevealIndex,
+          live: false,
+        });
+      }
     }
 
     this.nextRevealAt = now + this.computeNextRevealDelay();
@@ -834,6 +842,12 @@ export class GameRoom {
         isLive: true,
       };
       this.broadcast({ t: "reveal", reveal: liveReveal });
+      this.sendTo(x.ws, {
+        t: "positionShared",
+        at: liveReveal.at,
+        index: liveReveal.index,
+        live: true,
+      });
       this.persist();
     } else if (!outside && this.xCurrentlyOutOfBounds) {
       // Zurück im Gebiet → Live-Tracking stoppen
