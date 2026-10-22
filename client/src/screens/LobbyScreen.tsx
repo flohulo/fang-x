@@ -102,6 +102,19 @@ export function LobbyScreen({
     <div className="screen">
       <h1>Spielvorbereitung</h1>
 
+      {!youAreHost && (
+        <div className="card lobby-waiting-card">
+          <h3>Warte auf den Admin</h3>
+          <p>
+            Der Admin legt die Spielregeln fest und startet die Runde. Bleib in der Lobby, bis das
+            Spiel gestartet wird.
+          </p>
+          <a href={WIKI_BASE_URL} target="_blank" rel="noopener noreferrer">
+            Spielregeln im Wiki ansehen ↗
+          </a>
+        </div>
+      )}
+
       <div className="card">
         <label>Spiel-Code</label>
         <div className="code-display">{code}</div>

@@ -78,6 +78,18 @@ export function parseChangelog(markdown: string): ChangelogRelease[] {
 
 const RELEASES = parseChangelog(changelogRaw);
 
+const SECTION_CLASSES: Record<string, string> = {
+  Neu: "cat-feature",
+  Fehlerbehebungen: "cat-fix",
+  Leistung: "cat-perf",
+  Darstellung: "cat-style",
+  Dokumentation: "cat-docs",
+  Build: "cat-build",
+  CI: "cat-build",
+  Tests: "cat-build",
+  Sonstiges: "cat-misc",
+};
+
 function formatDate(date: string): string {
   const parsed = new Date(`${date}T00:00:00`);
   if (Number.isNaN(parsed.getTime())) return date;
@@ -117,35 +129,94 @@ export function ChangelogScreen() {
   return (
     <div className="screen legal-screen">
       <article className="card legal changelog">
-        <a className="legal-back" href="/">
-          ← Zurück zum Spiel
-        </a>
+        <div className="changelog-topbar">
+          <a className="legal-back" href="/">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Zurück zum Spiel
+          </a>
+          <span className="changelog-topbar-label">Fang X · Versionsverlauf</span>
+        </div>
 
-        <h1>Changelog</h1>
+        <header className="changelog-header">
+          <span className="legal-badge">Das ist neu</span>
+          <h1>Fang X entwickelt sich weiter.</h1>
+          <p className="legal-subtitle">
+            Hier findest du neue Funktionen, Verbesserungen und Fehlerbehebungen aus den letzten
+            Versionen.
+          </p>
+        </header>
 
-        {RELEASES.length === 0 && <p>Noch keine Einträge vorhanden.</p>}
+        {RELEASES.length === 0 && <p className="changelog-empty">Noch keine Einträge vorhanden.</p>}
 
-        {RELEASES.map((release) => (
-          <section key={release.version} className="changelog-release">
-            <h2>
-              Version {release.version}
-              {release.date && (
-                <span className="changelog-date"> · {formatDate(release.date)}</span>
-              )}
-            </h2>
-
-            {release.sections.map((section) => (
-              <div key={section.title}>
-                <h3>{section.title}</h3>
-                <ul>
-                  {section.items.map((item, index) => (
-                    <li key={index}>{renderInline(item)}</li>
-                  ))}
-                </ul>
+        <div className="changelog-releases">
+          {RELEASES.map((release, releaseIndex) => (
+            <section
+              key={release.version}
+              className={`changelog-release-card${releaseIndex === 0 ? " is-latest" : ""}`}
+            >
+              <div className="changelog-release-head">
+                <div className="changelog-release-title">
+                  <h2 className="changelog-version-tag">Version {release.version}</h2>
+                  {releaseIndex === 0 && (
+                    <span className="changelog-latest-pill">Neueste Version</span>
+                  )}
+                </div>
+                <div className="changelog-meta">
+                  {release.date && (
+                    <time className="changelog-date" dateTime={release.date}>
+                      {formatDate(release.date)}
+                    </time>
+                  )}
+                  {release.url && (
+                    <a
+                      className="changelog-github-link"
+                      href={release.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Änderungen
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                </div>
               </div>
-            ))}
-          </section>
-        ))}
+
+              <div className="changelog-sections">
+                {release.sections.map((section) => (
+                  <div key={section.title} className="changelog-section-group">
+                    <h3
+                      className={`changelog-cat-badge ${SECTION_CLASSES[section.title] ?? "cat-misc"}`}
+                    >
+                      {section.title}
+                    </h3>
+                    <ul className="changelog-list">
+                      {section.items.map((item) => (
+                        <li key={item} className="changelog-item">
+                          <span className="changelog-bullet-dot" aria-hidden="true">
+                            •
+                          </span>
+                          <span className="changelog-item-content">{renderInline(item)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       </article>
     </div>
   );

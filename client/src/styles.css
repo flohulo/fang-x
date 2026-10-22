@@ -799,6 +799,34 @@ label {
   text-decoration: underline;
 }
 
+.lobby-waiting-card {
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), var(--surface));
+}
+
+.lobby-waiting-card h3 {
+  margin: 0 0 8px;
+}
+
+.lobby-waiting-card p {
+  margin: 0 0 12px;
+  color: var(--text-dim);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.lobby-waiting-card a {
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lobby-waiting-card a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .privacy-note {
   font-size: 0.75rem;
   color: var(--text-dim);
@@ -821,6 +849,41 @@ label {
   font-size: 0.8rem;
   font-weight: 700;
   text-align: center;
+}
+
+.pwa-update-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(2, 6, 23, 0.78);
+}
+
+.pwa-update-dialog {
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pwa-update-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+.pwa-update-dialog p {
+  margin: 0 0 20px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.pwa-update-dialog button + button {
+  margin-top: 10px;
 }
 
 .offline-badge {
@@ -1259,17 +1322,83 @@ label {
 
 /* --- Changelog Styles --- */
 
-.changelog-release-card {
-  margin: 20px 0;
-  padding: 20px;
+.legal.changelog {
+  max-width: 860px;
+  padding: 28px;
+}
+
+.changelog-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 34px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.changelog-topbar-label {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.changelog-header {
+  max-width: 620px;
+  margin-bottom: 32px;
+}
+
+.changelog-header .legal-badge {
+  margin-bottom: 12px;
+}
+
+.legal.changelog .changelog-header h1 {
+  max-width: 600px;
+  margin: 0 0 10px;
+  font-size: clamp(1.9rem, 5vw, 2.65rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.changelog-header .legal-subtitle {
+  max-width: 540px;
+}
+
+.changelog-releases {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.changelog-empty {
+  margin: 0;
+  padding: 24px;
+  border: 1px dashed rgba(148, 163, 184, 0.25);
   border-radius: var(--radius);
-  background: rgba(51, 65, 85, 0.25);
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.changelog-release-card {
+  margin: 0;
+  padding: 22px;
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(30, 41, 59, 0.58));
   border: 1px solid rgba(148, 163, 184, 0.12);
-  transition: border-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .changelog-release-card:hover {
   border-color: rgba(56, 189, 248, 0.25);
+}
+
+.changelog-release-card.is-latest {
+  border-color: rgba(56, 189, 248, 0.28);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .changelog-release-head {
@@ -1281,6 +1410,13 @@ label {
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.changelog-release-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
 .changelog-version-tag {
@@ -1344,6 +1480,10 @@ label {
 
 .changelog-section-group:first-child {
   margin-top: 0;
+}
+
+.changelog-section-group h3 {
+  margin: 0;
 }
 
 .changelog-cat-badge {
@@ -1413,7 +1553,7 @@ label {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.35);
   border: 1px solid rgba(148, 163, 184, 0.08);
@@ -1439,4 +1579,37 @@ label {
   border-radius: 4px;
   background: rgba(148, 163, 184, 0.12);
   color: #f8fafc;
+}
+
+.changelog-item-content a {
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .legal.changelog {
+    padding: 20px 16px;
+  }
+
+  .changelog-topbar {
+    align-items: flex-start;
+    margin-bottom: 26px;
+  }
+
+  .changelog-topbar-label {
+    padding-top: 6px;
+    text-align: right;
+  }
+
+  .changelog-release-card {
+    padding: 16px;
+  }
+
+  .changelog-release-head {
+    align-items: flex-start;
+  }
+
+  .changelog-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
 import { ChangelogScreen } from "./changelog";
 import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
@@ -21,6 +22,43 @@ function readLegalPage(): LegalPage {
 
 function isChangelogPage(): boolean {
   return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/changelog";
+}
+
+function PwaUpdatePrompt() {
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    immediate: true,
+    onRegisterError(error) {
+      console.warn("Service Worker konnte nicht registriert werden:", error);
+    },
+  });
+
+  if (!needRefresh) return null;
+
+  return (
+    <div className="pwa-update-backdrop">
+      <section
+        className="pwa-update-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pwa-update-title"
+        aria-describedby="pwa-update-description"
+      >
+        <h2 id="pwa-update-title">Neue Version verfügbar</h2>
+        <p id="pwa-update-description">
+          Eine neue Version von Fang X ist verfügbar. Lade die Seite neu, um sie zu verwenden.
+        </p>
+        <button type="button" onClick={() => void updateServiceWorker(true)}>
+          Jetzt neu laden
+        </button>
+        <button className="secondary" type="button" onClick={() => setNeedRefresh(false)}>
+          Später
+        </button>
+      </section>
+    </div>
+  );
 }
 
 export default function App() {
@@ -138,11 +176,21 @@ export default function App() {
   }, []);
 
   if (legalPage) {
-    return <LegalScreen page={legalPage} />;
+    return (
+      <>
+        <LegalScreen page={legalPage} />
+        <PwaUpdatePrompt />
+      </>
+    );
   }
 
   if (changelogPage) {
-    return <ChangelogScreen />;
+    return (
+      <>
+        <ChangelogScreen />
+        <PwaUpdatePrompt />
+      </>
+    );
   }
 
   const content =
@@ -194,6 +242,7 @@ export default function App() {
         </div>
       )}
       {content}
+      <PwaUpdatePrompt />
     </>
   );
 }

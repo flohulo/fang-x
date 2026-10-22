@@ -4,12 +4,16 @@ import {
   Marker,
   NavigationControl,
   Popup,
+  setWorkerUrl,
 } from "maplibre-gl";
+import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LatLng, ObjectiveState, RevealEvent } from "@fang-x/shared";
 import { circlePolygon } from "@fang-x/shared";
 import type { Feature, Polygon } from "geojson";
+
+setWorkerUrl(mapLibreWorkerUrl);
 
 const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 const MAP_MAX_ZOOM = 14;
