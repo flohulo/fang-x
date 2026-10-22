@@ -102,6 +102,7 @@ export function GameScreen({
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
   const [clockNow, setClockNow] = useState(() => Date.now());
+  const [satelliteOn, setSatelliteOn] = useState(false);
   const lastSentRef = useRef<number>(0);
 
   const me = players.find((p) => p.id === myId);
@@ -285,6 +286,7 @@ export function GameScreen({
           lastReveal={lastReveal}
           objective={isX ? objective : null}
           onMapClick={handleMapClick}
+          onSatelliteChange={setSatelliteOn}
         />
 
         <div className="map-overlay">
@@ -455,18 +457,49 @@ export function GameScreen({
           )}
 
           <p className="map-credit">
-            Karte: ©{" "}
-            <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
-              OpenFreeMap
-            </a>{" "}
-            · © OpenMapTiles · Daten von{" "}
-            <a
-              href="https://www.openstreetmap.org/copyright"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenStreetMap
-            </a>
+            {satelliteOn ? (
+              <>
+                Satellitenbild: Sentinel-2 cloudless 2025 ©{" "}
+                <a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">
+                  EOX IT Services GmbH
+                </a>                {" "}
+                (
+                <a
+                  href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  CC BY-NC-SA 4.0
+                </a>
+                ) · Beschriftung von{" "}
+                <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
+                  OpenFreeMap
+                </a>{" "}
+                · ©{" "}
+                <a
+                  href="https://www.openstreetmap.org/copyright"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OpenStreetMap
+                </a>
+              </>
+            ) : (
+              <>
+                Karte: ©{" "}
+                <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
+                  OpenFreeMap
+                </a>{" "}
+                · © OpenMapTiles · Daten von{" "}
+                <a
+                  href="https://www.openstreetmap.org/copyright"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OpenStreetMap
+                </a>
+              </>
+            )}
           </p>
         </div>
 

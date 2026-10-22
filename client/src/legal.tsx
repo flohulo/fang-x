@@ -263,7 +263,27 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
           >
             OpenMapTiles ↗
           </a>
+          <a
+            href="https://cloudless.eox.at"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="legal-chip"
+          >
+            Sentinel-2 cloudless (EOX) ↗
+          </a>
         </div>
+        <p>
+          Die optionale Satellitenansicht nutzt „Sentinel-2 cloudless 2025“ von EOX IT Services GmbH
+          unter der Lizenz{" "}
+          <a
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CC BY-NC-SA 4.0 ↗
+          </a>
+          . Das Bildmaterial basiert auf Daten des europäischen Copernicus-Programms (Sentinel-2).
+        </p>
       </section>
     </>
   );
@@ -445,6 +465,15 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           (basierend auf OpenStreetMap-Daten) geladen. Hierbei wird technisch bedingt die IP-Adresse
           beim Kachelabruf an die Server des Kartendienstes übermittelt.
         </p>
+        <p>
+          Wird im Spiel die Satellitenansicht aktiviert, werden zusätzlich Satellitenbild-Kacheln von{" "}
+          <a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">
+            EOX IT Services GmbH ↗
+          </a>{" "}
+          (Sentinel-2 cloudless, CC BY-NC-SA 4.0) geladen. Auch dabei wird die IP-Adresse an die
+          Server von EOX übermittelt. Die Ansicht ist optional und lässt sich jederzeit wieder
+          ausschalten.
+        </p>
       </section>
 
       <section className="legal-section">
@@ -454,8 +483,9 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
         </div>
         <p>
           Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten
-          sind der Hosting-Anbieter Cloudflare und der Kartenanbieter OpenFreeMap, jeweils im Rahmen
-          der oben beschriebenen Zwecke. Eine Weitergabe an sonstige Dritte, ein Verkauf von Daten
+          sind der Hosting-Anbieter Cloudflare sowie – je nach gewählter Kartenansicht – der
+          Kartenanbieter OpenFreeMap und der Satellitenbild-Anbieter EOX, jeweils im Rahmen der oben
+          beschriebenen Zwecke. Eine Weitergabe an sonstige Dritte, ein Verkauf von Daten
           oder eine Nutzung zu Werbezwecken findet nicht statt.
         </p>
       </section>

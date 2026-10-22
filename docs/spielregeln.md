@@ -255,7 +255,9 @@ Damit kein Regelwerk missbraucht wird:
    nur der Spielzustand (Konfiguration, Ergebnis), nie die Standort-Historie — es sei denn,
    der Host schaltet `replayEnabled` bewusst ein **und** alle Spieler stimmen zu.
 7. **Karte ohne Tracking.** Es werden OpenStreetMap-Tiles genutzt (kein Google/Mapbox-Konto,
-   keine API-Keys, keine Nutzer-Profiling-Weitergabe an Kartenanbieter).
+   keine API-Keys, keine Nutzer-Profiling-Weitergabe an Kartenanbieter). Optional lässt sich im
+   Spiel eine Satellitenkarte von EOX (Sentinel-2 cloudless 2025, CC BY-NC-SA 4.0) einblenden;
+   dabei wird die IP-Adresse an `tiles.maps.eox.at` übermittelt.
 8. **Selbst-hostbar.** Wer will, betreibt den Server selbst — dann verlassen Standortdaten
    nie das eigene Netz. Kein Vendor-Lock-in, keine teuren SDKs.
 

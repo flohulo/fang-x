@@ -43,6 +43,8 @@ Chat schreiben; der Verlauf wird nach Spielende gelöscht.
 
 Für Karten nutzt Fang X [OpenFreeMap](https://openfreemap.org/) auf Basis von
 [OpenStreetMap](https://www.openstreetmap.org/). Die Kartendaten sind © OpenStreetMap-Mitwirkende.
+Über den Karten-Button lässt sich optional eine Satellitenkarte einblenden: Sentinel-2 cloudless
+2025 von [EOX](https://cloudless.eox.at/) (© EOX IT Services GmbH, CC BY-NC-SA 4.0).
 
 ## Lokal ausprobieren
 
