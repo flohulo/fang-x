@@ -167,7 +167,7 @@ export function GameScreen({
   }
 
   return (
-    <div className="app" style={{ height: "100%" }}>
+    <div className="app game-app" style={{ height: "100%" }}>
       <div className="map-container">
         <MapView
           center={center}

@@ -151,6 +151,11 @@ async function run() {
   const reveal = await det.waitFor((m) => m.t === "reveal", 15000);
   assert(reveal.reveal.pos.lat === xPos.lat, `Reveal empfangen: X bei ${reveal.reveal.pos.lat}`);
   assert(reveal.reveal.radiusMeters > 0, `Sichtradius: ${reveal.reveal.radiusMeters}m`);
+  const revealNotice = await host.waitFor((m) => m.t === "positionShared" && !m.live);
+  assert(
+    revealNotice.index === reveal.reveal.index,
+    "X wird informiert, wenn die Sichtung an Detektive übermittelt wird",
+  );
 
   const objectiveTarget = { lat: xPos.lat, lng: xPos.lng + 0.0008 };
   det.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
@@ -183,6 +188,12 @@ async function run() {
     completedObjective.revealDelayedUntil > Date.now() + 120_000,
     "Bonusmission verschiebt die nächste Sichtung um zwei Minuten",
   );
+
+  host.ws.send(JSON.stringify({ t: "position", pos: { lat: xPos.lat + 0.002, lng: xPos.lng } }));
+  const liveShareNotice = await host.waitFor((m) => m.t === "positionShared" && m.live);
+  assert(liveShareNotice.live, "X wird beim Start der Live-Übertragung alarmiert");
+  host.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
+  await host.waitFor((m) => m.t === "yourPositionIsShared" && !m.shared);
 
   // 9. Detektiv bewegt sich zu X → Fang
   console.log("\nDetektiv bewegt sich zu X...");

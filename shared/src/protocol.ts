@@ -79,6 +79,7 @@ export type ServerMessage =
     }
   | { t: "config"; ruleset: Ruleset }
   | { t: "reveal"; reveal: RevealEvent }
+  | { t: "positionShared"; at: number; index: number; live: boolean }
   | {
       t: "objective";
       objective: ObjectiveState | null;
