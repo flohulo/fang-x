@@ -4,9 +4,10 @@ import {
   Marker,
   NavigationControl,
   Popup,
+  ScaleControl,
   setWorkerUrl,
 } from "maplibre-gl";
-import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
+import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LatLng, ObjectiveState, RevealEvent } from "@fang-x/shared";
@@ -15,9 +16,11 @@ import type { Feature, Polygon } from "geojson";
 
 setWorkerUrl(mapLibreWorkerUrl);
 
-const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
-const MAP_MAX_ZOOM = 14;
-const MAP_INITIAL_ZOOM = 13;
+const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
+// OpenFreeMap liefert Details bis Zoom 14; MapLibre vergrößert diese Kacheln
+// darüber hinaus ohne zusätzliche, nicht vorhandene Kacheln anzufordern.
+const MAP_MAX_ZOOM = 18;
+const MAP_INITIAL_ZOOM = 15;
 
 interface PlayerMarker {
   id: string;
@@ -65,6 +68,16 @@ export function MapView({
     });
 
     map.addControl(new NavigationControl(), "top-right");
+    map.addControl(new ScaleControl({ maxWidth: 120, unit: "metric" }), "top-left");
+
+    // OpenFreeMap enthält die OpenStreetMap-Wanderwege bereits. Im Liberty-Stil
+    // werden sie jedoch sehr dezent dargestellt; für das Spiel heben wir sie hervor.
+    map.on("load", () => {
+      if (!map.getLayer("road_path_pedestrian")) return;
+      map.setPaintProperty("road_path_pedestrian", "line-color", "#8a4b08");
+      map.setPaintProperty("road_path_pedestrian", "line-width", 2.5);
+      map.setPaintProperty("road_path_pedestrian", "line-dasharray", [1.5, 1.5]);
+    });
 
     map.on("click", (e) => {
       onMapClickRef.current?.({ lat: e.lngLat.lat, lng: e.lngLat.lng });
