@@ -419,11 +419,19 @@ export default function App() {
         ruleset={game.ruleset}
         lastReveal={game.lastReveal}
         objective={game.objective}
+        transitStops={game.transitStops}
+        transitNotice={game.transitNotice}
+        chatMessages={game.chatMessages}
+        catchPending={game.catchPending}
         serverError={game.error}
         yourPositionIsShared={game.yourPositionIsShared}
         gameResult={game.gameResult}
         onPosition={game.sendPosition}
         onSetObjective={game.setObjectiveTarget}
+        onUseTransitStop={game.useTransitStop}
+        onSendChat={game.sendChat}
+        onReportCatch={game.reportCatch}
+        onResolveCatch={game.resolveCatch}
         onLeave={handleLeave}
       />
     );

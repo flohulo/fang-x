@@ -1,4 +1,11 @@
-import type { ClientMessage, LatLng, ObjectiveState, Ruleset, ServerMessage } from "@fang-x/shared";
+import type {
+  ChatMessage,
+  ClientMessage,
+  LatLng,
+  ObjectiveState,
+  Ruleset,
+  ServerMessage,
+} from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
 import { clearPlayerId, loadPlayerId, savePlayerId } from "./session";
 
@@ -21,6 +28,16 @@ export function useGame() {
   const [myId, setMyId] = useState<string | null>(null);
   const [youAreHost, setYouAreHost] = useState(false);
   const [ruleset, setRuleset] = useState<Ruleset | null>(null);
+  const [transitStops, setTransitStops] = useState({ bus: 0, train: 0 });
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [transitNotice, setTransitNotice] = useState<{
+    mode: "bus" | "train";
+    count: number;
+    bus: number;
+    train: number;
+    at: number;
+  } | null>(null);
+  const [catchPending, setCatchPending] = useState(false);
   const [reveals, setReveals] = useState<any[]>([]);
   const [lastReveal, setLastReveal] = useState<any>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -108,11 +125,19 @@ export function useGame() {
           setPhase(msg.phase);
           setPlayers(msg.players);
           setRuleset(msg.ruleset);
+          setTransitStops(msg.transitStops);
+          setChatMessages(msg.chat ?? []);
+          setCatchPending(msg.catchPending);
           setYouAreHost(msg.youAreHost);
           setReconnecting(false);
           break;
         case "players":
-          setPlayers(msg.players);
+          setPlayers((current) =>
+            msg.players.map((player) => ({
+              ...player,
+              position: current.find((existing) => existing.id === player.id)?.position ?? null,
+            })),
+          );
           break;
         case "phase":
           setPhase(msg.phase);
@@ -128,6 +153,10 @@ export function useGame() {
             setGameResult(null);
             setYourPositionIsShared(false);
             setObjective(null);
+            setTransitStops({ bus: 0, train: 0 });
+            setTransitNotice(null);
+            setChatMessages([]);
+            setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
             // Nach Reload/Reconnect: bereits erfolgte Sichtungen nachziehen.
             setReveals(msg.reveals);
@@ -136,6 +165,31 @@ export function useGame() {
           break;
         case "config":
           setRuleset(msg.ruleset);
+          break;
+        case "transitStops":
+          setTransitStops({ bus: msg.bus, train: msg.train });
+          break;
+        case "chat":
+          setChatMessages((current) => [...current, msg.message].slice(-100));
+          break;
+        case "transitNotice":
+          setTransitNotice({
+            mode: msg.mode,
+            count: msg.count,
+            bus: msg.bus,
+            train: msg.train,
+            at: msg.at,
+          });
+          break;
+        case "catchPending":
+          setCatchPending(msg.pending);
+          break;
+        case "playerPosition":
+          setPlayers((current) =>
+            current.map((player) =>
+              player.id === msg.playerId ? { ...player, position: msg.pos } : player,
+            ),
+          );
           break;
         case "reveal":
           setLastReveal(msg.reveal);
@@ -153,6 +207,7 @@ export function useGame() {
         case "end":
           setGameResult({ winner: msg.winner, reason: msg.reason });
           setPlayers(msg.players);
+          setChatMessages([]);
           setPhase("ENDED");
           break;
         case "error":
@@ -189,6 +244,10 @@ export function useGame() {
     attemptRef.current = 0;
     setObjective(null);
     setLastPositionShared(null);
+    setTransitStops({ bus: 0, train: 0 });
+    setTransitNotice(null);
+    setChatMessages([]);
+    setCatchPending(false);
     sessionRef.current = { code, name, wantsX };
     wsRef.current?.close();
     connect({ code, name, wantsX });
@@ -211,6 +270,22 @@ export function useGame() {
     send({ t: "setObjective", target });
   };
 
+  const useTransitStop = (mode: "bus" | "train", count: number) => {
+    send({ t: "useTransitStop", mode, count });
+  };
+
+  const sendChat = (text: string) => {
+    send({ t: "chat", text });
+  };
+
+  const reportCatch = () => {
+    send({ t: "reportCatch" });
+  };
+
+  const resolveCatch = (caught: boolean) => {
+    send({ t: "resolveCatch", caught });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -228,6 +303,7 @@ export function useGame() {
     setConnected(false);
     setReconnecting(false);
     setObjective(null);
+    setChatMessages([]);
   };
 
   // Beim Verlassen der Seite sauber abschalten, ohne Reconnect zu starten.
@@ -247,6 +323,10 @@ export function useGame() {
     myId,
     youAreHost,
     ruleset,
+    transitStops,
+    transitNotice,
+    chatMessages,
+    catchPending,
     reveals,
     lastReveal,
     lastPositionShared,
@@ -261,6 +341,10 @@ export function useGame() {
     setRole,
     start,
     setObjectiveTarget,
+    useTransitStop,
+    sendChat,
+    reportCatch,
+    resolveCatch,
     sendPosition,
     leave,
     clearError: () => setError(null),
