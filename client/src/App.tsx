@@ -435,6 +435,13 @@ export default function App() {
           Verbindung verloren – verbinde neu …
         </div>
       )}
+      <AppMenu
+        alertsEnabled={alertsEnabled}
+        notificationPermission={notificationPermission}
+        onEnableAlerts={enableAlerts}
+        onDisableAlerts={disableAlerts}
+        isGame={Boolean(game.myId && game.phase !== "LOBBY")}
+      />
       {content}
       <PwaUpdatePrompt />
     </>
