@@ -676,7 +676,7 @@ export function LobbyScreen({
         </div>
       )}
 
-      <button className="secondary" onClick={onLeave}>
+      <button className="secondary lobby-leave-button" onClick={onLeave}>
         Spiel verlassen
       </button>
     </div>
