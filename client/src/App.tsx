@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChangelogScreen } from "./changelog";
 import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
