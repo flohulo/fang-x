@@ -123,6 +123,14 @@ async function run() {
   await host.waitFor((m) => m.t === "config");
   assert(true, "Konfiguration gesendet und bestätigt");
 
+  // 4b. Chat ist in der Lobby deaktiviert
+  host.ws.send(JSON.stringify({ t: "chat", text: "Vor dem Start" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !det.messages.some((message) => message.t === "chat"),
+    "Chat ist in der Lobby deaktiviert",
+  );
+
   // 5. Spiel starten
   host.ws.send(JSON.stringify({ t: "start" }));
   await host.waitFor((m) => m.t === "phase" && m.phase === "COUNTDOWN");
@@ -133,6 +141,19 @@ async function run() {
 
   await host.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
   assert(true, "Phase RUNNING erreicht");
+
+  // 5b. Chat im laufenden Spiel: alle Spielenden sehen die Nachrichten
+  host.ws.send(JSON.stringify({ t: "chat", text: "Treffpunkt Bahnhof" }));
+  const chatToDetective = await det.waitFor(
+    (m) => m.t === "chat" && m.message.text === "Treffpunkt Bahnhof",
+  );
+  assert(chatToDetective.message.name === "Host", "Chat wird an alle Spielenden verteilt");
+  det.ws.send(JSON.stringify({ t: "chat", text: "Verstanden" }));
+  const chatToHost = await host.waitFor((m) => m.t === "chat" && m.message.text === "Verstanden");
+  assert(
+    chatToHost.message.playerId === detJoined.playerId,
+    "Chat-Nachrichten tragen den richtigen Absender",
+  );
 
   // 6. X positioniert sich (im Spielgebiet)
   const xPos = { lat: 47.3769, lng: 8.5417 };
@@ -204,8 +225,25 @@ async function run() {
   const end = await det.waitFor((m) => m.t === "end", 10000);
   assert(end.winner === "DETECTIVES", `Spielende: ${end.winner} gewinnt (${end.reason})`);
 
+  // Chat ist nach dem Spielende gesperrt
+  host.ws.send(JSON.stringify({ t: "chat", text: "Nach dem Spiel" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !det.messages.some(
+      (message) => message.t === "chat" && message.message.text === "Nach dem Spiel",
+    ),
+    "Chat ist nach Spielende deaktiviert",
+  );
+
   host.ws.close();
   det.ws.close();
+
+  // Der Verlauf wird beim Zurücksetzen des Raums nicht mitgegeben
+  const afterChat = await connect(code);
+  afterChat.ws.send(JSON.stringify({ t: "join", code, name: "Nachzügler", wantsX: false }));
+  const afterChatJoined = await afterChat.waitFor((m) => m.t === "joined");
+  assert(afterChatJoined.chat?.length === 0, "Chatverlauf wird nach Spielende gelöscht");
+  afterChat.ws.close();
 
   // 11. Reconnect: getrennte Verbindung übernimmt den alten Platz
   console.log("\n=== Reconnect ===");
@@ -261,6 +299,128 @@ async function run() {
   a.ws.close();
   b2.ws.close();
   ghost.ws.close();
+
+  // 13. Unabhängige Spielregeln: Standortfreigabe, ÖV-Budget und Foto-Fang
+  console.log("\n=== Konfigurierbare Spielregeln ===");
+  const code3 = await createGame();
+  const mrX = await connect(code3);
+  mrX.ws.send(JSON.stringify({ t: "join", code: code3, name: "X", wantsX: true }));
+  const mrXJoined = await mrX.waitFor((m) => m.t === "joined");
+
+  const detective1 = await connect(code3);
+  detective1.ws.send(JSON.stringify({ t: "join", code: code3, name: "Detektiv 1", wantsX: false }));
+  const detective1Joined = await detective1.waitFor((m) => m.t === "joined");
+
+  const detective2 = await connect(code3);
+  detective2.ws.send(JSON.stringify({ t: "join", code: code3, name: "Detektiv 2", wantsX: false }));
+  await detective2.waitFor((m) => m.t === "joined");
+
+  mrX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: {
+          durationMinutes: 0.3,
+          headStartMinutes: 0.02,
+          countdownSeconds: 0,
+          detectivesWaitDuringHeadStart: true,
+        },
+        reveal: { firstRevealAfterMinutes: 0, intervalMinutes: 0.1 },
+        catch: { method: "PHOTO_CONFIRMATION" },
+        movement: {
+          minUpdateSeconds: 5,
+          transportModes: ["WALK", "TRANSIT"],
+          xTransportModes: ["WALK", "TRANSIT"],
+          xTransitBudget: { enabled: true, busStops: 3, trainStops: 1 },
+          detectivesShareLiveLocation: true,
+        },
+        map: {
+          startLocation: { lat: 47.3769, lng: 8.5417 },
+          outOfBoundsEnabled: false,
+        },
+      },
+    }),
+  );
+  const configuredRules = await mrX.waitFor((m) => m.t === "config");
+  assert(
+    configuredRules.ruleset.movement.xTransportModes.includes("TRANSIT") &&
+      configuredRules.ruleset.movement.transportModes.includes("TRANSIT") &&
+      !configuredRules.ruleset.map.outOfBoundsEnabled,
+    "Verkehrsmittel und Spielfeldrand lassen sich unabhängig festlegen",
+  );
+
+  mrX.ws.send(JSON.stringify({ t: "start" }));
+  const mrXHeadstart = await mrX.waitFor((m) => m.t === "phase" && m.phase === "HEADSTART");
+  assert(mrXHeadstart.phase === "HEADSTART", "Vorsprung startet");
+  assert(
+    mrXHeadstart.playAreaCenter?.lat === 47.3769,
+    "Vom Host gesetzter Treffpunkt wird als Spielmittelpunkt verwendet",
+  );
+
+  const mrXPos = { lat: 47.3769, lng: 8.5417 };
+  mrX.ws.send(JSON.stringify({ t: "position", pos: mrXPos }));
+  detective1.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.38, lng: 8.55 } }));
+  await mrX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  assert(
+    !detective1.messages.some(
+      (m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId,
+    ),
+    "Detektiv-Standorte bleiben während des Vorsprungs verborgen",
+  );
+  const mrXReveal = await detective1.waitFor((m) => m.t === "reveal", 5000);
+  await detective2.waitFor((m) => m.t === "reveal", 5000);
+  assert(
+    mrXReveal.reveal.pos.lat === mrXPos.lat,
+    "Erster Standort-Ping erfolgt direkt nach dem Vorsprung",
+  );
+  assert(
+    !detective1.messages.some((m) => m.t === "playerPosition" && m.playerId === mrXJoined.playerId),
+    "X-Standort wird zwischen den Pings nicht live geteilt",
+  );
+
+  const detectivePos = { lat: 47.39, lng: 8.56 };
+  detective1.ws.send(JSON.stringify({ t: "position", pos: detectivePos }));
+  await mrX.waitFor((m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId);
+  await detective2.waitFor((m) => m.t === "playerPosition");
+  assert(true, "Detektive teilen ihre Live-Standorte in der App");
+  detective1.ws.close();
+  await mrX.waitFor(
+    (m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId && m.pos === null,
+  );
+  assert(true, "Getrennte Detektive werden von der Live-Karte entfernt");
+
+  mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 2 }));
+  await mrX.waitFor((m) => m.t === "transitStops" && m.bus === 2);
+  const transitNotice = await detective2.waitFor((m) => m.t === "transitNotice", 5000);
+  assert(
+    transitNotice.mode === "bus" && transitNotice.count === 2,
+    "Detektive bekommen eine Nachricht über die gemeldeten ÖV-Haltestellen",
+  );
+  assert(
+    !mrX.messages.some((m) => m.t === "transitNotice"),
+    "Die ÖV-Meldung geht nicht an X zurück",
+  );
+  mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 2 }));
+  const overBudget = await mrX.waitFor(
+    (m) => m.t === "error" && m.message.includes("nur noch 1 Haltestelle"),
+  );
+  assert(overBudget.t === "error", "Mehr Haltestellen als das Restbudget werden abgelehnt");
+  mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 1 }));
+  await mrX.waitFor((m) => m.t === "transitStops" && m.bus === 3);
+  mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 1 }));
+  const exhaustedBudget = await mrX.waitFor(
+    (m) => m.t === "error" && m.message.includes("Budget für Bus"),
+  );
+  assert(exhaustedBudget.t === "error", "Bus-Budget wird pro Haltestelle gezählt und begrenzt");
+
+  detective2.ws.send(JSON.stringify({ t: "reportCatch" }));
+  await mrX.waitFor((m) => m.t === "catchPending" && m.pending);
+  mrX.ws.send(JSON.stringify({ t: "resolveCatch", caught: true }));
+  const photoCatchEnd = await detective2.waitFor((m) => m.t === "end", 5000);
+  assert(photoCatchEnd.winner === "DETECTIVES", "Detektive gewinnen nach bestätigtem Foto-Fang");
+
+  mrX.ws.close();
+  detective2.ws.close();
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);

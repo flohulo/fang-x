@@ -11,10 +11,11 @@
 // Robustheit: Phasen, Regeln, Spieler und Zeitpunkte liegen in `state.storage`,
 // alle zeitgesteuerten Schritte laufen über Durable-Object-Alarms. Ein Neustart
 // oder eine Eviction der Instanz beendet das Spiel damit nicht mehr.
-// Standorte selbst werden bewusst NICHT gespeichert (Datenminimierung) — nach
-// einem Neustart schickt jedes Gerät beim nächsten GPS-Update wieder eine Position.
+// Standortverläufe werden bewusst NICHT gespeichert. Der einmalige Spielmittelpunkt
+// wird für die laufende Runde persistiert und bei Spielende aus dem Zustand gelöscht.
 
 import {
+  type ChatMessage,
   type ClientMessage,
   DEFAULT_RULESET,
   distanceMeters,
@@ -57,6 +58,10 @@ const OBJECTIVE_RADIUS_METERS = 50;
 const OBJECTIVE_MIN_DISTANCE_METERS = 100;
 const OBJECTIVE_REVEAL_DELAY_MS = 2 * 60_000;
 
+/** Chat: nur die letzten Nachrichten der laufenden Runde, nie persistiert. */
+const MAX_CHAT_MESSAGES = 100;
+const MAX_CHAT_TEXT_LENGTH = 300;
+
 const STATE_KEY = "room";
 
 interface Player {
@@ -76,7 +81,7 @@ interface Player {
 
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
-// Gespeicherter Zustand. Enthält absichtlich keine Standorte.
+// Gespeicherter Zustand ohne Standortverläufe; playAreaCenter ist der einmalige Startpunkt.
 interface RoomSnapshot {
   version: 1;
   created: boolean;
@@ -100,6 +105,8 @@ interface RoomSnapshot {
   objective: ObjectiveState | null;
   winner: "X" | "DETECTIVES" | null;
   endReason: string | null;
+  transitStops?: { bus: number; train: number };
+  catchPending?: boolean;
   nextPlayerId: number;
   updatedAt: number;
 }
@@ -123,6 +130,10 @@ export class GameRoom {
   private playAreaCenter: LatLng | null = null;
   private winner: "X" | "DETECTIVES" | null = null;
   private endReason: string | null = null;
+  private transitStops = { bus: 0, train: 0 };
+  private chatMessages: ChatMessage[] = [];
+  private nextChatMessageId = 1;
+  private catchPending = false;
   private nextPlayerId = 1;
   /** Wurde dieser Raum über das Matchmaking angelegt? */
   private created = false;
@@ -197,6 +208,8 @@ export class GameRoom {
         : null,
       winner: this.winner,
       endReason: this.endReason,
+      transitStops: this.transitStops,
+      catchPending: this.catchPending,
       nextPlayerId: this.nextPlayerId,
       updatedAt: Date.now(),
     };
@@ -238,6 +251,8 @@ export class GameRoom {
     this.objective = snap.objective ?? null;
     this.winner = snap.winner;
     this.endReason = snap.endReason;
+    this.transitStops = snap.transitStops ?? { bus: 0, train: 0 };
+    this.catchPending = snap.catchPending ?? false;
     this.nextPlayerId = Math.max(1, snap.nextPlayerId);
     this.lastActiveAt = snap.updatedAt;
 
@@ -383,6 +398,7 @@ export class GameRoom {
     this.winner = null;
     this.endReason = null;
     this.xPositions.length = 0;
+    this.chatMessages.length = 0;
     void this.state.storage.deleteAll().catch(() => {});
   }
 
@@ -472,12 +488,26 @@ export class GameRoom {
             phase: this.phase,
             players: this.getPlayerInfos(),
             ruleset: this.ruleset,
+            transitStops: this.transitStops,
+            chat: this.chatMessages,
+            catchPending: this.catchPending,
             youAreHost: player.isHost,
           });
           // Phase/Zeit/Reveals nachliefern — nach einem Reload fehlt dem
           // Client sonst der komplette Spielzustand.
           this.sendTo(ws, this.phaseMessage());
           this.sendObjective(player);
+          if (this.ruleset.movement.detectivesShareLiveLocation && this.phase === "RUNNING") {
+            for (const other of this.players.values()) {
+              if (other.role === "DETECTIVE" && other.position) {
+                this.sendTo(ws, {
+                  t: "playerPosition",
+                  playerId: other.id,
+                  pos: other.position,
+                });
+              }
+            }
+          }
           this.broadcastPlayers();
           // Beendetes Spiel? Ergebnis direkt nachliefern, damit ein Reload im
           // Endzustand nicht die Karte statt des Ergebnisses zeigt.
@@ -503,6 +533,13 @@ export class GameRoom {
             return;
           }
           this.ruleset = mergeRuleset(msg.ruleset);
+          if (
+            this.ruleset.map.startLocation !== null &&
+            !isValidPosition(this.ruleset.map.startLocation)
+          ) {
+            this.sendTo(ws, { t: "error", message: "Der Startpunkt ist ungültig." });
+            return;
+          }
           this.lastActiveAt = Date.now();
           this.broadcast({ t: "config", ruleset: this.ruleset });
           this.persist();
@@ -523,6 +560,26 @@ export class GameRoom {
           this.setObjective(player, msg.target);
           break;
         }
+        case "useTransitStop": {
+          if (msg.mode === "bus" || msg.mode === "train") {
+            this.useTransitStop(player, msg.mode, msg.count);
+          }
+          break;
+        }
+        case "chat": {
+          this.postChatMessage(player, msg.text);
+          break;
+        }
+        case "reportCatch": {
+          this.reportCatch(player);
+          break;
+        }
+        case "resolveCatch": {
+          if (typeof msg.caught === "boolean") {
+            this.resolveCatch(player, msg.caught);
+          }
+          break;
+        }
         case "start": {
           if (!player || !player.isHost) return;
           if (this.phase !== "LOBBY") return;
@@ -537,6 +594,13 @@ export class GameRoom {
           if (!player) return;
           // Standorte nur im laufenden Spiel annehmen (Datenminimierung!)
           if (this.phase !== "HEADSTART" && this.phase !== "RUNNING") return;
+          if (
+            this.phase === "HEADSTART" &&
+            this.ruleset.game.detectivesWaitDuringHeadStart &&
+            player.role !== "X"
+          ) {
+            return;
+          }
           if (!isValidPosition(msg.pos)) return;
           player.position = msg.pos;
           player.lastPositionAt = Date.now();
@@ -552,6 +616,9 @@ export class GameRoom {
             this.checkXOutOfBounds(player);
             this.checkObjective(player);
           } else {
+            if (this.ruleset.movement.detectivesShareLiveLocation && this.phase === "RUNNING") {
+              this.broadcast({ t: "playerPosition", playerId: player.id, pos: msg.pos });
+            }
             this.checkCatch();
           }
           break;
@@ -609,6 +676,17 @@ export class GameRoom {
     p.ws = null;
     p.connected = false;
     p.disconnectedAt = Date.now();
+    if (
+      p.role === "DETECTIVE" &&
+      p.position &&
+      (this.ruleset.movement.detectivesShareLiveLocation ||
+        (this.ruleset.game.detectivesWaitDuringHeadStart && this.phase === "HEADSTART"))
+    ) {
+      p.position = null;
+      if (this.ruleset.movement.detectivesShareLiveLocation) {
+        this.broadcast({ t: "playerPosition", playerId: p.id, pos: null });
+      }
+    }
     this.broadcastPlayers();
     this.persist();
     this.scheduleAlarm();
@@ -686,7 +764,7 @@ export class GameRoom {
     }
 
     // Neues Spielgebiet: wird mit der ersten X-Position festgelegt.
-    this.playAreaCenter = null;
+    this.playAreaCenter = this.ruleset.map.startLocation;
     this.xCurrentlyOutOfBounds = false;
     this.objective = this.ruleset.objective.enabled
       ? { status: "PENDING", target: null, radiusMeters: OBJECTIVE_RADIUS_METERS }
@@ -697,6 +775,10 @@ export class GameRoom {
     this.lastRevealAt = 0;
     this.nextRevealAt = null;
     this.xPositions.length = 0;
+    this.transitStops = { bus: 0, train: 0 };
+    this.catchPending = false;
+    this.broadcast({ t: "transitStops", ...this.transitStops });
+    this.broadcast({ t: "catchPending", pending: false });
 
     this.phase = "COUNTDOWN";
     this.phaseEndsAt = Date.now() + this.ruleset.game.countdownSeconds * 1000;
@@ -738,6 +820,9 @@ export class GameRoom {
     this.ensureTick();
     this.persist();
     this.scheduleAlarm();
+    if (this.ruleset.reveal.firstRevealAfterMinutes <= 0) {
+      this.performReveal();
+    }
   }
 
   private ensureTick() {
@@ -770,8 +855,21 @@ export class GameRoom {
   private performReveal() {
     if (this.phase !== "RUNNING") return;
 
-    const xPlayers = [...this.players.values()].filter((p) => p.role === "X" && p.position);
     const now = Date.now();
+    const xPlayers = [...this.players.values()].filter((p) => p.role === "X" && p.position);
+    if (xPlayers.length === 0) {
+      const x = [...this.players.values()].find((p) => p.role === "X");
+      if (x) {
+        this.sendTo(x.ws, {
+          t: "error",
+          message: "Standort-Ping verschoben: X-GPS ist gerade nicht verfügbar.",
+        });
+      }
+      this.nextRevealAt = now + 5_000;
+      this.persist();
+      this.scheduleAlarm();
+      return;
+    }
 
     for (const x of xPlayers) {
       if (!x.position) continue;
@@ -932,7 +1030,7 @@ export class GameRoom {
   }
 
   private checkCatch() {
-    if (this.phase !== "RUNNING") return;
+    if (this.phase !== "RUNNING" || this.ruleset.catch.method !== "RADIUS") return;
     const catchRadius = this.ruleset.catch.radiusMeters;
     const xPlayers = [...this.players.values()].filter((p) => p.role === "X" && p.position);
     const detectives = [...this.players.values()].filter((p) => p.role !== "X" && p.position);
@@ -985,6 +1083,9 @@ export class GameRoom {
     for (const p of this.players.values()) {
       if (p.position && now - p.lastPositionAt > cutoff) {
         p.position = null;
+        if (this.ruleset.movement.detectivesShareLiveLocation && p.role === "DETECTIVE") {
+          this.broadcast({ t: "playerPosition", playerId: p.id, pos: null });
+        }
       }
     }
   }
@@ -1000,6 +1101,8 @@ export class GameRoom {
     this.objective = null;
     this.winner = winner;
     this.endReason = reason;
+    this.catchPending = false;
+    this.chatMessages.length = 0;
     this.phaseEndsAt = null;
     this.nextRevealAt = null;
     this.stopTick();
@@ -1011,10 +1114,128 @@ export class GameRoom {
       reason,
       players: this.getPlayerInfos(),
     });
+    this.playAreaCenter = null;
+    this.ruleset = {
+      ...this.ruleset,
+      map: { ...this.ruleset.map, startLocation: null },
+    };
+    for (const player of this.players.values()) {
+      player.position = null;
+    }
+    this.xPositions.length = 0;
     this.broadcastPhase();
     this.lastActiveAt = Date.now();
     this.persist();
     this.scheduleAlarm();
+  }
+
+  private useTransitStop(player: Player | null, mode: "bus" | "train", count = 1) {
+    if (
+      !player ||
+      player.role !== "X" ||
+      !this.ruleset.movement.xTransitBudget.enabled ||
+      (this.phase !== "HEADSTART" && this.phase !== "RUNNING")
+    ) {
+      return;
+    }
+
+    const label = mode === "bus" ? "Bus" : "Zug";
+    const limit =
+      mode === "bus"
+        ? this.ruleset.movement.xTransitBudget.busStops
+        : this.ruleset.movement.xTransitBudget.trainStops;
+    const remaining = limit - this.transitStops[mode];
+    if (remaining <= 0) {
+      this.sendTo(player.ws, {
+        t: "error",
+        message: `Das ÖV-Budget für ${label} ist aufgebraucht.`,
+      });
+      return;
+    }
+
+    const stations = Math.floor(count);
+    if (!Number.isFinite(stations) || stations < 1) {
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Bitte gib mindestens eine Haltestelle an.",
+      });
+      return;
+    }
+    if (stations > remaining) {
+      this.sendTo(player.ws, {
+        t: "error",
+        message: `Für ${label} sind nur noch ${remaining} Haltestelle${remaining === 1 ? "" : "n"} übrig.`,
+      });
+      return;
+    }
+
+    this.transitStops[mode] += stations;
+    this.broadcast({ t: "transitStops", ...this.transitStops });
+    this.broadcastToDetectives({
+      t: "transitNotice",
+      mode,
+      count: stations,
+      bus: this.transitStops.bus,
+      train: this.transitStops.train,
+      at: Date.now(),
+    });
+    this.persist();
+  }
+
+  private postChatMessage(player: Player | null, text: unknown) {
+    if (!player || this.phase === "LOBBY" || this.phase === "ENDED" || typeof text !== "string") {
+      return;
+    }
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const message: ChatMessage = {
+      id: this.nextChatMessageId++,
+      playerId: player.id,
+      name: player.name,
+      color: player.color,
+      text: trimmed.slice(0, MAX_CHAT_TEXT_LENGTH),
+      at: Date.now(),
+    };
+    this.chatMessages.push(message);
+    if (this.chatMessages.length > MAX_CHAT_MESSAGES) {
+      this.chatMessages.splice(0, this.chatMessages.length - MAX_CHAT_MESSAGES);
+    }
+    this.broadcast({ t: "chat", message });
+  }
+
+  private reportCatch(player: Player | null) {
+    if (
+      !player ||
+      player.role !== "DETECTIVE" ||
+      this.phase !== "RUNNING" ||
+      this.ruleset.catch.method !== "PHOTO_CONFIRMATION" ||
+      this.catchPending
+    ) {
+      return;
+    }
+    this.catchPending = true;
+    this.broadcast({ t: "catchPending", pending: true });
+    this.persist();
+  }
+
+  private resolveCatch(player: Player | null, caught: boolean) {
+    if (
+      !player ||
+      player.role !== "X" ||
+      this.phase !== "RUNNING" ||
+      this.ruleset.catch.method !== "PHOTO_CONFIRMATION" ||
+      !this.catchPending
+    ) {
+      return;
+    }
+    if (caught) {
+      this.endGame("DETECTIVES", "X hat den Fang mit Foto bestätigt.");
+      return;
+    }
+    this.catchPending = false;
+    this.broadcast({ t: "catchPending", pending: false });
+    this.persist();
   }
 
   /** Zurück in die Lobby — z. B. wenn der Raum leer wird oder ein neues Spiel beginnt. */
@@ -1028,6 +1249,13 @@ export class GameRoom {
     this.objective = null;
     this.winner = null;
     this.endReason = null;
+    this.ruleset = {
+      ...this.ruleset,
+      map: { ...this.ruleset.map, startLocation: null },
+    };
+    this.transitStops = { bus: 0, train: 0 };
+    this.chatMessages.length = 0;
+    this.catchPending = false;
     this.lastRevealIndex = 0;
     this.lastRevealAt = 0;
     this.xPositions.length = 0;
