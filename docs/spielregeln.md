@@ -20,9 +20,9 @@ Gegenteil: **maximale Konfigurierbarkeit ohne Komplexitäts-Overhead**.
 4. **Sicherheitsgrenzen.** Extremwerte sind erlaubt, aber physikalisch unmögliche Konfigurationen
    (z. B. Fangradius > Sichtradius + Intervall × Max-Geschwindigkeit) werden gewarnt.
 5. **Datenminimierung zuerst.** Wir erfassen so wenig wie möglich: kein Login, keine
-   E-Mail, keine Konten. Standortdaten existieren nur während des Spiels im Speicher
-   und werden danach verworfen — die Aufbewahrungsdauer ist ein expliziter Parameter
-   (Default: sofort löschen), kein verstecktes Default. Der Server ist selbst-hostbar.
+   E-Mail, keine Konten. Standortverläufe werden nicht gespeichert. Der Spielmittelpunkt
+   wird nur bis zum Spielende oder Entfernen des leeren Raums gespeichert; danach wird
+   er verworfen. Der Server ist selbst-hostbar.
 
 ---
 
@@ -44,6 +44,11 @@ Gegenteil: **maximale Konfigurierbarkeit ohne Komplexitäts-Overhead**.
 Jeder Parameter: `key` · Typ · Bereich · **Default** · Bedeutung.
 JSON-Keys sind englisch (Konvention für Contributors), die UI-Sprache ist ausschließlich Deutsch.
 
+### 3.0 Individuelle Regeln
+
+Alle Regeln sind unabhängig voneinander einstellbar. Es gibt kein festes Profil, das andere
+Einstellungen überschreibt.
+
 ### 3.1 Spieldauer & Phasen
 
 | Key | Typ | Bereich | Default | Bedeutung |
@@ -54,6 +59,7 @@ JSON-Keys sind englisch (Konvention für Contributors), die UI-Sprache ist aussc
 | `game.overtimeMaxMinutes` | int | 1–120 | 10 | Obergrenze fürs Nachspiel. |
 | `game.countdownSeconds` | int | 0–60 | 10 | Countdown vor Spielstart (Handy hochhalten). |
 | `game.pauseAllowed` | bool | — | false | Host kann pausieren (z. B. Regenpause). |
+| `game.detectivesWaitDuringHeadStart` | bool | — | false | Detektive senden während des Vorsprungs keinen Standort. |
 
 ### 3.2 Sichtbarkeit von X (Kernmechanik)
 
@@ -85,6 +91,7 @@ JSON-Keys sind englisch (Konvention für Contributors), die UI-Sprache ist aussc
 
 | Key | Typ | Bereich | Default | Bedeutung |
 |---|---|---|---|---|
+| `catch.method` | enum | `RADIUS` / `PHOTO_CONFIRMATION` | `RADIUS` | Automatischer Fang im Radius oder Fangmeldung per Foto mit Bestätigung durch X. Fotos werden nicht in die App hochgeladen. |
 | `catch.radiusMeters` | int | 5–1000 | **30** | Abstand, bei dem X als gefangen gilt. |
 | `catch.confirmSeconds` | int | 0–300 | **0** | X muss so lange im Radius *bleiben* (verhindert zufälliges Vorbeilaufen). |
 | `catch.teamCatchRequired` | int | 1–10 | 1 | Wie viele Detektive gleichzeitig im Radius sein müssen. |
@@ -111,6 +118,9 @@ Das Original erlaubt Wahl zwischen „zu Fuß" und „Bus & Bahn" — wir parame
 | `movement.speedCheckGraceSeconds` | int | 0–120 | 30 | Toleranz bei Messfehlern/GPS-Sprüngen. |
 | `movement.jumpDetectionMeters` | int | 0–5000 | 300 | Einzelsprung über N m = GPS-Fehler oder Schummeln → Warnung. |
 | `movement.minUpdateSeconds` | int | 5–300 | 15 | Wie oft Client Position nachsendet (nur während des Spiels). |
+| `movement.detectivesShareLiveLocation` | bool | — | false | Detektive sehen während des Spiels gegenseitig ihren Live-Standort. |
+| `movement.xTransitBudget.enabled` | bool | — | false | Aktiviert ein manuelles ÖV-Budget für X, gezählt pro Haltestelle. X meldet Haltestellen im Spiel über ein Dialogfenster (Bus/Zug und Anzahl); die Detektive werden über jede Meldung informiert. |
+| `movement.xTransitBudget.busStops` / `trainStops` | int | 0+ | 10 / 2 | Anzahl erlaubter Bus- und Zughalte, wenn das Budget aktiviert ist. |
 
 ### 3.6 Rollen, Teams & Spielervariationen
 
@@ -149,6 +159,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
 |---|---|---|---|---|
 | `map.centerLat` / `map.centerLng` | number | — | Host-Position | Zentrum des Spiels. |
 | `map.playAreaRadiusMeters` | int | 100–20000 | **700** | Spielradius: Die Fläche, auf der gespielt wird (entspricht dem aufgedeckten Kreis im Screenshot). |
+| `map.startLocation` | LatLng/null | — | null | Optionaler Startpunkt des Spiels; wird nur während der laufenden Runde gespeichert. |
 | `map.outOfBoundsEnabled` | bool | — | **true** | Randzaun aktiv? X darf das Gebiet nicht verlassen. |
 | `map.outOfBoundsGraceSeconds` | int | 0–120 | 15 | Toleranz am Rand (GPS-Genauigkeit) — erst danach greift die Regel. |
 | `map.outOfBoundsPenalty` | enum | `LIVE_SHARE` / `WARNING` / `TELEPORT_BACK` / `INSTANT_LOSS` | **LIVE_SHARE** | Folge bei Verlassen: Bei `LIVE_SHARE` wird X's Live-Standort solange permanent an alle Detektive gestreamt, wie er außerhalb ist — Flucht aus dem Gebiet bestraft sich selbst. |

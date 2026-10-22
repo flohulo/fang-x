@@ -7,7 +7,7 @@ export interface LegalInfo {
 
 export const LEGAL: LegalInfo = {
   email: "fang-x@meine-dateien.info",
-  updated: "21.10.2026",
+  updated: "22.10.2026",
 };
 
 const PLACEHOLDER_MARKER = /\[[^\]]*\]/;
@@ -324,9 +324,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             📍
           </span>
           <div>
-            <span className="legal-highlight-title">Echtzeit-GPS ohne Speicher</span>
+            <span className="legal-highlight-title">Kein gespeicherter Routenverlauf</span>
             <p className="legal-highlight-desc">
-              Standorte werden nur live übertragen und nach Spielende sofort verworfen.
+              Nur der Spielmittelpunkt wird während der Runde gespeichert. Er wird nach Spielende
+              oder beim Entfernen des leeren Raums gelöscht.
             </p>
           </div>
         </div>
@@ -359,9 +360,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             <strong>Keine Benutzerkonten:</strong> Du benötigst weder Registrierung noch Passwort.
           </li>
           <li>
-            <strong>Ausschließliche Live-Übertragung:</strong> Dein Standort wird ausschließlich
-            während eines laufenden Spiels übertragen. Standortverläufe werden nicht dauerhaft
-            gespeichert.
+            <strong>Standortverarbeitung:</strong> Live-Standorte werden während eines laufenden
+            Spiels übertragen. Standortverläufe werden nicht gespeichert; der vom Host gesetzte
+            Startpunkt oder X' erster Standort wird während Lobby und Runde als Spielmittelpunkt für
+            die Karte aufbewahrt und danach gelöscht.
           </li>
           <li>
             <strong>Sichtbarkeit für Mitspieler:</strong> Mitspieler sehen deinen gewählten Namen
@@ -412,8 +414,9 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             gewünschten Spielraum.
           </li>
           <li>
-            <strong>GPS-Standortdaten:</strong> Nur bei aktiver Freigabe im Browser und nur während
-            laufender Spielphasen.
+            <strong>GPS-Standortdaten:</strong> Bei aktiver Freigabe im Browser für das Festlegen
+            des Spielmittelpunkts und für Live-Standortupdates während des Spiels. Der
+            Spielmittelpunkt wird während Lobby und Runde gespeichert.
           </li>
         </ul>
       </section>
@@ -463,8 +466,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           <h2>Speicherdauer</h2>
         </div>
         <p>
-          Spieldaten, temporäre IDs und Standorte werden nach Beendigung des Spiels bzw. beim
-          Schließen und Aufräumen des Raums vollständig aus dem Arbeitsspeicher gelöscht.
+          Standortverläufe werden nicht dauerhaft gespeichert. Der Spielmittelpunkt wird während der
+          Lobby und Runde benötigt und bei Spielende oder beim Entfernen des leeren Raums aus dem
+          gespeicherten Spielzustand gelöscht. Weitere Spieldaten und temporäre IDs werden beim
+          Schließen und Aufräumen des Raums entfernt.
         </p>
       </section>
 

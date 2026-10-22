@@ -1,6 +1,7 @@
-import type { LatLng, ObjectiveState } from "@fang-x/shared";
+import type { ChatMessage, LatLng, ObjectiveState, Ruleset } from "@fang-x/shared";
 import { distanceMeters } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ChatPanel } from "../components/ChatPanel";
 import { MapView } from "../components/MapView";
 import { useGeolocation } from "../lib/useGeolocation";
 
@@ -11,14 +12,28 @@ interface GameScreenProps {
   playAreaCenter: LatLng | null;
   players: any[];
   myId: string | null;
-  ruleset: any;
+  ruleset: Ruleset | null;
   lastReveal: any;
   objective: ObjectiveState | null;
+  transitStops: { bus: number; train: number };
+  transitNotice: {
+    mode: "bus" | "train";
+    count: number;
+    bus: number;
+    train: number;
+    at: number;
+  } | null;
+  chatMessages: ChatMessage[];
+  catchPending: boolean;
   serverError: string | null;
   yourPositionIsShared: boolean;
   gameResult: any;
   onPosition: (pos: LatLng) => void;
   onSetObjective: (target: LatLng) => void;
+  onUseTransitStop: (mode: "bus" | "train", count: number) => void;
+  onSendChat: (text: string) => void;
+  onReportCatch: () => void;
+  onResolveCatch: (caught: boolean) => void;
   onLeave: () => void;
 }
 
@@ -57,18 +72,36 @@ export function GameScreen({
   ruleset,
   lastReveal,
   objective,
+  transitStops,
+  transitNotice,
+  chatMessages,
+  catchPending,
   serverError,
   yourPositionIsShared,
   gameResult,
   onPosition,
   onSetObjective,
+  onUseTransitStop,
+  onSendChat,
+  onReportCatch,
+  onResolveCatch,
   onLeave,
 }: GameScreenProps) {
   const [mapCenter, setMapCenter] = useState<LatLng | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSimHint, setShowSimHint] = useState(false);
   const [choosingObjective, setChoosingObjective] = useState(false);
+  const [transitDialogOpen, setTransitDialogOpen] = useState(false);
+  const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
+  const [transitCount, setTransitCount] = useState(1);
+  const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
   const lastSentRef = useRef<number>(0);
+
+  const me = players.find((p) => p.id === myId);
+  const isX = me?.role === "X";
+  const trackingActive =
+    phase === "RUNNING" ||
+    (phase === "HEADSTART" && (!ruleset?.game.detectivesWaitDuringHeadStart || isX));
 
   const playAreaRadius: number = ruleset?.map?.playAreaRadiusMeters ?? 700;
 
@@ -86,7 +119,7 @@ export function GameScreen({
   );
 
   const { position, error, simulated, setSimulatedPosition, enableRealGps } = useGeolocation(
-    phase === "HEADSTART" || phase === "RUNNING",
+    trackingActive,
     handlePosition,
   );
 
@@ -102,8 +135,29 @@ export function GameScreen({
     return () => clearInterval(id);
   }, [phaseEndsAt]);
 
-  const me = players.find((p) => p.id === myId);
-  const isX = me?.role === "X";
+  const busStopsLimit = ruleset?.movement.xTransitBudget.busStops ?? 0;
+  const trainStopsLimit = ruleset?.movement.xTransitBudget.trainStops ?? 0;
+  const busRemaining = Math.max(0, busStopsLimit - transitStops.bus);
+  const trainRemaining = Math.max(0, trainStopsLimit - transitStops.train);
+  const transitRemaining = transitMode === "bus" ? busRemaining : trainRemaining;
+  const visibleTransitNotice =
+    transitNotice && transitNotice.at !== dismissedTransitNoticeAt ? transitNotice : null;
+
+  useEffect(() => {
+    if (!transitNotice) return;
+    const timer = window.setTimeout(() => setDismissedTransitNoticeAt(transitNotice.at), 15_000);
+    return () => window.clearTimeout(timer);
+  }, [transitNotice]);
+
+  useEffect(() => {
+    if (!transitDialogOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setTransitDialogOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [transitDialogOpen]);
+
   const detectiveCount = players.filter((p) => p.role === "DETECTIVE").length;
   const isSolo = players.length > 0 && detectiveCount === 0 && isX;
 
@@ -149,6 +203,28 @@ export function GameScreen({
   });
   const canChooseObjective =
     phase === "RUNNING" && isX && ruleset?.objective?.enabled && objective?.status === "PENDING";
+  const canReportPhotoCatch =
+    phase === "RUNNING" && ruleset?.catch.method === "PHOTO_CONFIRMATION" && !isX && !catchPending;
+  const canUseTransitBudget = isX && trackingActive;
+
+  const openTransitDialog = () => {
+    setTransitMode(busRemaining > 0 ? "bus" : "train");
+    setTransitCount(1);
+    setTransitDialogOpen(true);
+  };
+
+  const chooseTransitMode = (mode: "bus" | "train") => {
+    const max = mode === "bus" ? busRemaining : trainRemaining;
+    setTransitMode(mode);
+    setTransitCount((current) => Math.min(current, Math.max(1, max)));
+  };
+
+  const confirmTransitStops = () => {
+    if (transitRemaining < 1) return;
+    onUseTransitStop(transitMode, Math.min(transitCount, transitRemaining));
+    setTransitDialogOpen(false);
+    setTransitCount(1);
+  };
 
   if (gameResult) {
     return (
@@ -204,6 +280,25 @@ export function GameScreen({
           </div>
         )}
 
+        {visibleTransitNotice && !isX && (
+          <div className="transit-notice" role="status">
+            <span>
+              <strong>ÖV-Meldung:</strong> X hat{" "}
+              {visibleTransitNotice.count === 1 ? "eine" : visibleTransitNotice.count}{" "}
+              {visibleTransitNotice.mode === "bus" ? "Bus-Haltestelle" : "Zug-Haltestelle"}
+              {visibleTransitNotice.count === 1 ? "" : "n"} genutzt.
+            </span>
+            <button
+              type="button"
+              className="transit-notice-close"
+              aria-label="Hinweis schließen"
+              onClick={() => setDismissedTransitNoticeAt(visibleTransitNotice.at)}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {error && !simulated && (
           <div className="alert-banner" style={{ bottom: 200 }}>
             GPS-Fehler: {error}
@@ -212,12 +307,16 @@ export function GameScreen({
 
         <div className="game-status">
           <div className="game-status-head">
-            <span className={`area-chip${isOutside ? " is-out" : ""}`}>
-              {metersToEdge === null
-                ? "Standort unbekannt"
-                : isOutside
-                  ? `${Math.abs(metersToEdge)} m außerhalb`
-                  : `${metersToEdge} m bis zum Rand`}
+            <span
+              className={`area-chip${ruleset?.map?.outOfBoundsEnabled && isOutside ? " is-out" : ""}`}
+            >
+              {ruleset?.map?.outOfBoundsEnabled
+                ? metersToEdge === null
+                  ? "Standort unbekannt"
+                  : isOutside
+                    ? `${Math.abs(metersToEdge)} m außerhalb`
+                    : `${metersToEdge} m bis zum Rand`
+                : "Kein Spielfeldrand"}
             </span>
             <span className={`gps-chip${position === null ? " is-off" : ""}`}>
               {simulated ? "Simulation" : position ? "GPS aktiv" : "kein GPS"}
@@ -228,6 +327,64 @@ export function GameScreen({
           <p className="game-hint">
             <strong>{hint.title}</strong> {hint.text}
           </p>
+          {isX && ruleset?.movement.xTransitBudget.enabled && (
+            <div className="transit-budget">
+              <div className="transit-budget-head">
+                <span>
+                  ÖV-Budget: Bus {transitStops.bus}/{busStopsLimit} · Zug {transitStops.train}/
+                  {trainStopsLimit}
+                </span>
+                {canUseTransitBudget && (
+                  <button
+                    type="button"
+                    className="secondary transit-trigger"
+                    disabled={busRemaining + trainRemaining === 0}
+                    onClick={openTransitDialog}
+                  >
+                    Halt melden
+                  </button>
+                )}
+              </div>
+              <small>
+                {busRemaining + trainRemaining === 0
+                  ? "ÖV-Budget aufgebraucht."
+                  : "Bei jedem Halt melden – die Detektive werden informiert."}
+              </small>
+            </div>
+          )}
+          {ruleset?.catch.method === "PHOTO_CONFIRMATION" && phase === "RUNNING" && (
+            <div className="photo-catch">
+              {catchPending ? (
+                isX ? (
+                  <>
+                    <strong>Fang gemeldet</strong>
+                    <span>Bestätige, wenn die Detektive ein Foto von dir gemacht haben.</span>
+                    <div className="transit-budget-actions">
+                      <button type="button" onClick={() => onResolveCatch(true)}>
+                        Fang bestätigen
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary"
+                        onClick={() => onResolveCatch(false)}
+                      >
+                        Ablehnen
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <span>Fang gemeldet – warte auf die Bestätigung von X.</span>
+                )
+              ) : canReportPhotoCatch ? (
+                <button type="button" onClick={onReportCatch}>
+                  Foto-Fang melden
+                </button>
+              ) : (
+                <span>Die Detektive gewinnen, wenn X ein Fangfoto bestätigt.</span>
+              )}
+              <small>Fotos werden nicht in die App hochgeladen.</small>
+            </div>
+          )}
 
           <p className="map-credit">
             Karte: ©{" "}
@@ -266,6 +423,79 @@ export function GameScreen({
           )}
           <button onClick={onLeave}>Verlassen</button>
         </div>
+
+        <ChatPanel messages={chatMessages} myId={myId} onSend={onSendChat} />
+
+        {transitDialogOpen && (
+          <div
+            className="transit-dialog-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setTransitDialogOpen(false);
+            }}
+          >
+            <section
+              className="transit-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="transit-dialog-title"
+            >
+              <h2 id="transit-dialog-title">ÖV-Haltestellen melden</h2>
+              <p>
+                Wähle Verkehrsmittel und Anzahl der Haltestellen. Die Detektive erhalten eine
+                Nachricht.
+              </p>
+
+              <div className="transit-mode-toggle" role="group" aria-label="Verkehrsmittel">
+                <button
+                  type="button"
+                  className={transitMode === "bus" ? undefined : "secondary"}
+                  aria-pressed={transitMode === "bus"}
+                  disabled={busRemaining === 0}
+                  onClick={() => chooseTransitMode("bus")}
+                >
+                  Bus · noch {busRemaining}
+                </button>
+                <button
+                  type="button"
+                  className={transitMode === "train" ? undefined : "secondary"}
+                  aria-pressed={transitMode === "train"}
+                  disabled={trainRemaining === 0}
+                  onClick={() => chooseTransitMode("train")}
+                >
+                  Zug · noch {trainRemaining}
+                </button>
+              </div>
+
+              <label htmlFor="transit-count">Anzahl Haltestellen</label>
+              <select
+                id="transit-count"
+                value={transitCount}
+                onChange={(event) => setTransitCount(Number(event.target.value))}
+              >
+                {Array.from({ length: Math.max(1, transitRemaining) }, (_, index) => index + 1).map(
+                  (value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ),
+                )}
+              </select>
+
+              <div className="transit-dialog-actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setTransitDialogOpen(false)}
+                >
+                  Abbrechen
+                </button>
+                <button type="button" disabled={transitRemaining < 1} onClick={confirmTransitStops}>
+                  Melden
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );

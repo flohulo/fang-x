@@ -1,12 +1,15 @@
 // Regelwerk-Schema — kanonisch nach docs/spielregeln.md (v1.1)
 // Regeln sind Daten, kein Code. Jeder Parameter: Typ, Bereich, Default.
 
+import type { LatLng } from "./geo";
+
 export type TransportMode = "WALK" | "BIKE" | "CAR" | "TRANSIT";
 export type RevealSchedule = "FIXED" | "DECREASING" | "RANDOM";
 export type ShowTrail = "NONE" | "LAST3" | "FULL";
 export type XSeesDetectives = "ALWAYS" | "ON_REVEAL" | "NEVER";
 export type OutOfBoundsPenalty = "LIVE_SHARE" | "WARNING" | "TELEPORT_BACK" | "INSTANT_LOSS";
 export type DetectiveOutOfBoundsPenalty = "NONE" | "WARNING" | "TELEPORT_BACK";
+export type CatchMethod = "RADIUS" | "PHOTO_CONFIRMATION";
 
 export interface Ruleset {
   schemaVersion: number;
@@ -18,6 +21,7 @@ export interface Ruleset {
     overtimeMaxMinutes: number;
     countdownSeconds: number;
     pauseAllowed: boolean;
+    detectivesWaitDuringHeadStart: boolean;
   };
   reveal: {
     firstRevealAfterMinutes: number;
@@ -38,6 +42,7 @@ export interface Ruleset {
     detectivesSeesXHistory: boolean;
   };
   catch: {
+    method: CatchMethod;
     radiusMeters: number;
     confirmSeconds: number;
     teamCatchRequired: number;
@@ -51,6 +56,12 @@ export interface Ruleset {
     speedCheckGraceSeconds: number;
     jumpDetectionMeters: number;
     minUpdateSeconds: number;
+    xTransitBudget: {
+      enabled: boolean;
+      busStops: number;
+      trainStops: number;
+    };
+    detectivesShareLiveLocation: boolean;
   };
   roles: {
     xCount: number;
@@ -65,6 +76,7 @@ export interface Ruleset {
   };
   map: {
     playAreaRadiusMeters: number;
+    startLocation: LatLng | null;
     outOfBoundsEnabled: boolean;
     outOfBoundsGraceSeconds: number;
     outOfBoundsPenalty: OutOfBoundsPenalty;
@@ -91,6 +103,7 @@ export const DEFAULT_RULESET: Ruleset = {
     overtimeMaxMinutes: 10,
     countdownSeconds: 10,
     pauseAllowed: false,
+    detectivesWaitDuringHeadStart: false,
   },
   reveal: {
     firstRevealAfterMinutes: 3,
@@ -111,6 +124,7 @@ export const DEFAULT_RULESET: Ruleset = {
     detectivesSeesXHistory: true,
   },
   catch: {
+    method: "RADIUS",
     radiusMeters: 30,
     confirmSeconds: 0,
     teamCatchRequired: 1,
@@ -124,6 +138,12 @@ export const DEFAULT_RULESET: Ruleset = {
     speedCheckGraceSeconds: 30,
     jumpDetectionMeters: 300,
     minUpdateSeconds: 15,
+    xTransitBudget: {
+      enabled: false,
+      busStops: 10,
+      trainStops: 2,
+    },
+    detectivesShareLiveLocation: false,
   },
   roles: {
     xCount: 1,
@@ -138,6 +158,7 @@ export const DEFAULT_RULESET: Ruleset = {
   },
   map: {
     playAreaRadiusMeters: 700,
+    startLocation: null,
     outOfBoundsEnabled: true,
     outOfBoundsGraceSeconds: 15,
     outOfBoundsPenalty: "LIVE_SHARE",
@@ -157,16 +178,40 @@ type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
 
+function nonNegativeInteger(value: number | undefined, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value))
+    : fallback;
+}
+
 // Kombiniert ein partielles Ruleset rekursiv mit den Defaults.
 // Unbekannte Schlüssel werden ignoriert, fehlende mit Default gefüllt.
-export function mergeRuleset(partial?: DeepPartial<Ruleset> | null): Ruleset {
+export function mergeRuleset(
+  partial?: (DeepPartial<Ruleset> & { profile?: string }) | null,
+): Ruleset {
   const p = partial ?? {};
+  const legacyProfile = p.profile === "MR_X";
   return {
     schemaVersion: 1,
-    name: typeof p.name === "string" ? p.name : DEFAULT_RULESET.name,
-    game: { ...DEFAULT_RULESET.game, ...(p.game ?? {}) },
+    name: legacyProfile
+      ? DEFAULT_RULESET.name
+      : typeof p.name === "string"
+        ? p.name
+        : DEFAULT_RULESET.name,
+    game: {
+      ...DEFAULT_RULESET.game,
+      ...(p.game ?? {}),
+      detectivesWaitDuringHeadStart: p.game?.detectivesWaitDuringHeadStart ?? legacyProfile,
+    },
     reveal: { ...DEFAULT_RULESET.reveal, ...(p.reveal ?? {}) },
-    catch: { ...DEFAULT_RULESET.catch, ...(p.catch ?? {}) },
+    catch: {
+      ...DEFAULT_RULESET.catch,
+      ...(p.catch ?? {}),
+      method:
+        p.catch?.method === "PHOTO_CONFIRMATION" || (legacyProfile && !p.catch?.method)
+          ? "PHOTO_CONFIRMATION"
+          : "RADIUS",
+    },
     movement: {
       ...DEFAULT_RULESET.movement,
       ...(p.movement ?? {}),
@@ -180,10 +225,31 @@ export function mergeRuleset(partial?: DeepPartial<Ruleset> | null): Ruleset {
         ...DEFAULT_RULESET.movement.maxSpeedKmh,
         ...(p.movement?.maxSpeedKmh ?? {}),
       },
+      xTransitBudget: {
+        ...DEFAULT_RULESET.movement.xTransitBudget,
+        ...(p.movement?.xTransitBudget ?? {}),
+        enabled: p.movement?.xTransitBudget?.enabled ?? legacyProfile,
+        busStops: nonNegativeInteger(
+          p.movement?.xTransitBudget?.busStops,
+          DEFAULT_RULESET.movement.xTransitBudget.busStops,
+        ),
+        trainStops: nonNegativeInteger(
+          p.movement?.xTransitBudget?.trainStops,
+          DEFAULT_RULESET.movement.xTransitBudget.trainStops,
+        ),
+      },
+      detectivesShareLiveLocation: p.movement?.detectivesShareLiveLocation ?? legacyProfile,
     },
-    roles: { ...DEFAULT_RULESET.roles, ...(p.roles ?? {}) },
+    roles: {
+      ...DEFAULT_RULESET.roles,
+      ...(p.roles ?? {}),
+    },
     win: { ...DEFAULT_RULESET.win, ...(p.win ?? {}) },
-    map: { ...DEFAULT_RULESET.map, ...(p.map ?? {}) },
+    map: {
+      ...DEFAULT_RULESET.map,
+      ...(p.map ?? {}),
+      startLocation: p.map?.startLocation ?? DEFAULT_RULESET.map.startLocation,
+    },
     objective: { ...DEFAULT_RULESET.objective, ...(p.objective ?? {}) },
     privacy: { ...DEFAULT_RULESET.privacy, ...(p.privacy ?? {}) },
   };
