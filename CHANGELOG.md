@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.4.0...fang-x-v0.5.0) (2026-10-22)
+
+
+### Features
+
+* diverse hinweisfelder ([#24](https://github.com/flohulo/fang-x/issues/24)) ([28d9472](https://github.com/flohulo/fang-x/commit/28d9472d67f655fd0f04fa0d1d077d0db392734e))
+* notification ([#26](https://github.com/flohulo/fang-x/issues/26)) ([9e6c988](https://github.com/flohulo/fang-x/commit/9e6c988c6084c51da99da028ac4958fdafd6a910))
+
 ## [0.4.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.3.0...fang-x-v0.4.0) (2026-10-22)
 
 
