@@ -22,8 +22,8 @@ export function AlertSettings({
         <h3>Alarm bei Standortmeldung</h3>
         <p>
           Wenn dein Standort an die Detektive übermittelt oder live geteilt wird, alarmieren wir
-          dich mit Ton und Vibration. Eine Systembenachrichtigung gibt es, wenn du sie im Browser
-          erlaubst.
+          dich mit Ton und Vibration. Gibt X auf, werden Detektive mit einer Systembenachrichtigung
+          informiert. Eine Systembenachrichtigung gibt es, wenn du sie im Browser erlaubst.
         </p>
         {enabled && notificationPermission === "denied" && (
           <p className="alert-settings-note">

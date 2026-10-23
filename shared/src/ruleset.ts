@@ -129,7 +129,7 @@ export const DEFAULT_RULESET: Ruleset = {
     confirmSeconds: 0,
     teamCatchRequired: 1,
     anyDetectiveWins: true,
-    xCanSurrender: false,
+    xCanSurrender: true,
   },
   movement: {
     transportModes: ["WALK"],

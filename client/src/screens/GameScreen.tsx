@@ -44,6 +44,7 @@ interface GameScreenProps {
   onSendChat: (text: string) => void;
   onReportCatch: () => void;
   onResolveCatch: (caught: boolean) => void;
+  onSurrender: () => void;
   onLeave: () => void;
 }
 
@@ -96,6 +97,7 @@ export function GameScreen({
   onSendChat,
   onReportCatch,
   onResolveCatch,
+  onSurrender,
   onLeave,
 }: GameScreenProps) {
   const [mapCenter, setMapCenter] = useState<LatLng | null>(null);
@@ -103,6 +105,7 @@ export function GameScreen({
   const [showSimHint, setShowSimHint] = useState(false);
   const [choosingObjective, setChoosingObjective] = useState(false);
   const [transitDialogOpen, setTransitDialogOpen] = useState(false);
+  const [surrenderDialogOpen, setSurrenderDialogOpen] = useState(false);
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
@@ -171,6 +174,15 @@ export function GameScreen({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [transitDialogOpen]);
+
+  useEffect(() => {
+    if (!surrenderDialogOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSurrenderDialogOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [surrenderDialogOpen]);
 
   useEffect(() => {
     if (!revealTimer || phase !== "RUNNING") return;
@@ -246,6 +258,11 @@ export function GameScreen({
   const canReportPhotoCatch =
     phase === "RUNNING" && ruleset?.catch.method === "PHOTO_CONFIRMATION" && !isX && !catchPending;
   const canUseTransitBudget = isX && trackingActive;
+  const canSurrender =
+    isX &&
+    !!ruleset?.catch.xCanSurrender &&
+    (phase === "HEADSTART" || phase === "RUNNING");
+  const surrender = gameResult?.surrender ?? null;
 
   const openTransitDialog = () => {
     setTransitMode(busRemaining > 0 ? "bus" : "train");
@@ -279,10 +296,55 @@ export function GameScreen({
   if (gameResult) {
     return (
       <div className="screen">
+        {surrender?.pos && (
+          <div className="map-container result-map">
+            <MapView
+              center={surrender.pos}
+              playAreaRadiusMeters={0}
+              players={[
+                {
+                  id: surrender.playerId,
+                  name: surrender.name,
+                  color: "#ef4444",
+                  role: "X",
+                  pos: surrender.pos,
+                },
+              ]}
+              lastReveal={{
+                pos: surrender.pos,
+                radiusMeters: 0,
+                at: surrender.at,
+                index: 0,
+                isLive: true,
+              }}
+              objective={null}
+              startPoint={null}
+            />
+          </div>
+        )}
         <div className="card" style={{ textAlign: "center" }}>
           <h2 style={{ margin: "0 0 16px", fontSize: "1.5rem" }}>
             {gameResult.winner === "X" ? "X gewinnt!" : "Detektive gewinnen!"}
           </h2>
+          {surrender && (
+            <div className="surrender-result" role="status">
+              <strong>🚨 {surrender.name} hat aufgegeben</strong>
+              <span>
+                {surrender.pos
+                  ? "Der exakte Live-Standort wurde an die Detektive übertragen."
+                  : "Ein Standort war nicht verfügbar."}
+              </span>
+              {surrender.pos && (
+                <a
+                  href={`https://www.openstreetmap.org/?mlat=${surrender.pos.lat}&mlon=${surrender.pos.lng}#map=17/${surrender.pos.lat}/${surrender.pos.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Standort auf OpenStreetMap öffnen ↗
+                </a>
+              )}
+            </div>
+          )}
           <p style={{ color: "var(--text-dim)" }}>{gameResult.reason}</p>
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             Zurück zur Startseite
@@ -556,10 +618,62 @@ export function GameScreen({
               GPS aktivieren
             </button>
           )}
+          {canSurrender && !choosingObjective && (
+            <button
+              className="danger"
+              type="button"
+              aria-label="Notfall: Spiel aufgeben"
+              onClick={() => setSurrenderDialogOpen(true)}
+            >
+              Notfall
+            </button>
+          )}
           <button onClick={onLeave}>Verlassen</button>
         </div>
 
         <ChatPanel messages={chatMessages} myId={myId} onSend={onSendChat} />
+
+        {surrenderDialogOpen && (
+          <div
+            className="transit-dialog-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setSurrenderDialogOpen(false);
+            }}
+          >
+            <section
+              className="transit-dialog surrender-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="surrender-dialog-title"
+              aria-describedby="surrender-dialog-description"
+            >
+              <h2 id="surrender-dialog-title">Notfall: Spiel aufgeben?</h2>
+              <p id="surrender-dialog-description">
+                Die Runde endet sofort und die Detektive gewinnen. Dein exakter Standort wird
+                einmalig an sie übertragen und sie werden benachrichtigt.
+              </p>
+              <div className="transit-dialog-actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setSurrenderDialogOpen(false)}
+                >
+                  Weiterspielen
+                </button>
+                <button
+                  type="button"
+                  className="danger"
+                  onClick={() => {
+                    setSurrenderDialogOpen(false);
+                    onSurrender();
+                  }}
+                >
+                  Aufgeben
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
 
         {transitDialogOpen && (
           <div

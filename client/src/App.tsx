@@ -43,6 +43,20 @@ function playLiveShareAlarm(context: AudioContext) {
   }
 }
 
+async function showSurrenderNotification(name: string) {
+  const options: NotificationOptions = {
+    body: `${name} hat das Spiel aufgegeben. Der Live-Standort wurde geteilt.`,
+    icon: "/icon-192.png",
+    tag: "fang-x-surrender",
+  };
+  if ("serviceWorker" in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    await registration.showNotification("X hat aufgegeben", options);
+    return;
+  }
+  new Notification("X hat aufgegeben", options);
+}
+
 async function showPositionSharedNotification(at: number, index: number, live: boolean) {
   const options: NotificationOptions = {
     body: live
@@ -124,6 +138,7 @@ export default function App() {
   const changelogPage = useMemo(isChangelogPage, []);
   const resumedRef = useRef(false);
   const lastAlertedPositionRef = useRef<string | null>(null);
+  const surrenderNotifiedRef = useRef<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const game = useGame();
@@ -215,6 +230,20 @@ export default function App() {
         console.warn("Standortwarnung konnte nicht abgespielt werden:", error);
       });
   }, [alertsEnabled, game.lastPositionShared, notificationPermission]);
+
+  useEffect(() => {
+    const surrender = game.gameResult?.surrender;
+    if (!surrender) return;
+    const eventId = `${surrender.at}:${surrender.playerId}`;
+    if (surrenderNotifiedRef.current === eventId) return;
+    surrenderNotifiedRef.current = eventId;
+    if (!alertsEnabled || notificationPermission !== "granted") return;
+    const myRole = game.players.find((player) => player.id === game.myId)?.role;
+    if (myRole === "X") return;
+    void showSurrenderNotification(surrender.name).catch((error: unknown) => {
+      console.warn("Benachrichtigung zum Aufgeben konnte nicht angezeigt werden:", error);
+    });
+  }, [alertsEnabled, notificationPermission, game.gameResult, game.myId, game.players]);
 
   // Einladungslink: /?code=ABC234
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);
@@ -433,6 +462,7 @@ export default function App() {
         onSendChat={game.sendChat}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
+        onSurrender={game.surrender}
         onLeave={handleLeave}
       />
     );

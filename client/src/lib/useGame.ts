@@ -52,7 +52,11 @@ export function useGame() {
   } | null>(null);
   const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
-  const [gameResult, setGameResult] = useState<{ winner: string; reason: string } | null>(null);
+  const [gameResult, setGameResult] = useState<{
+    winner: string;
+    reason: string;
+    surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
@@ -222,7 +226,7 @@ export function useGame() {
           setYourPositionIsShared(msg.shared);
           break;
         case "end":
-          setGameResult({ winner: msg.winner, reason: msg.reason });
+          setGameResult({ winner: msg.winner, reason: msg.reason, surrender: msg.surrender });
           setPlayers(msg.players);
           setRevealTimer(null);
           setChatMessages([]);
@@ -305,6 +309,10 @@ export function useGame() {
     send({ t: "resolveCatch", caught });
   };
 
+  const surrender = () => {
+    send({ t: "surrender" });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -366,6 +374,7 @@ export function useGame() {
     sendChat,
     reportCatch,
     resolveCatch,
+    surrender,
     sendPosition,
     leave,
     clearError: () => setError(null),

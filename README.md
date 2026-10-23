@@ -26,6 +26,9 @@ Live-Standorte für die Detektive und ein begrenztes ÖV-Budget. Beim Foto-Fang 
 Spielenden den Fang direkt in der App. Während der Runde können alle Spielenden im integrierten
 Chat schreiben; der Verlauf wird nach Spielende gelöscht.
 
+Muss X die Runde abbrechen, gibt es dafür den Notfall-Knopf: Nach einer Bestätigung endet das
+Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
+
 ## Datenschutz und sicher spielen
 
 - Es gibt keine Benutzerkonten.

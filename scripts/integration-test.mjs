@@ -588,6 +588,106 @@ async function run() {
   revealX.ws.close();
   revealedDetective.ws.close();
 
+  // 17. Notfall-Knopf: X gibt auf und teilt den exakten Standort
+  console.log("\n=== Notfall-Knopf: X gibt auf ===");
+  const code7 = await createGame();
+  const emergencyX = await connect(code7);
+  emergencyX.ws.send(JSON.stringify({ t: "join", code: code7, name: "Notfall-X", wantsX: true }));
+  await emergencyX.waitFor((m) => m.t === "joined");
+  const emergencyDetective = await connect(code7);
+  emergencyDetective.ws.send(
+    JSON.stringify({ t: "join", code: code7, name: "Notfall-Detektiv", wantsX: false }),
+  );
+  await emergencyDetective.waitFor((m) => m.t === "joined");
+
+  emergencyX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        catch: { xCanSurrender: true },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await emergencyX.waitFor((m) => m.t === "config");
+  emergencyX.ws.send(JSON.stringify({ t: "start" }));
+  await emergencyX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+
+  emergencyDetective.ws.send(JSON.stringify({ t: "surrender" }));
+  const notXError = await emergencyDetective.waitFor(
+    (m) => m.t === "error" && m.message.includes("Nur X"),
+  );
+  assert(notXError.t === "error", "Nur X kann das Spiel aufgeben");
+
+  const surrenderPos = { lat: 47.3769, lng: 8.5417 };
+  emergencyX.ws.send(JSON.stringify({ t: "position", pos: surrenderPos }));
+  emergencyX.ws.send(JSON.stringify({ t: "surrender" }));
+  const surrenderEnd = await emergencyDetective.waitFor((m) => m.t === "end", 5000);
+  assert(surrenderEnd.winner === "DETECTIVES", "Aufgeben beendet die Runde – Detektive gewinnen");
+  assert(
+    surrenderEnd.reason.includes("aufgegeben"),
+    `Spielende nennt das Aufgeben: ${surrenderEnd.reason}`,
+  );
+  assert(
+    surrenderEnd.surrender?.pos?.lat === surrenderPos.lat &&
+      surrenderEnd.surrender?.pos?.lng === surrenderPos.lng &&
+      surrenderEnd.surrender?.name === "Notfall-X",
+    "Detektive erhalten den exakten Standort und den Namen von X",
+  );
+
+  const surrenderReconnect = await connect(code7);
+  surrenderReconnect.ws.send(
+    JSON.stringify({ t: "join", code: code7, name: "Nachzügler", wantsX: false }),
+  );
+  const reconnectedEnd = await surrenderReconnect.waitFor((m) => m.t === "end", 5000);
+  assert(
+    reconnectedEnd.surrender?.pos?.lat === surrenderPos.lat,
+    "Standort beim Aufgeben bleibt für Wiedereinsteiger sichtbar",
+  );
+
+  surrenderReconnect.ws.close();
+  emergencyX.ws.close();
+  emergencyDetective.ws.close();
+
+  // 18. Ohne Regel ist der Notfall-Knopf wirkungslos
+  console.log("\n=== Aufgeben nur mit Regel ===");
+  const code8 = await createGame();
+  const noSurrenderX = await connect(code8);
+  noSurrenderX.ws.send(JSON.stringify({ t: "join", code: code8, name: "Ohne-X", wantsX: true }));
+  await noSurrenderX.waitFor((m) => m.t === "joined");
+  const noSurrenderDetective = await connect(code8);
+  noSurrenderDetective.ws.send(
+    JSON.stringify({ t: "join", code: code8, name: "Beobachter", wantsX: false }),
+  );
+  await noSurrenderDetective.waitFor((m) => m.t === "joined");
+
+  noSurrenderX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        catch: { xCanSurrender: false },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await noSurrenderX.waitFor((m) => m.t === "config");
+  noSurrenderX.ws.send(JSON.stringify({ t: "start" }));
+  await noSurrenderX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  noSurrenderX.ws.send(JSON.stringify({ t: "position", pos: surrenderPos }));
+  noSurrenderX.ws.send(JSON.stringify({ t: "surrender" }));
+  const disabledError = await noSurrenderX.waitFor(
+    (m) => m.t === "error" && m.message.includes("nicht vorgesehen"),
+  );
+  assert(disabledError.t === "error", "Bei deaktivierter Regel wird das Aufgeben abgelehnt");
+  assert(
+    !noSurrenderDetective.messages.some((m) => m.t === "end"),
+    "Die Runde läuft nach einem abgelehnten Aufgeben weiter",
+  );
+  noSurrenderX.ws.close();
+  noSurrenderDetective.ws.close();
+
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);
 }

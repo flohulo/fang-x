@@ -252,6 +252,11 @@ button.secondary {
   color: var(--text);
 }
 
+button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
 input[type="text"] {
   background: var(--surface-2);
   color: var(--text);
@@ -765,6 +770,47 @@ label {
   position: relative;
 }
 
+/* Standort beim Aufgeben auf der Ergebnisansicht. */
+.result-map {
+  flex: none;
+  width: 100%;
+  max-width: 520px;
+  height: 240px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.result-map .maplibregl-ctrl-top-right,
+.result-map .maplibregl-ctrl-top-left {
+  top: 8px;
+}
+
+.surrender-result {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.12);
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.surrender-result strong {
+  color: #fca5a5;
+}
+
+.surrender-result span {
+  color: var(--text-dim);
+}
+
+.surrender-result a {
+  color: var(--text);
+  text-decoration: underline;
+}
+
 .map-overlay {
   position: absolute;
   top: 0;
@@ -971,6 +1017,10 @@ label {
   place-items: center;
   padding: 20px;
   background: rgba(2, 6, 23, 0.78);
+}
+
+.surrender-dialog {
+  border-color: rgba(239, 68, 68, 0.45);
 }
 
 .transit-dialog {

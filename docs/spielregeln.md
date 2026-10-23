@@ -99,7 +99,9 @@ Während der Laufzeit zeigt die App einen Fortschrittsbalken bis zur nächsten S
 | `catch.confirmSeconds` | int | 0–300 | **0** | X muss so lange im Radius *bleiben* (verhindert zufälliges Vorbeilaufen). |
 | `catch.teamCatchRequired` | int | 1–10 | 1 | Wie viele Detektive gleichzeitig im Radius sein müssen. |
 | `catch.anyDetectiveWins` | bool | — | true | Erster Fang gewinnt für alle Detektive (sonst: nur fürs Team). |
-| `catch.xCanSurrender` | bool | — | false | X kann aufgeben. |
+| `catch.xCanSurrender` | bool | — | true | Notfall-Knopf für X: Runde aufgeben, Detektive gewinnen, exakter Standort wird einmalig geteilt. |
+
+Der Notfall-Knopf erscheint für X während Vorsprung und Laufzeit in der Kartensteuerung. Nach einer Bestätigung endet die Runde sofort; die Detektive gewinnen und erhalten den exakten Standort von X zum Zeitpunkt des Aufgebens (einmalig, kein Verlauf). Liegt kein aktueller Standort vor, endet die Runde trotzdem – der Hinweis nennt dann, dass kein Standort verfügbar war. Die Detektive sehen den Punkt auf der Ergebnis-Karte und können ihn in OpenStreetMap öffnen; bei aktiviertem Alarm gibt es zusätzlich eine Systembenachrichtigung.
 
 ### 3.4 Bonusmission
 

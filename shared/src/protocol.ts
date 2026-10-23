@@ -31,6 +31,7 @@ export type ClientMessage =
   | { t: "chat"; text: string }
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
+  | { t: "surrender" }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -131,6 +132,18 @@ export type ServerMessage =
       revealDelayedUntil?: number;
     }
   | { t: "yourPositionIsShared"; shared: boolean }
-  | { t: "end"; winner: "X" | "DETECTIVES"; reason: string; players: PlayerInfo[] }
+  | {
+      t: "end";
+      winner: "X" | "DETECTIVES";
+      reason: string;
+      players: PlayerInfo[];
+      /** X hat aufgegeben und den exakten Standort geteilt. */
+      surrender?: {
+        playerId: string;
+        name: string;
+        pos: LatLng | null;
+        at: number;
+      };
+    }
   | { t: "error"; message: string; code?: string }
   | { t: "pong" };

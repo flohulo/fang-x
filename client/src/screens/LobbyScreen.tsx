@@ -278,6 +278,18 @@ export function LobbyScreen({
               <label className="objective-option">
                 <input
                   type="checkbox"
+                  checked={localRuleset.catch.xCanSurrender}
+                  onChange={(event) =>
+                    updateNested("catch", { xCanSurrender: event.target.checked })
+                  }
+                />
+                Notfall-Knopf für X: Spiel aufgeben und Standort teilen
+              </label>
+            </ConfigOptionHelp>
+            <ConfigOptionHelp>
+              <label className="objective-option">
+                <input
+                  type="checkbox"
                   checked={localRuleset.movement.xTransitBudget.enabled}
                   onChange={(event) =>
                     updateNested("movement", {

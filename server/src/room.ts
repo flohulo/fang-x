@@ -81,6 +81,14 @@ interface Player {
 
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
+// X hat aufgegeben: exakter Standort beim Aufgeben (einmalig, kein Verlauf).
+interface SurrenderInfo {
+  playerId: string;
+  name: string;
+  pos: LatLng | null;
+  at: number;
+}
+
 // Gespeicherter Zustand ohne Standortverläufe; playAreaCenter ist der einmalige Startpunkt.
 interface RoomSnapshot {
   version: 1;
@@ -105,6 +113,7 @@ interface RoomSnapshot {
   objective: ObjectiveState | null;
   winner: "X" | "DETECTIVES" | null;
   endReason: string | null;
+  surrender?: SurrenderInfo | null;
   transitStops?: { bus: number; train: number };
   catchPending?: boolean;
   nextPlayerId: number;
@@ -130,6 +139,7 @@ export class GameRoom {
   private playAreaCenter: LatLng | null = null;
   private winner: "X" | "DETECTIVES" | null = null;
   private endReason: string | null = null;
+  private surrenderInfo: SurrenderInfo | null = null;
   private transitStops = { bus: 0, train: 0 };
   private chatMessages: ChatMessage[] = [];
   private nextChatMessageId = 1;
@@ -208,6 +218,7 @@ export class GameRoom {
         : null,
       winner: this.winner,
       endReason: this.endReason,
+      surrender: this.surrenderInfo,
       transitStops: this.transitStops,
       catchPending: this.catchPending,
       nextPlayerId: this.nextPlayerId,
@@ -251,6 +262,7 @@ export class GameRoom {
     this.objective = snap.objective ?? null;
     this.winner = snap.winner;
     this.endReason = snap.endReason;
+    this.surrenderInfo = snap.surrender ?? null;
     this.transitStops = snap.transitStops ?? { bus: 0, train: 0 };
     this.catchPending = snap.catchPending ?? false;
     this.nextPlayerId = Math.max(1, snap.nextPlayerId);
@@ -512,6 +524,7 @@ export class GameRoom {
               winner: this.winner,
               reason: this.endReason,
               players: this.getPlayerInfos(),
+              ...(this.surrenderInfo ? { surrender: this.surrenderInfo } : {}),
             });
           }
           this.persist();
@@ -573,6 +586,10 @@ export class GameRoom {
           if (typeof msg.caught === "boolean") {
             this.resolveCatch(player, msg.caught);
           }
+          break;
+        }
+        case "surrender": {
+          this.surrender(player);
           break;
         }
         case "start": {
@@ -751,6 +768,7 @@ export class GameRoom {
     // Endgültige Rollenvergabe: willst-du-X-Flag bestimmt X vs. Detektiv.
     // Die Host-Eigenschaft (isHost) bleibt erhalten, damit die Berechtigungen
     // (configure/start) nicht verloren gehen.
+    this.surrenderInfo = null;
     for (const p of this.players.values()) {
       p.role = p.wantsX ? "X" : "DETECTIVE";
     }
@@ -1096,7 +1114,39 @@ export class GameRoom {
     return this.playAreaCenter;
   }
 
-  private endGame(winner: "X" | "DETECTIVES", reason: string) {
+  /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */
+  private surrender(player: Player | null) {
+    if (!player || player.role !== "X") {
+      if (player) {
+        this.sendTo(player.ws, { t: "error", message: "Nur X kann das Spiel aufgeben." });
+      }
+      return;
+    }
+    if (this.phase !== "HEADSTART" && this.phase !== "RUNNING") return;
+    if (!this.ruleset.catch.xCanSurrender) {
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Aufgeben ist in dieser Runde nicht vorgesehen.",
+      });
+      return;
+    }
+
+    const pos = player.position ? { ...player.position } : null;
+    this.endGame(
+      "DETECTIVES",
+      pos
+        ? `${player.name} hat aufgegeben. Der Live-Standort wurde geteilt.`
+        : `${player.name} hat aufgegeben. Ein Standort war nicht verfügbar.`,
+      { playerId: player.id, name: player.name, pos, at: Date.now() },
+    );
+  }
+
+  private endGame(
+    winner: "X" | "DETECTIVES",
+    reason: string,
+    surrender?: SurrenderInfo,
+  ) {
+    this.surrenderInfo = surrender ?? null;
     this.phase = "ENDED";
     this.objective = null;
     this.winner = winner;
@@ -1113,6 +1163,7 @@ export class GameRoom {
       winner,
       reason,
       players: this.getPlayerInfos(),
+      ...(surrender ? { surrender } : {}),
     });
     this.playAreaCenter = null;
     this.ruleset = {
@@ -1249,6 +1300,7 @@ export class GameRoom {
     this.objective = null;
     this.winner = null;
     this.endReason = null;
+    this.surrenderInfo = null;
     this.ruleset = {
       ...this.ruleset,
       map: { ...this.ruleset.map, startLocation: null },
