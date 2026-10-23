@@ -1,0 +1,76 @@
+site_name: Fang X Handbuch
+site_description: Spielregeln, Einstellungen und Tipps für Fang X – das GPS-Fangspiel für draußen.
+site_url: https://flohulo.github.io/fang-x/
+repo_url: https://github.com/flohulo/fang-x
+repo_name: flohulo/fang-x
+edit_uri: edit/main/docs/
+copyright: Fang X · AGPL-3.0-only
+
+theme:
+  name: material
+  language: de
+  favicon: assets/favicon.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Zum dunklen Modus wechseln
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Zum hellen Modus wechseln
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+nav:
+  - Startseite: index.md
+  - Erste Schritte: Erste-Schritte.md
+  - Spieleinstellungen:
+      - Übersicht: Spieleinstellungen.md
+      - Spieldauer: Spieldauer.md
+      - Vorsprung für X: Vorsprung-fuer-X.md
+      - Reveal-Intervall: Reveal-Intervall.md
+      - Sichtradius: Sichtradius.md
+      - Fangradius: Fangradius.md
+      - Spielgebiet: Spielgebiet.md
+      - Bonusmission für X: Bonusmission-fuer-X.md
+      - Notfall-Knopf: Notfall-Knopf.md
+
+# Die interne Regelwerk-Spezifikation bleibt im Repository, gehört aber nicht ins Handbuch.
+exclude_docs: |
+  spielregeln.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search:
+      lang: de
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/flohulo/fang-x
+      name: Fang X auf GitHub

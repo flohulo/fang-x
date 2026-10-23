@@ -1,6 +1,7 @@
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
 import { DEFAULT_RULESET } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
+import { docsUrl } from "../lib/docs";
 import { inviteUrl } from "../lib/invite";
 
 interface LobbyScreenProps {
@@ -134,8 +135,8 @@ export function LobbyScreen({
             Der Admin legt die Spielregeln fest und startet die Runde. Bleib in der Lobby, bis das
             Spiel gestartet wird.
           </p>
-          <a href={WIKI_BASE_URL} target="_blank" rel="noopener noreferrer">
-            Spielregeln im Wiki ansehen ↗
+          <a href={docsUrl()} target="_blank" rel="noopener noreferrer">
+            Spielregeln im Handbuch ansehen ↗
           </a>
         </div>
       )}
@@ -701,12 +702,12 @@ export function LobbyScreen({
           <div className="config-wiki-footer">
             <span className="config-wiki-footer-text">💡 Fragen zu Taktiken & Einstellungen?</span>
             <a
-              href={WIKI_BASE_URL}
+              href={docsUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="config-wiki-footer-link"
             >
-              Handbuch im Wiki öffnen ↗
+              Handbuch öffnen ↗
             </a>
           </div>
 
@@ -782,17 +783,15 @@ function PlayerRow({
   );
 }
 
-const WIKI_BASE_URL = "https://github.com/flohulo/fang-x/wiki/Spieleinstellungen";
-
 function WikiInfoLink() {
   return (
     <a
-      href={WIKI_BASE_URL}
+      href={docsUrl()}
       target="_blank"
       rel="noopener noreferrer"
       className="param-info-btn param-info-link"
-      aria-label="Diese Einstellung im Wiki nachlesen"
-      title="Im Wiki nachlesen"
+      aria-label="Diese Einstellung im Handbuch nachlesen"
+      title="Im Handbuch nachlesen"
     >
       i
     </a>
@@ -935,12 +934,12 @@ function ParamPopover({
       <p className="param-popover-desc">{info.description}</p>
       <div className="param-popover-badge">{info.recommendation}</div>
       <a
-        href={`https://github.com/flohulo/fang-x/wiki/${info.wikiPage}`}
+        href={docsUrl(info.wikiPage)}
         target="_blank"
         rel="noopener noreferrer"
         className="param-popover-wiki"
       >
-        Im Wiki nachlesen ↗
+        Im Handbuch nachlesen ↗
       </a>
     </div>
   );

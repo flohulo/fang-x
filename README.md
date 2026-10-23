@@ -81,6 +81,20 @@ npm run test:integration
 Weitere Hinweise zum Entwickeln und Mitwirken stehen in
 [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Handbuch
+
+Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
+<https://flohulo.github.io/fang-x/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
+aus den Seiten in [`docs/`](docs/) gebaut:
+
+```bash
+pip install -r requirements-docs.txt
+mkdocs serve
+```
+
+Die Seite wird bei Änderungen an `docs/` oder `mkdocs.yml` automatisch über den Workflow
+`.github/workflows/deploy-docs.yml` auf GitHub Pages veröffentlicht.
+
 ## Mitmachen
 
 Fehlerberichte und Verbesserungsvorschläge sind willkommen. Nutze dafür die
