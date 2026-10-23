@@ -192,6 +192,22 @@ export function LobbyScreen({
       {youAreHost && (
         <div className="card">
           <h3>Spieleinstellungen</h3>
+          <div className="config-field">
+            <div className="config-label-row">
+              <label htmlFor="cfg-ruleset-name">Name der Einstellungen</label>
+            </div>
+            <input
+              id="cfg-ruleset-name"
+              type="text"
+              maxLength={40}
+              placeholder="z. B. Samstagsrunde"
+              value={localRuleset.name}
+              onChange={(event) => handleConfigure({ name: event.target.value })}
+            />
+            <p className="config-hint">
+              Erscheint im Dateinamen des Exports nach dem Spiel.
+            </p>
+          </div>
           <div className="optional-game-settings">
             <p>Die Rollen ergeben sich direkt aus den Mitspielern in der Lobby.</p>
             <ConfigOptionHelp>

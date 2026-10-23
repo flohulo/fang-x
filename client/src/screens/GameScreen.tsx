@@ -3,6 +3,11 @@ import { distanceMeters } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatPanel } from "../components/ChatPanel";
 import { MapView } from "../components/MapView";
+import {
+  buildSettingsExport,
+  downloadSettingsExport,
+  settingsExportFileName,
+} from "../lib/settingsExport";
 import { useGeolocation } from "../lib/useGeolocation";
 
 interface GameScreenProps {
@@ -103,6 +108,7 @@ export function GameScreen({
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
   const [clockNow, setClockNow] = useState(() => Date.now());
   const [satelliteOn, setSatelliteOn] = useState(false);
+  const [settingsExported, setSettingsExported] = useState(false);
   const lastSentRef = useRef<number>(0);
 
   const me = players.find((p) => p.id === myId);
@@ -260,6 +266,16 @@ export function GameScreen({
     setTransitCount(1);
   };
 
+  const exportSettings = () => {
+    if (!ruleset) return;
+    const exportedAt = new Date();
+    downloadSettingsExport(
+      buildSettingsExport(ruleset, code, exportedAt),
+      settingsExportFileName(ruleset, code, exportedAt),
+    );
+    setSettingsExported(true);
+  };
+
   if (gameResult) {
     return (
       <div className="screen">
@@ -271,6 +287,23 @@ export function GameScreen({
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             Zurück zur Startseite
           </button>
+          {ruleset && (
+            <>
+              <button
+                className="secondary"
+                type="button"
+                onClick={exportSettings}
+                style={{ marginTop: 8 }}
+              >
+                {settingsExported
+                  ? "Einstellungen exportiert ✓"
+                  : "Einstellungen dieser Runde exportieren"}
+              </button>
+              <p className="config-hint" style={{ marginTop: 12 }}>
+                {`Regeln dieser Runde als JSON-Datei (${ruleset.name.trim() || "ohne Namen"}) – ohne Startpunkt.`}
+              </p>
+            </>
+          )}
         </div>
       </div>
     );
