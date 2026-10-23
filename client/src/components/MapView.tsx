@@ -27,8 +27,7 @@ const MAP_INITIAL_ZOOM = 15;
 const SATELLITE_TILES =
   "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2025_3857/default/g/{z}/{y}/{x}.jpg";
 const SATELLITE_MAX_ZOOM = 16;
-const SATELLITE_ATTRIBUTION =
-  "Sentinel-2 cloudless 2025 © EOX IT Services GmbH (CC BY-NC-SA 4.0)";
+const SATELLITE_ATTRIBUTION = "Sentinel-2 cloudless 2025 © EOX IT Services GmbH (CC BY-NC-SA 4.0)";
 const SATELLITE_LAYER_ID = "satellite";
 
 // Amtliches Orthofoto der Schweiz (SWISSIMAGE 10 cm) von swisstopo.
@@ -171,8 +170,7 @@ function applySatelliteMode(
         GAME_LAYER_IDS.has(layer.id)
       )
         continue;
-      const original: "visible" | "none" =
-        layer.layout?.visibility === "none" ? "none" : "visible";
+      const original: "visible" | "none" = layer.layout?.visibility === "none" ? "none" : "visible";
       baseVisibility.set(layer.id, original);
     }
   }

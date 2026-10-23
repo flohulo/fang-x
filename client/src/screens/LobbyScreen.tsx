@@ -205,9 +205,7 @@ export function LobbyScreen({
               value={localRuleset.name}
               onChange={(event) => handleConfigure({ name: event.target.value })}
             />
-            <p className="config-hint">
-              Erscheint im Dateinamen des Exports nach dem Spiel.
-            </p>
+            <p className="config-hint">Erscheint im Dateinamen des Exports nach dem Spiel.</p>
           </div>
           <div className="optional-game-settings">
             <p>Die Rollen ergeben sich direkt aus den Mitspielern in der Lobby.</p>

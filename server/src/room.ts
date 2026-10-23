@@ -1141,11 +1141,7 @@ export class GameRoom {
     );
   }
 
-  private endGame(
-    winner: "X" | "DETECTIVES",
-    reason: string,
-    surrender?: SurrenderInfo,
-  ) {
+  private endGame(winner: "X" | "DETECTIVES", reason: string, surrender?: SurrenderInfo) {
     this.surrenderInfo = surrender ?? null;
     this.phase = "ENDED";
     this.objective = null;

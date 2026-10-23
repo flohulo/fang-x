@@ -486,7 +486,8 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           beim Kachelabruf an die Server des Kartendienstes übermittelt.
         </p>
         <p>
-          Wird im Spiel die Satellitenansicht aktiviert, werden zusätzlich Satellitenbild-Kacheln von{" "}
+          Wird im Spiel die Satellitenansicht aktiviert, werden zusätzlich Satellitenbild-Kacheln
+          von{" "}
           <a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">
             EOX IT Services GmbH ↗
           </a>{" "}

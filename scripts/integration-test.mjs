@@ -535,7 +535,8 @@ async function run() {
 
   seenDetective.ws.close();
   await seerX.waitFor(
-    (m) => m.t === "playerPosition" && m.playerId === seenDetectiveJoined.playerId && m.pos === null,
+    (m) =>
+      m.t === "playerPosition" && m.playerId === seenDetectiveJoined.playerId && m.pos === null,
   );
   assert(true, "Getrennte Detektive verschwinden auch aus der X-Karte");
 

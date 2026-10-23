@@ -259,9 +259,7 @@ export function GameScreen({
     phase === "RUNNING" && ruleset?.catch.method === "PHOTO_CONFIRMATION" && !isX && !catchPending;
   const canUseTransitBudget = isX && trackingActive;
   const canSurrender =
-    isX &&
-    !!ruleset?.catch.xCanSurrender &&
-    (phase === "HEADSTART" || phase === "RUNNING");
+    isX && !!ruleset?.catch.xCanSurrender && (phase === "HEADSTART" || phase === "RUNNING");
   const surrender = gameResult?.surrender ?? null;
 
   const openTransitDialog = () => {
@@ -558,7 +556,7 @@ export function GameScreen({
                 Satellitenbild: Sentinel-2 cloudless 2025 ©{" "}
                 <a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">
                   EOX IT Services GmbH
-                </a>                {" "}
+                </a>{" "}
                 (
                 <a
                   href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de"
