@@ -151,6 +151,8 @@ interface MapViewProps {
   players: PlayerMarker[];
   lastReveal: RevealEvent | null;
   objective: ObjectiveState | null;
+  /** Treffpunkt/Startpunkt des Spiels — bleibt dauerhaft sichtbar. */
+  startPoint: LatLng | null;
   onMapClick?: (pos: LatLng) => void;
   onSatelliteChange?: (enabled: boolean) => void;
 }
@@ -161,6 +163,7 @@ export function MapView({
   players,
   lastReveal,
   objective,
+  startPoint,
   onMapClick,
   onSatelliteChange,
 }: MapViewProps) {
@@ -168,6 +171,7 @@ export function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<Map<string, Marker>>(new Map());
   const objectiveMarkerRef = useRef<Marker | null>(null);
+  const startMarkerRef = useRef<Marker | null>(null);
   const onMapClickRef = useRef(onMapClick);
   onMapClickRef.current = onMapClick;
   const onSatelliteChangeRef = useRef(onSatelliteChange);
@@ -430,6 +434,38 @@ export function MapView({
       )
       .addTo(map);
   }, [objective]);
+
+  // Startpunkt dauerhaft markieren
+  const startLat = startPoint?.lat ?? null;
+  const startLng = startPoint?.lng ?? null;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (startLat === null || startLng === null) {
+      startMarkerRef.current?.remove();
+      startMarkerRef.current = null;
+      return;
+    }
+
+    const marker = startMarkerRef.current;
+    if (marker) {
+      marker.setLngLat([startLng, startLat]);
+      return;
+    }
+
+    const el = document.createElement("div");
+    el.className = "start-marker";
+    el.textContent = "Start";
+    el.setAttribute("aria-label", "Startpunkt");
+
+    // Über dem eigentlichen Punkt, damit die Markierung nicht auf dem
+    // Spieler-Marker liegt, wenn X noch am Startpunkt steht.
+    startMarkerRef.current = new Marker({ element: el, anchor: "bottom", offset: [0, -16] })
+      .setLngLat([startLng, startLat])
+      .setPopup(new Popup().setText("Startpunkt · hier begann die Runde"))
+      .addTo(map);
+  }, [startLat, startLng]);
 
   // Karte zentrieren wenn sich Zentrum ändert
   useEffect(() => {

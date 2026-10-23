@@ -498,16 +498,10 @@ export class GameRoom {
           this.sendTo(ws, this.phaseMessage());
           this.sendTo(ws, this.revealTimerMessage());
           this.sendObjective(player);
-          if (this.ruleset.movement.detectivesShareLiveLocation && this.phase === "RUNNING") {
-            for (const other of this.players.values()) {
-              if (other.role === "DETECTIVE" && other.position) {
-                this.sendTo(ws, {
-                  t: "playerPosition",
-                  playerId: other.id,
-                  pos: other.position,
-                });
-              }
-            }
+          // Detektiv-Standorte nachliefern, soweit dieser Spieler sie sehen darf.
+          for (const other of this.players.values()) {
+            if (!other.position || !this.canSeeDetectivePosition(player, other)) continue;
+            this.sendTo(ws, { t: "playerPosition", playerId: other.id, pos: other.position });
           }
           this.broadcastPlayers();
           // Beendetes Spiel? Ergebnis direkt nachliefern, damit ein Reload im
@@ -617,9 +611,7 @@ export class GameRoom {
             this.checkXOutOfBounds(player);
             this.checkObjective(player);
           } else {
-            if (this.ruleset.movement.detectivesShareLiveLocation && this.phase === "RUNNING") {
-              this.broadcast({ t: "playerPosition", playerId: player.id, pos: msg.pos });
-            }
+            this.broadcastDetectivePosition(player, msg.pos);
             this.checkCatch();
           }
           break;
@@ -681,12 +673,11 @@ export class GameRoom {
       p.role === "DETECTIVE" &&
       p.position &&
       (this.ruleset.movement.detectivesShareLiveLocation ||
+        this.ruleset.reveal.xSeesDetectives === "ALWAYS" ||
         (this.ruleset.game.detectivesWaitDuringHeadStart && this.phase === "HEADSTART"))
     ) {
       p.position = null;
-      if (this.ruleset.movement.detectivesShareLiveLocation) {
-        this.broadcast({ t: "playerPosition", playerId: p.id, pos: null });
-      }
+      this.broadcastDetectivePosition(p, null);
     }
     this.broadcastPlayers();
     this.persist();
@@ -916,6 +907,10 @@ export class GameRoom {
       }
     }
 
+    if (this.ruleset.reveal.xSeesDetectives === "ON_REVEAL") {
+      this.broadcastDetectiveSnapshotToX();
+    }
+
     this.nextRevealAt = now + this.computeNextRevealDelay();
     this.broadcastRevealTimer();
     this.persist();
@@ -1088,8 +1083,8 @@ export class GameRoom {
     for (const p of this.players.values()) {
       if (p.position && now - p.lastPositionAt > cutoff) {
         p.position = null;
-        if (this.ruleset.movement.detectivesShareLiveLocation && p.role === "DETECTIVE") {
-          this.broadcast({ t: "playerPosition", playerId: p.id, pos: null });
+        if (p.role === "DETECTIVE") {
+          this.broadcastDetectivePosition(p, null);
         }
       }
     }
@@ -1327,6 +1322,41 @@ export class GameRoom {
   private broadcastToDetectives(msg: ServerMessage) {
     for (const p of this.players.values()) {
       if (p.role !== "X") this.sendTo(p.ws, msg);
+    }
+  }
+
+  /**
+   * Darf `viewer` die Live-Position dieses Detektivs erfahren?
+   * X sieht Detektive nur, wenn das Regelwerk es vorsieht; Detektive sehen sich
+   * nur bei ausdrücklich aktivierter Live-Freigabe gegenseitig.
+   */
+  private canSeeDetectivePosition(viewer: Player, detective: Player): boolean {
+    if (viewer.id === detective.id || detective.role !== "DETECTIVE") return false;
+    if (this.phase !== "RUNNING" && this.phase !== "HEADSTART") return false;
+    if (viewer.role === "X") return this.ruleset.reveal.xSeesDetectives === "ALWAYS";
+    return this.ruleset.movement.detectivesShareLiveLocation && this.phase === "RUNNING";
+  }
+
+  /** Verteilt eine Detektiv-Position an alle Spieler, die sie sehen dürfen. */
+  private broadcastDetectivePosition(detective: Player, pos: LatLng | null) {
+    for (const viewer of this.players.values()) {
+      if (!this.canSeeDetectivePosition(viewer, detective)) continue;
+      this.sendTo(viewer.ws, { t: "playerPosition", playerId: detective.id, pos });
+    }
+  }
+
+  /** Bei jeder Sichtung erfährt X zusätzlich, wo die Detektive gerade stehen. */
+  private broadcastDetectiveSnapshotToX() {
+    for (const viewer of this.players.values()) {
+      if (viewer.role !== "X") continue;
+      for (const detective of this.players.values()) {
+        if (detective.role !== "DETECTIVE" || !detective.position) continue;
+        this.sendTo(viewer.ws, {
+          t: "playerPosition",
+          playerId: detective.id,
+          pos: detective.position,
+        });
+      }
     }
   }
 

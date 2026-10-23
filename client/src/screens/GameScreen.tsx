@@ -285,6 +285,7 @@ export function GameScreen({
           players={playerMarkers}
           lastReveal={lastReveal}
           objective={isX ? objective : null}
+          startPoint={playAreaCenter ?? ruleset?.map?.startLocation ?? null}
           onMapClick={handleMapClick}
           onSatelliteChange={setSatelliteOn}
         />

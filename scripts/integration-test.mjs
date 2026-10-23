@@ -401,11 +401,16 @@ async function run() {
 
   const detectivePos = { lat: 47.39, lng: 8.56 };
   detective1.ws.send(JSON.stringify({ t: "position", pos: detectivePos }));
-  await mrX.waitFor((m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId);
-  await detective2.waitFor((m) => m.t === "playerPosition");
+  await detective2.waitFor(
+    (m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId,
+  );
   assert(true, "Detektive teilen ihre Live-Standorte in der App");
+  assert(
+    !mrX.messages.some((m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId),
+    "Ohne Freigabe sieht X die Detektive nicht live",
+  );
   detective1.ws.close();
-  await mrX.waitFor(
+  await detective2.waitFor(
     (m) => m.t === "playerPosition" && m.playerId === detective1Joined.playerId && m.pos === null,
   );
   assert(true, "Getrennte Detektive werden von der Live-Karte entfernt");
@@ -485,6 +490,103 @@ async function run() {
 
   randomX.ws.close();
   randomDetective.ws.close();
+
+  // 15. X sieht Detektive immer (Regel ALWAYS)
+  console.log("\n=== X sieht Detektive (immer) ===");
+  const code5 = await createGame();
+  const seerX = await connect(code5);
+  seerX.ws.send(JSON.stringify({ t: "join", code: code5, name: "Seher-X", wantsX: true }));
+  await seerX.waitFor((m) => m.t === "joined");
+  const seenDetective = await connect(code5);
+  seenDetective.ws.send(
+    JSON.stringify({ t: "join", code: code5, name: "Sichtbarer Detektiv", wantsX: false }),
+  );
+  const seenDetectiveJoined = await seenDetective.waitFor((m) => m.t === "joined");
+
+  seerX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        reveal: { firstRevealAfterMinutes: 5, intervalMinutes: 5, xSeesDetectives: "ALWAYS" },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await seerX.waitFor((m) => m.t === "config");
+  seerX.ws.send(JSON.stringify({ t: "start" }));
+  await seerX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+
+  seerX.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.3769, lng: 8.5417 } }));
+  seenDetective.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.38, lng: 8.55 } }));
+  const seenFirst = await seerX.waitFor(
+    (m) => m.t === "playerPosition" && m.playerId === seenDetectiveJoined.playerId,
+  );
+  assert(seenFirst.pos.lat === 47.38, "X sieht den Live-Standort der Detektive (Regel ALWAYS)");
+
+  seenDetective.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.381, lng: 8.551 } }));
+  const seenUpdate = await seerX.waitFor(
+    (m) =>
+      m.t === "playerPosition" &&
+      m.playerId === seenDetectiveJoined.playerId &&
+      m.pos?.lat === 47.381,
+  );
+  assert(!!seenUpdate, "X bekommt die Standort-Updates der Detektive");
+
+  seenDetective.ws.close();
+  await seerX.waitFor(
+    (m) => m.t === "playerPosition" && m.playerId === seenDetectiveJoined.playerId && m.pos === null,
+  );
+  assert(true, "Getrennte Detektive verschwinden auch aus der X-Karte");
+
+  seerX.ws.close();
+
+  // 16. X sieht Detektive nur bei der Sichtung (Regel ON_REVEAL)
+  console.log("\n=== X sieht Detektive bei der Sichtung ===");
+  const code6 = await createGame();
+  const revealX = await connect(code6);
+  revealX.ws.send(JSON.stringify({ t: "join", code: code6, name: "Reveal-X", wantsX: true }));
+  await revealX.waitFor((m) => m.t === "joined");
+  const revealedDetective = await connect(code6);
+  revealedDetective.ws.send(
+    JSON.stringify({ t: "join", code: code6, name: "Versteckter Detektiv", wantsX: false }),
+  );
+  const revealedDetectiveJoined = await revealedDetective.waitFor((m) => m.t === "joined");
+
+  revealX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        reveal: {
+          firstRevealAfterMinutes: 0.1,
+          intervalMinutes: 5,
+          xSeesDetectives: "ON_REVEAL",
+        },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await revealX.waitFor((m) => m.t === "config");
+  revealX.ws.send(JSON.stringify({ t: "start" }));
+  await revealX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  revealX.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.3769, lng: 8.5417 } }));
+  revealedDetective.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.38, lng: 8.55 } }));
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  assert(
+    !revealX.messages.some(
+      (m) => m.t === "playerPosition" && m.playerId === revealedDetectiveJoined.playerId,
+    ),
+    "Ohne Sichtung bleibt der Detektiv-Standort bei ON_REVEAL verborgen",
+  );
+  const snapshot = await revealX.waitFor(
+    (m) => m.t === "playerPosition" && m.playerId === revealedDetectiveJoined.playerId,
+    15000,
+  );
+  assert(snapshot.pos.lat === 47.38, "Bei der Sichtung erfährt X, wo der Detektiv steht");
+
+  revealX.ws.close();
+  revealedDetective.ws.close();
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);

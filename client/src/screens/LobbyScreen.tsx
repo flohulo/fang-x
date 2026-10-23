@@ -1,4 +1,4 @@
-import type { Ruleset } from "@fang-x/shared";
+import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
 import { DEFAULT_RULESET } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
 import { inviteUrl } from "../lib/invite";
@@ -220,6 +220,25 @@ export function LobbyScreen({
                 Detektive teilen während des Spiels gegenseitig ihren Live-Standort
               </label>
             </ConfigOptionHelp>
+            <div className="config-field">
+              <div className="config-label-row">
+                <label htmlFor="cfg-x-sees-detectives">X sieht Detektive</label>
+                <WikiInfoLink />
+              </div>
+              <select
+                id="cfg-x-sees-detectives"
+                value={localRuleset.reveal.xSeesDetectives}
+                onChange={(event) =>
+                  updateNested("reveal", {
+                    xSeesDetectives: event.target.value as XSeesDetectives,
+                  })
+                }
+              >
+                <option value="ALWAYS">Immer – Live-Standort der Detektive</option>
+                <option value="ON_REVEAL">Nur bei jeder Sichtung</option>
+                <option value="NEVER">Nie</option>
+              </select>
+            </div>
             <div className="config-field">
               <div className="config-label-row">
                 <label htmlFor="cfg-catch-method">Fangregel</label>

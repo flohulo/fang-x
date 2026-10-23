@@ -78,7 +78,7 @@ Einstellungen überschreibt.
 | `reveal.showExactPoint` | bool | — | true | Zusätzlich zum Kreis den exakten letzten Punkt zeigen. |
 | `reveal.jitterMeters` | int | 0–500 | 0 | X's gemeldeter Punkt wird um bis zu ±N m verstellt (täuscht Detektive). |
 | `reveal.showTrail` | enum | `NONE` / `LAST3` / `FULL` | LAST3 | Frühere Sichtungen bleiben als Spur sichtbar. |
-| `reveal.xSeesDetectives` | enum | `ALWAYS` / `ON_REVEAL` / `NEVER` | ON_REVEAL | Was X über Detektive weiß. |
+| `reveal.xSeesDetectives` | enum | `ALWAYS` / `ON_REVEAL` / `NEVER` | ON_REVEAL | Was X über Detektive weiß. `ALWAYS`: X sieht den Live-Standort aller Detektive dauerhaft. `ON_REVEAL`: X erfährt nur zum Zeitpunkt jeder Sichtung, wo die Detektive stehen. `NEVER`: X sieht keine Detektiv-Standorte. |
 | `reveal.detectivesSeesXHistory` | bool | — | true | Verlauf aller bisherigen Sichtungen sichtbar. |
 
 > **Hinweis zum Screenshot:** Die 700 Meter aus dem Original sind der **Spielradius**
@@ -162,7 +162,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
 |---|---|---|---|---|
 | `map.centerLat` / `map.centerLng` | number | — | Host-Position | Zentrum des Spiels. |
 | `map.playAreaRadiusMeters` | int | 100–20000 | **700** | Spielradius: Die Fläche, auf der gespielt wird (entspricht dem aufgedeckten Kreis im Screenshot). |
-| `map.startLocation` | LatLng/null | — | null | Optionaler Startpunkt des Spiels; wird nur während der laufenden Runde gespeichert. |
+| `map.startLocation` | LatLng/null | — | null | Optionaler Startpunkt des Spiels; wird nur während der laufenden Runde gespeichert und während der gesamten Runde als „Start“-Marker auf der Karte angezeigt. |
 | `map.outOfBoundsEnabled` | bool | — | **true** | Randzaun aktiv? X darf das Gebiet nicht verlassen. |
 | `map.outOfBoundsGraceSeconds` | int | 0–120 | 15 | Toleranz am Rand (GPS-Genauigkeit) — erst danach greift die Regel. |
 | `map.outOfBoundsPenalty` | enum | `LIVE_SHARE` / `WARNING` / `TELEPORT_BACK` / `INSTANT_LOSS` | **LIVE_SHARE** | Folge bei Verlassen: Bei `LIVE_SHARE` wird X's Live-Standort solange permanent an alle Detektive gestreamt, wie er außerhalb ist — Flucht aus dem Gebiet bestraft sich selbst. |
