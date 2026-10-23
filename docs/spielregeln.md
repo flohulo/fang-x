@@ -259,7 +259,8 @@ Damit kein Regelwerk missbraucht wird:
 7. **Karte ohne Tracking.** Es werden OpenStreetMap-Tiles genutzt (kein Google/Mapbox-Konto,
    keine API-Keys, keine Nutzer-Profiling-Weitergabe an Kartenanbieter). Optional lässt sich im
    Spiel eine Satellitenkarte von EOX (Sentinel-2 cloudless 2025, CC BY-NC-SA 4.0) einblenden;
-   dabei wird die IP-Adresse an `tiles.maps.eox.at` übermittelt.
+   in der Schweiz ergänzt das amtliche Luftbild SWISSIMAGE von swisstopo die Nahaufnahmen. Dabei
+   wird die IP-Adresse an `tiles.maps.eox.at` bzw. `wmts.geo.admin.ch` übermittelt.
 8. **Selbst-hostbar.** Wer will, betreibt den Server selbst — dann verlassen Standortdaten
    nie das eigene Netz. Kein Vendor-Lock-in, keine teuren SDKs.
 

@@ -47,7 +47,10 @@ Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt Benac
 Für Karten nutzt Fang X [OpenFreeMap](https://openfreemap.org/) auf Basis von
 [OpenStreetMap](https://www.openstreetmap.org/). Die Kartendaten sind © OpenStreetMap-Mitwirkende.
 Über den Karten-Button lässt sich optional eine Satellitenkarte einblenden: Sentinel-2 cloudless
-2025 von [EOX](https://cloudless.eox.at/) (© EOX IT Services GmbH, CC BY-NC-SA 4.0).
+2025 von [EOX](https://cloudless.eox.at/) (© EOX IT Services GmbH, CC BY-NC-SA 4.0). In der
+Schweiz wird bei Nahaufnahmen zusätzlich das amtliche Luftbild SWISSIMAGE von
+[swisstopo](https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10) eingeblendet
+(© swisstopo, freie Geodaten des Bundes).
 
 ## Lokal ausprobieren
 

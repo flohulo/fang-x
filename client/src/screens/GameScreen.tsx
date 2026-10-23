@@ -578,6 +578,14 @@ export function GameScreen({
                   rel="noopener noreferrer"
                 >
                   OpenStreetMap
+                </a>{" "}
+                · Luftbild Schweiz:{" "}
+                <a
+                  href="https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  © swisstopo
                 </a>
               </>
             ) : (

@@ -271,6 +271,14 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
           >
             Sentinel-2 cloudless (EOX) ↗
           </a>
+          <a
+            href="https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="legal-chip"
+          >
+            SWISSIMAGE (swisstopo) ↗
+          </a>
         </div>
         <p>
           Die optionale Satellitenansicht nutzt „Sentinel-2 cloudless 2025“ von EOX IT Services GmbH
@@ -283,6 +291,18 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
             CC BY-NC-SA 4.0 ↗
           </a>
           . Das Bildmaterial basiert auf Daten des europäischen Copernicus-Programms (Sentinel-2).
+        </p>
+        <p>
+          Für Nahaufnahmen in der Schweiz wird darüber zusätzlich das amtliche Luftbildmosaik
+          SWISSIMAGE (10 cm) von swisstopo eingeblendet. Die Geodaten sind nach den{" "}
+          <a
+            href="https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Nutzungsbedingungen für freie Geodaten des Bundes ↗
+          </a>{" "}
+          frei nutzbar; erforderlich ist die Quellenangabe „© swisstopo“.
         </p>
       </section>
     </>
@@ -471,8 +491,13 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             EOX IT Services GmbH ↗
           </a>{" "}
           (Sentinel-2 cloudless, CC BY-NC-SA 4.0) geladen. Auch dabei wird die IP-Adresse an die
-          Server von EOX übermittelt. Die Ansicht ist optional und lässt sich jederzeit wieder
-          ausschalten.
+          Server von EOX übermittelt. Befindet sich die Karte über der Schweiz, werden zusätzlich
+          Orthofoto-Kacheln von{" "}
+          <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener noreferrer">
+            swisstopo ↗
+          </a>{" "}
+          über das Bundesgeoportal (wmts.geo.admin.ch) geladen; dabei wird die IP-Adresse an dieses
+          übermittelt. Die Ansicht ist optional und lässt sich jederzeit wieder ausschalten.
         </p>
       </section>
 
@@ -484,9 +509,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
         <p>
           Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten
           sind der Hosting-Anbieter Cloudflare sowie – je nach gewählter Kartenansicht – der
-          Kartenanbieter OpenFreeMap und der Satellitenbild-Anbieter EOX, jeweils im Rahmen der oben
-          beschriebenen Zwecke. Eine Weitergabe an sonstige Dritte, ein Verkauf von Daten
-          oder eine Nutzung zu Werbezwecken findet nicht statt.
+          Kartenanbieter OpenFreeMap, der Satellitenbild-Anbieter EOX sowie für das Schweizer
+          Luftbild swisstopo, jeweils im Rahmen der oben beschriebenen Zwecke. Eine Weitergabe an
+          sonstige Dritte, ein Verkauf von Daten oder eine Nutzung zu Werbezwecken findet nicht
+          statt.
         </p>
       </section>
 
