@@ -278,7 +278,7 @@ export function MapView({
       mapRef.current = null;
       satelliteControlRef.current = null;
     };
-  }, []);
+  }, [center.lat, center.lng]);
 
   // Satellitenkarte ein-/ausschalten, sobald der Stil geladen ist.
   useEffect(() => {
@@ -343,7 +343,7 @@ export function MapView({
 
     if (map.isStyleLoaded()) addPlayArea();
     else map.on("load", addPlayArea);
-  }, [center.lat, center.lng, playAreaRadiusMeters]);
+  }, [center.lat, center.lng, playAreaRadiusMeters, center]);
 
   // X-Reveal-Kreis zeichnen
   useEffect(() => {

@@ -1768,7 +1768,7 @@ label {
   padding: 6px 14px;
   border-radius: 999px;
   cursor: pointer;
-  text-decoration: none !important;
+  text-decoration: none;
   transition: all 0.18s ease;
 }
 

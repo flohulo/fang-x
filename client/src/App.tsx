@@ -128,8 +128,8 @@ export default function App() {
   const [joinError, setJoinError] = useState<string | null>(null);
   const [checkingCode, setCheckingCode] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
-  const [requestingLocation, setRequestingLocation] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [_requestingLocation, setRequestingLocation] = useState(false);
+  const [_locationError, setLocationError] = useState<string | null>(null);
   const [alertsEnabled, setAlertsEnabled] = useState(loadAlertsEnabled);
   const [notificationPermission, setNotificationPermission] = useState<AlertNotificationPermission>(
     () => (typeof Notification === "undefined" ? "unsupported" : Notification.permission),
@@ -267,7 +267,7 @@ export default function App() {
       });
   }, [legalPage, changelogPage]);
 
-  const requestLocationAccess = useCallback(() => {
+  const _requestLocationAccess = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationError(
         "Standortfreigabe wird nicht unterstützt. Öffne Fang X über eine sichere HTTPS-Verbindung auf einem Gerät mit GPS.",
@@ -396,7 +396,7 @@ export default function App() {
     };
     // absichtlich nur beim ersten Mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locationReady]);
+  }, [locationReady, game.join]);
 
   if (legalPage) {
     return (
@@ -458,7 +458,7 @@ export default function App() {
         gameResult={game.gameResult}
         onPosition={game.sendPosition}
         onSetObjective={game.setObjectiveTarget}
-        onUseTransitStop={game.useTransitStop}
+        onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}

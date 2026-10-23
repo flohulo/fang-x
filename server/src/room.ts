@@ -244,7 +244,7 @@ export class GameRoom {
     } catch {
       snap = null;
     }
-    if (!snap || snap.version !== 1) {
+    if (snap?.version !== 1) {
       this.scheduleAlarm();
       return;
     }
@@ -376,7 +376,6 @@ export class GameRoom {
         return GRACE_COUNTDOWN_MS;
       case "RUNNING":
         return p.role === "X" ? GRACE_RUNNING_X_MS : GRACE_RUNNING_DETECTIVE_MS;
-      case "ENDED":
       default:
         return GRACE_ENDED_MS;
     }
@@ -532,7 +531,7 @@ export class GameRoom {
           break;
         }
         case "configure": {
-          if (!player || !player.isHost) {
+          if (!player?.isHost) {
             this.sendTo(ws, { t: "error", message: "Nur der Host kann konfigurieren." });
             return;
           }
@@ -593,7 +592,7 @@ export class GameRoom {
           break;
         }
         case "start": {
-          if (!player || !player.isHost) return;
+          if (!player?.isHost) return;
           if (this.phase !== "LOBBY") return;
           if (![...this.players.values()].some((p) => p.wantsX)) {
             this.sendTo(ws, { t: "error", message: "Für den Start braucht es mindestens ein X." });
@@ -857,7 +856,6 @@ export class GameRoom {
         const max = r.randomMaxMinutes;
         return (min + Math.random() * (max - min)) * 60000;
       }
-      case "FIXED":
       default:
         return r.intervalMinutes * 60000;
     }
@@ -973,7 +971,7 @@ export class GameRoom {
   }
 
   private setObjective(player: Player | null, target: LatLng) {
-    if (!player || player.role !== "X") {
+    if (player?.role !== "X") {
       if (player)
         this.sendTo(player.ws, { t: "error", message: "Nur X kann ein Missionsziel setzen." });
       return;
@@ -985,7 +983,7 @@ export class GameRoom {
       });
       return;
     }
-    if (!this.objective || this.objective.status !== "PENDING") {
+    if (this.objective?.status !== "PENDING") {
       this.sendTo(player.ws, { t: "error", message: "Das Missionsziel wurde bereits festgelegt." });
       return;
     }
@@ -1084,7 +1082,7 @@ export class GameRoom {
     // LIVE_SHARE: kontinuierlich X-Position an alle senden, wenn außerhalb
     if (this.xCurrentlyOutOfBounds && this.ruleset.map.outOfBoundsPenalty === "LIVE_SHARE") {
       const x = [...this.players.values()].find((p) => p.role === "X" && p.position);
-      if (x && x.position) {
+      if (x?.position) {
         const liveReveal: RevealEvent = {
           pos: x.position,
           radiusMeters: 0,
@@ -1116,7 +1114,7 @@ export class GameRoom {
 
   /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */
   private surrender(player: Player | null) {
-    if (!player || player.role !== "X") {
+    if (player?.role !== "X") {
       if (player) {
         this.sendTo(player.ws, { t: "error", message: "Nur X kann das Spiel aufgeben." });
       }
@@ -1178,8 +1176,7 @@ export class GameRoom {
 
   private useTransitStop(player: Player | null, mode: "bus" | "train", count = 1) {
     if (
-      !player ||
-      player.role !== "X" ||
+      player?.role !== "X" ||
       !this.ruleset.movement.xTransitBudget.enabled ||
       (this.phase !== "HEADSTART" && this.phase !== "RUNNING")
     ) {
@@ -1253,8 +1250,7 @@ export class GameRoom {
 
   private reportCatch(player: Player | null) {
     if (
-      !player ||
-      player.role !== "DETECTIVE" ||
+      player?.role !== "DETECTIVE" ||
       this.phase !== "RUNNING" ||
       this.ruleset.catch.method !== "PHOTO_CONFIRMATION" ||
       this.catchPending
@@ -1268,8 +1264,7 @@ export class GameRoom {
 
   private resolveCatch(player: Player | null, caught: boolean) {
     if (
-      !player ||
-      player.role !== "X" ||
+      player?.role !== "X" ||
       this.phase !== "RUNNING" ||
       this.ruleset.catch.method !== "PHOTO_CONFIRMATION" ||
       !this.catchPending

@@ -788,24 +788,24 @@ function buildHint({
     case "COUNTDOWN":
       return isX
         ? {
-            title: PHASE_TITLE.COUNTDOWN + ".",
+            title: `${PHASE_TITLE.COUNTDOWN}.`,
             text: "Prüfe kurz deinen Standort – gleich startet dein Vorsprung.",
           }
         : {
-            title: PHASE_TITLE.COUNTDOWN + ".",
+            title: `${PHASE_TITLE.COUNTDOWN}.`,
             text: "X bekommt gleich Vorsprung. Mach dich bereit.",
           };
 
     case "HEADSTART":
       return isX
         ? {
-            title: PHASE_TITLE.HEADSTART + ".",
+            title: `${PHASE_TITLE.HEADSTART}.`,
             text: isSolo
               ? "Kein Detektiv im Raum – du kannst in Ruhe das Gebiet erkunden."
               : "Bewege dich in Deckung und bleib im Spielgebiet.",
           }
         : {
-            title: PHASE_TITLE.HEADSTART + ".",
+            title: `${PHASE_TITLE.HEADSTART}.`,
             text: "X läuft los – warte auf die erste Sichtung.",
           };
 

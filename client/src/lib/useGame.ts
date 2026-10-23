@@ -293,7 +293,7 @@ export function useGame() {
     send({ t: "setObjective", target });
   };
 
-  const useTransitStop = (mode: "bus" | "train", count: number) => {
+  const requestTransitStop = (mode: "bus" | "train", count: number) => {
     send({ t: "useTransitStop", mode, count });
   };
 
@@ -341,7 +341,7 @@ export function useGame() {
       clearRetryTimer();
       wsRef.current?.close();
     };
-  }, []);
+  }, [clearRetryTimer]);
 
   return {
     phase,
@@ -370,7 +370,7 @@ export function useGame() {
     setRole,
     start,
     setObjectiveTarget,
-    useTransitStop,
+    requestTransitStop,
     sendChat,
     reportCatch,
     resolveCatch,

@@ -447,7 +447,7 @@ export function LobbyScreen({
                 value={localRuleset.game.durationMinutes}
                 onChange={(e) =>
                   updateNested("game", {
-                    durationMinutes: parseInt(e.target.value) || 30,
+                    durationMinutes: parseInt(e.target.value, 10) || 30,
                   })
                 }
               />
@@ -478,7 +478,7 @@ export function LobbyScreen({
                 value={localRuleset.game.headStartMinutes}
                 onChange={(e) =>
                   updateNested("game", {
-                    headStartMinutes: parseInt(e.target.value) || 0,
+                    headStartMinutes: parseInt(e.target.value, 10) || 0,
                   })
                 }
               />
@@ -560,7 +560,7 @@ export function LobbyScreen({
                 value={localRuleset.reveal.intervalMinutes}
                 onChange={(e) =>
                   updateNested("reveal", {
-                    intervalMinutes: parseInt(e.target.value) || 3,
+                    intervalMinutes: parseInt(e.target.value, 10) || 3,
                   })
                 }
               />
@@ -591,7 +591,7 @@ export function LobbyScreen({
                 value={localRuleset.reveal.revealRadiusMeters}
                 onChange={(e) =>
                   updateNested("reveal", {
-                    revealRadiusMeters: parseInt(e.target.value) || 5,
+                    revealRadiusMeters: parseInt(e.target.value, 10) || 5,
                   })
                 }
               />
@@ -623,7 +623,7 @@ export function LobbyScreen({
                   value={localRuleset.catch.radiusMeters}
                   onChange={(e) =>
                     updateNested("catch", {
-                      radiusMeters: parseInt(e.target.value) || 30,
+                      radiusMeters: parseInt(e.target.value, 10) || 30,
                     })
                   }
                 />
@@ -655,7 +655,7 @@ export function LobbyScreen({
                 value={localRuleset.map.playAreaRadiusMeters}
                 onChange={(e) =>
                   updateNested("map", {
-                    playAreaRadiusMeters: parseInt(e.target.value) || 700,
+                    playAreaRadiusMeters: parseInt(e.target.value, 10) || 700,
                   })
                 }
               />
