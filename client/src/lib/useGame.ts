@@ -246,7 +246,10 @@ export function useGame() {
     };
 
     ws.onclose = () => {
-      if (wsRef.current === ws) wsRef.current = null;
+      // Ein bereits ersetzter Socket (z. B. durch einen neuen Beitritt) darf
+      // keinen Reconnect für die aktuelle Verbindung auslösen.
+      if (wsRef.current !== ws) return;
+      wsRef.current = null;
       setConnected(false);
       if (intentionalRef.current) return;
       // Ungeplant getrennt — Platz bleibt serverseitig frei, wir versuchen es erneut.
@@ -272,7 +275,9 @@ export function useGame() {
     setChatMessages([]);
     setCatchPending(false);
     sessionRef.current = { code, name, wantsX };
-    wsRef.current?.close();
+    const previous = wsRef.current;
+    wsRef.current = null;
+    previous?.close();
     connect({ code, name, wantsX });
   };
 
@@ -335,13 +340,18 @@ export function useGame() {
   };
 
   // Beim Verlassen der Seite sauber abschalten, ohne Reconnect zu starten.
+  // Darf nur beim Unmount laufen: bei jedem Render würde der gerade
+  // aufgebaute WebSocket sofort wieder geschlossen.
   useEffect(() => {
     return () => {
       intentionalRef.current = true;
-      clearRetryTimer();
+      if (retryTimerRef.current !== null) {
+        window.clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       wsRef.current?.close();
     };
-  }, [clearRetryTimer]);
+  }, []);
 
   return {
     phase,
