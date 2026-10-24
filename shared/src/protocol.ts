@@ -58,7 +58,7 @@ export interface RevealEvent {
   radiusMeters: number;
   at: number; // server timestamp ms
   index: number;
-  isLive: boolean; // true = LIVE_SHARE (X außerhalb des Gebiets)
+  isLive: boolean; // true = LIVE_SHARE (X ausserhalb des Gebiets)
 }
 
 // Eine Chat-Nachricht im Spielraum. Wird nicht persistiert und nach Spielende verworfen.
@@ -105,7 +105,7 @@ export type ServerMessage =
   | {
       t: "revealTimer";
       serverTime: number;
-      /** Nächste Sichtung; null bei Zufallsintervall oder außerhalb der Laufzeit. */
+      /** Nächste Sichtung; null bei Zufallsintervall oder ausserhalb der Laufzeit. */
       nextRevealAt: number | null;
       /** Beginn des aktuellen Intervalls (letzte Sichtung bzw. Laufzeitstart). */
       intervalStartedAt: number;

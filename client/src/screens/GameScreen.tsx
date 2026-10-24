@@ -455,7 +455,7 @@ export function GameScreen({
             <button
               type="button"
               className="transit-notice-close"
-              aria-label="Hinweis schließen"
+              aria-label="Hinweis schliessen"
               onClick={() => setDismissedTransitNoticeAt(visibleTransitNotice.at)}
             >
               ×
@@ -478,7 +478,7 @@ export function GameScreen({
                 ? metersToEdge === null
                   ? "Standort unbekannt"
                   : isOutside
-                    ? `${Math.abs(metersToEdge)} m außerhalb`
+                    ? `${Math.abs(metersToEdge)} m ausserhalb`
                     : `${metersToEdge} m bis zum Rand`
                 : "Kein Spielfeldrand"}
             </span>

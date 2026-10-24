@@ -170,7 +170,7 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
           <span className="legal-section-num">02</span>
           <h2>Verantwortlich für den Inhalt</h2>
         </div>
-        <p>Verantwortlich für redaktionelle Inhalte gemäß Telemediengesetz / Datenschutzrecht:</p>
+        <p>Verantwortlich für redaktionelle Inhalte:</p>
         <p>
           <strong>{LEGAL.email}</strong>
         </p>
@@ -182,7 +182,7 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
           <h2>Haftungsausschluss</h2>
         </div>
         <p>
-          Alle Inhalte und Funktionen dieses Online-Spiels werden mit größter Sorgfalt
+          Alle Inhalte und Funktionen dieses Online-Spiels werden mit grösster Sorgfalt
           bereitgestellt, jedoch ohne Gewähr. Für Richtigkeit, Vollständigkeit und Aktualität der
           bereitgestellten Inhalte sowie für die permanente Verfügbarkeit des Servers kann keine
           Gewähr übernommen werden.
@@ -197,7 +197,7 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
         <p>
           Für Inhalte externer Webseiten sind stets deren Betreiber verantwortlich. Zum Zeitpunkt
           der Verlinkung waren keine rechtswidrigen Inhalte erkennbar. Bei Bekanntwerden von
-          Rechtsverstößen werden derartige Links unverzüglich entfernt.
+          Rechtsverstössen werden derartige Links unverzüglich entfernt.
         </p>
       </section>
 
@@ -443,7 +443,7 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           <span className="legal-section-num">04</span>
           <h2>Im Spiel verarbeitete Daten</h2>
         </div>
-        <p>Während des Spielens werden ausschließlich folgende funktionale Daten verarbeitet:</p>
+        <p>Während des Spielens werden ausschliesslich folgende funktionale Daten verarbeitet:</p>
         <ul>
           <li>
             <strong>Anzeigename:</strong> Frei wählbar (Spitzname), keine Pflicht zur Angabe des
@@ -526,7 +526,7 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           Standortverläufe werden nicht dauerhaft gespeichert. Der Spielmittelpunkt wird während der
           Lobby und Runde benötigt und bei Spielende oder beim Entfernen des leeren Raums aus dem
           gespeicherten Spielzustand gelöscht. Weitere Spieldaten und temporäre IDs werden beim
-          Schließen und Aufräumen des Raums entfernt.
+          Schliessen und Aufräumen des Raums entfernt.
         </p>
       </section>
 
@@ -537,8 +537,8 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
         </div>
         <p>
           Du hast das Recht auf Auskunft über deine verarbeiteten Daten sowie ggf. Berichtigung oder
-          Löschung gemäß geltendem Datenschutzrecht (DSG / DSGVO). Da jedoch keine persistenten
-          Konten oder Protokolle über dich geführt werden, liegen außerhalb eines laufenden Spiels
+          Löschung gemäss geltendem Datenschutzrecht (DSG / DSGVO). Da jedoch keine persistenten
+          Konten oder Protokolle über dich geführt werden, liegen ausserhalb eines laufenden Spiels
           in der Regel keine personenbezogenen Daten über dich vor.
         </p>
         <p>

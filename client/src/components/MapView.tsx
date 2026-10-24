@@ -18,7 +18,7 @@ import type { Feature, Polygon } from "geojson";
 setWorkerUrl(mapLibreWorkerUrl);
 
 const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
-// OpenFreeMap liefert Details bis Zoom 14; MapLibre vergrößert diese Kacheln
+// OpenFreeMap liefert Details bis Zoom 14; MapLibre vergrössert diese Kacheln
 // darüber hinaus ohne zusätzliche, nicht vorhandene Kacheln anzufordern.
 const MAP_MAX_ZOOM = 18;
 const MAP_INITIAL_ZOOM = 15;
@@ -38,7 +38,7 @@ const SWISS_ORTHO_TILES =
 const SWISS_ORTHO_LAYER_ID = "swiss-ortho";
 const SWISS_ORTHO_MIN_ZOOM = 13;
 const SWISS_ORTHO_MAX_ZOOM = 19;
-// Schweiz inklusive Randstreifen; außerhalb bleibt Sentinel-2 sichtbar.
+// Schweiz inklusive Randstreifen; ausserhalb bleibt Sentinel-2 sichtbar.
 const SWISS_ORTHO_BOUNDS: [number, number, number, number] = [5.8, 45.7, 10.6, 47.9];
 const SWISS_ORTHO_ATTRIBUTION = "© swisstopo (SWISSIMAGE)";
 
@@ -94,7 +94,7 @@ class SatelliteControl implements IControl {
     this.button.textContent = active ? "Karte" : "Satellit";
     this.button.classList.toggle("is-active", active);
     this.button.setAttribute("aria-pressed", String(active));
-    const label = active ? "Straßenkarte anzeigen" : "Satellitenkarte anzeigen";
+    const label = active ? "Strassenkarte anzeigen" : "Satellitenkarte anzeigen";
     this.button.title = label;
     this.button.setAttribute("aria-label", label);
   }

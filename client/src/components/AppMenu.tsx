@@ -77,7 +77,7 @@ export function AppMenu({
                 ref={closeRef}
                 className="app-menu-close"
                 type="button"
-                aria-label="Menü schließen"
+                aria-label="Menü schliessen"
                 onClick={() => setOpen(false)}
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">

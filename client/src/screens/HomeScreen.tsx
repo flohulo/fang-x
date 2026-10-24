@@ -70,9 +70,7 @@ export function HomeScreen({
 
       <div className="card">
         <h3>Neues Spiel</h3>
-        <p className="card-text">
-          Du legst den Raum an, stellst die Regeln ein.
-        </p>
+        <p className="card-text">Du legst den Raum an, stellst die Regeln ein.</p>
         <button onClick={() => onCreateGame(name)} disabled={busy}>
           Neues Spiel starten
         </button>

@@ -1,9 +1,9 @@
 # Fang X
 
-**Ein GPS-Fangspiel für draußen – kostenlos, werbefrei und Open Source.**
+**Ein GPS-Fangspiel für draussen – kostenlos, werbefrei und Open Source.**
 
 Eine Person ist **X** und versucht zu entkommen. Die anderen spielen als **Detektive** und
-bekommen regelmäßig ungefähre Hinweise auf X' Standort. Wer X im Fangradius erreicht, gewinnt.
+bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius erreicht, gewinnt.
 
 [![CI](https://github.com/flohulo/fang-x/actions/workflows/ci.yml/badge.svg)](https://github.com/flohulo/fang-x/actions/workflows/ci.yml)
 [![Lizenz: AGPL-3.0-only](https://img.shields.io/badge/Lizenz-AGPL--3.0--only-blue.svg)](LICENSE)
@@ -63,7 +63,7 @@ cd server
 npx wrangler dev --ip 127.0.0.1 --port 8787
 ```
 
-Öffne anschließend <http://localhost:8787>. Der lokale Server liefert Spiel und API gemeinsam
+Öffne anschliessend <http://localhost:8787>. Der lokale Server liefert Spiel und API gemeinsam
 aus. Das Spiel benötigt eine Internetverbindung.
 
 ### Prüfen
@@ -100,7 +100,7 @@ Die Seite wird bei Änderungen an `docs/` oder `mkdocs.yml` automatisch über de
 Fehlerberichte und Verbesserungsvorschläge sind willkommen. Nutze dafür die
 [Issue-Vorlagen](https://github.com/flohulo/fang-x/issues/new/choose) oder eröffne einen
 [Pull Request](https://github.com/flohulo/fang-x/pulls). Bitte teile dabei keine echten
-Standortdaten oder privaten Spielcodes. Sicherheitsprobleme sollten privat gemäß
+Standortdaten oder privaten Spielcodes. Sicherheitsprobleme sollten privat gemäss
 [SECURITY.md](SECURITY.md) gemeldet werden.
 
 ## Lizenz

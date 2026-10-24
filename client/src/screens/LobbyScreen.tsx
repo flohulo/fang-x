@@ -824,7 +824,7 @@ const PARAM_INFOS: Record<string, ParamInfo> = {
     title: "Vorsprung",
     description:
       "Zeit in Minuten, die X vor Spielbeginn alleine hat, um Distanz aufzubauen. Detektive müssen währenddessen am Startpunkt warten.",
-    recommendation: "Standard: 0 Min. (bei großem Spielgebiet 2–20 Min. empfohlen)",
+    recommendation: "Standard: 0 Min. (bei grossem Spielgebiet 2–20 Min. empfohlen)",
     wikiPage: "Vorsprung-fuer-X",
   },
   interval: {
@@ -923,7 +923,7 @@ function ParamPopover({
         <button
           type="button"
           className="param-popover-close"
-          aria-label="Schließen"
+          aria-label="Schliessen"
           onClick={onClose}
         >
           ×

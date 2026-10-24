@@ -827,6 +827,11 @@ label {
   top: 68px;
 }
 
+/* Der Maßstab teilt sich die linke Seite mit dem Chat-Knopf und rückt hinter ihn. */
+.game-app .map-container .maplibregl-ctrl-top-left .maplibregl-ctrl-scale {
+  margin-left: 68px;
+}
+
 .map-container .map-satellite-btn {
   width: auto;
   min-width: 29px;

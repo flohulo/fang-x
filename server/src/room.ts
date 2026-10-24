@@ -1079,7 +1079,7 @@ export class GameRoom {
       return;
     }
 
-    // LIVE_SHARE: kontinuierlich X-Position an alle senden, wenn außerhalb
+    // LIVE_SHARE: kontinuierlich X-Position an alle senden, wenn ausserhalb
     if (this.xCurrentlyOutOfBounds && this.ruleset.map.outOfBoundsPenalty === "LIVE_SHARE") {
       const x = [...this.players.values()].find((p) => p.role === "X" && p.position);
       if (x?.position) {

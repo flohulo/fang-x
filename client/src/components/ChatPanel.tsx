@@ -60,7 +60,7 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
         type="button"
         className={`chat-fab${open ? " is-open" : ""}`}
         onClick={() => setOpen((value) => !value)}
-        aria-label={open ? "Chat schließen" : "Chat öffnen"}
+        aria-label={open ? "Chat schliessen" : "Chat öffnen"}
         aria-expanded={open}
         aria-controls="game-chat-window"
       >
@@ -78,7 +78,7 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
             <button
               type="button"
               className="chat-close"
-              aria-label="Chat schließen"
+              aria-label="Chat schliessen"
               onClick={() => setOpen(false)}
             >
               ×

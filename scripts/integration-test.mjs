@@ -214,7 +214,7 @@ async function run() {
   const outsideObjective = await host.waitFor(
     (m) => m.t === "error" && m.message.includes("innerhalb"),
   );
-  assert(outsideObjective.message.includes("innerhalb"), "Missionsziel außerhalb wird abgelehnt");
+  assert(outsideObjective.message.includes("innerhalb"), "Missionsziel ausserhalb wird abgelehnt");
 
   host.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
   await host.waitFor((m) => m.t === "objective" && m.objective?.status === "ACTIVE");

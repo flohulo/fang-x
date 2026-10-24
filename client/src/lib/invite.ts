@@ -18,7 +18,7 @@ export function inviteUrl(code: string, origin: string): string {
   return `${origin.replace(/\/$/, "")}/?code=${encodeURIComponent(code)}`;
 }
 
-/** Normalisiert eine Eingabe im Code-Feld (Großbuchstaben, nur erlaubte Zeichen). */
+/** Normalisiert eine Eingabe im Code-Feld (Grossbuchstaben, nur erlaubte Zeichen). */
 export function normalizeCodeInput(value: string): string {
   return value
     .toUpperCase()

@@ -50,7 +50,7 @@ Die Navigation steht in `mkdocs.yml`. Neue Seiten dort eintragen und aus den bes
 
 ## Sicherheit und Standortdaten
 
-Melde vermutete Sicherheitsprobleme privat gemäß [SECURITY.md](SECURITY.md), nicht als öffentliches Issue. Vermeide Änderungen, die Standortdaten länger speichern oder an mehr Empfänger weitergeben, ohne dies ausdrücklich zu dokumentieren und zu begründen.
+Melde vermutete Sicherheitsprobleme privat gemäss [SECURITY.md](SECURITY.md), nicht als öffentliches Issue. Vermeide Änderungen, die Standortdaten länger speichern oder an mehr Empfänger weitergeben, ohne dies ausdrücklich zu dokumentieren und zu begründen.
 
 ## Lizenz
 
