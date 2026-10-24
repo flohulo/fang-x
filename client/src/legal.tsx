@@ -7,7 +7,7 @@ export interface LegalInfo {
 
 export const LEGAL: LegalInfo = {
   email: "fang-x@meine-dateien.info",
-  updated: "21.10.2026",
+  updated: "22.10.2026",
 };
 
 const PLACEHOLDER_MARKER = /\[[^\]]*\]/;
@@ -263,7 +263,47 @@ function Impressum({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: () =
           >
             OpenMapTiles ↗
           </a>
+          <a
+            href="https://cloudless.eox.at"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="legal-chip"
+          >
+            Sentinel-2 cloudless (EOX) ↗
+          </a>
+          <a
+            href="https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="legal-chip"
+          >
+            SWISSIMAGE (swisstopo) ↗
+          </a>
         </div>
+        <p>
+          Die optionale Satellitenansicht nutzt „Sentinel-2 cloudless 2025“ von EOX IT Services GmbH
+          unter der Lizenz{" "}
+          <a
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CC BY-NC-SA 4.0 ↗
+          </a>
+          . Das Bildmaterial basiert auf Daten des europäischen Copernicus-Programms (Sentinel-2).
+        </p>
+        <p>
+          Für Nahaufnahmen in der Schweiz wird darüber zusätzlich das amtliche Luftbildmosaik
+          SWISSIMAGE (10 cm) von swisstopo eingeblendet. Die Geodaten sind nach den{" "}
+          <a
+            href="https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Nutzungsbedingungen für freie Geodaten des Bundes ↗
+          </a>{" "}
+          frei nutzbar; erforderlich ist die Quellenangabe „© swisstopo“.
+        </p>
       </section>
     </>
   );
@@ -324,9 +364,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             📍
           </span>
           <div>
-            <span className="legal-highlight-title">Echtzeit-GPS ohne Speicher</span>
+            <span className="legal-highlight-title">Kein gespeicherter Routenverlauf</span>
             <p className="legal-highlight-desc">
-              Standorte werden nur live übertragen und nach Spielende sofort verworfen.
+              Nur der Spielmittelpunkt wird während der Runde gespeichert. Er wird nach Spielende
+              oder beim Entfernen des leeren Raums gelöscht.
             </p>
           </div>
         </div>
@@ -359,9 +400,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             <strong>Keine Benutzerkonten:</strong> Du benötigst weder Registrierung noch Passwort.
           </li>
           <li>
-            <strong>Ausschließliche Live-Übertragung:</strong> Dein Standort wird ausschließlich
-            während eines laufenden Spiels übertragen. Standortverläufe werden nicht dauerhaft
-            gespeichert.
+            <strong>Standortverarbeitung:</strong> Live-Standorte werden während eines laufenden
+            Spiels übertragen. Standortverläufe werden nicht gespeichert; der vom Host gesetzte
+            Startpunkt oder X' erster Standort wird während Lobby und Runde als Spielmittelpunkt für
+            die Karte aufbewahrt und danach gelöscht.
           </li>
           <li>
             <strong>Sichtbarkeit für Mitspieler:</strong> Mitspieler sehen deinen gewählten Namen
@@ -412,8 +454,9 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             gewünschten Spielraum.
           </li>
           <li>
-            <strong>GPS-Standortdaten:</strong> Nur bei aktiver Freigabe im Browser und nur während
-            laufender Spielphasen.
+            <strong>GPS-Standortdaten:</strong> Bei aktiver Freigabe im Browser für das Festlegen
+            des Spielmittelpunkts und für Live-Standortupdates während des Spiels. Der
+            Spielmittelpunkt wird während Lobby und Runde gespeichert.
           </li>
         </ul>
       </section>
@@ -442,6 +485,21 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           (basierend auf OpenStreetMap-Daten) geladen. Hierbei wird technisch bedingt die IP-Adresse
           beim Kachelabruf an die Server des Kartendienstes übermittelt.
         </p>
+        <p>
+          Wird im Spiel die Satellitenansicht aktiviert, werden zusätzlich Satellitenbild-Kacheln
+          von{" "}
+          <a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">
+            EOX IT Services GmbH ↗
+          </a>{" "}
+          (Sentinel-2 cloudless, CC BY-NC-SA 4.0) geladen. Auch dabei wird die IP-Adresse an die
+          Server von EOX übermittelt. Befindet sich die Karte über der Schweiz, werden zusätzlich
+          Orthofoto-Kacheln von{" "}
+          <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener noreferrer">
+            swisstopo ↗
+          </a>{" "}
+          über das Bundesgeoportal (wmts.geo.admin.ch) geladen; dabei wird die IP-Adresse an dieses
+          übermittelt. Die Ansicht ist optional und lässt sich jederzeit wieder ausschalten.
+        </p>
       </section>
 
       <section className="legal-section">
@@ -451,9 +509,11 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
         </div>
         <p>
           Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten
-          sind der Hosting-Anbieter Cloudflare und der Kartenanbieter OpenFreeMap, jeweils im Rahmen
-          der oben beschriebenen Zwecke. Eine Weitergabe an sonstige Dritte, ein Verkauf von Daten
-          oder eine Nutzung zu Werbezwecken findet nicht statt.
+          sind der Hosting-Anbieter Cloudflare sowie – je nach gewählter Kartenansicht – der
+          Kartenanbieter OpenFreeMap, der Satellitenbild-Anbieter EOX sowie für das Schweizer
+          Luftbild swisstopo, jeweils im Rahmen der oben beschriebenen Zwecke. Eine Weitergabe an
+          sonstige Dritte, ein Verkauf von Daten oder eine Nutzung zu Werbezwecken findet nicht
+          statt.
         </p>
       </section>
 
@@ -463,8 +523,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           <h2>Speicherdauer</h2>
         </div>
         <p>
-          Spieldaten, temporäre IDs und Standorte werden nach Beendigung des Spiels bzw. beim
-          Schließen und Aufräumen des Raums vollständig aus dem Arbeitsspeicher gelöscht.
+          Standortverläufe werden nicht dauerhaft gespeichert. Der Spielmittelpunkt wird während der
+          Lobby und Runde benötigt und bei Spielende oder beim Entfernen des leeren Raums aus dem
+          gespeicherten Spielzustand gelöscht. Weitere Spieldaten und temporäre IDs werden beim
+          Schließen und Aufräumen des Raums entfernt.
         </p>
       </section>
 

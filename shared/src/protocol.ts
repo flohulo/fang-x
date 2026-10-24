@@ -22,6 +22,16 @@ export type ClientMessage =
   | { t: "configure"; ruleset: Ruleset }
   | { t: "setRole"; playerId: string; wantsX: boolean }
   | { t: "setObjective"; target: LatLng }
+  | {
+      t: "useTransitStop";
+      mode: "bus" | "train";
+      /** Anzahl der gefahrenen Haltestellen; ältere Clients lassen das Feld weg (= 1). */
+      count?: number;
+    }
+  | { t: "chat"; text: string }
+  | { t: "reportCatch" }
+  | { t: "resolveCatch"; caught: boolean }
+  | { t: "surrender" }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -51,6 +61,16 @@ export interface RevealEvent {
   isLive: boolean; // true = LIVE_SHARE (X außerhalb des Gebiets)
 }
 
+// Eine Chat-Nachricht im Spielraum. Wird nicht persistiert und nach Spielende verworfen.
+export interface ChatMessage {
+  id: number;
+  playerId: string;
+  name: string;
+  color: string;
+  text: string;
+  at: number;
+}
+
 export interface ObjectiveState {
   status: "PENDING" | "ACTIVE" | "COMPLETED";
   target: LatLng | null;
@@ -64,6 +84,10 @@ export type ServerMessage =
       phase: Phase;
       players: PlayerInfo[];
       ruleset: Ruleset;
+      transitStops: { bus: number; train: number };
+      /** Bisherige Chat-Nachrichten der laufenden Runde (nach Spielende leer). */
+      chat: ChatMessage[];
+      catchPending: boolean;
       youAreHost: boolean;
     }
   | { t: "players"; players: PlayerInfo[] }
@@ -78,6 +102,28 @@ export type ServerMessage =
       reveals?: RevealEvent[];
     }
   | { t: "config"; ruleset: Ruleset }
+  | {
+      t: "revealTimer";
+      serverTime: number;
+      /** Nächste Sichtung; null bei Zufallsintervall oder außerhalb der Laufzeit. */
+      nextRevealAt: number | null;
+      /** Beginn des aktuellen Intervalls (letzte Sichtung bzw. Laufzeitstart). */
+      intervalStartedAt: number;
+      /** true, wenn der Zeitpunkt bewusst verborgen bleibt (RANDOM). */
+      indeterminate: boolean;
+    }
+  | { t: "transitStops"; bus: number; train: number }
+  | { t: "chat"; message: ChatMessage }
+  | {
+      t: "transitNotice";
+      mode: "bus" | "train";
+      count: number;
+      bus: number;
+      train: number;
+      at: number;
+    }
+  | { t: "catchPending"; pending: boolean }
+  | { t: "playerPosition"; playerId: string; pos: LatLng | null }
   | { t: "reveal"; reveal: RevealEvent }
   | { t: "positionShared"; at: number; index: number; live: boolean }
   | {
@@ -86,6 +132,18 @@ export type ServerMessage =
       revealDelayedUntil?: number;
     }
   | { t: "yourPositionIsShared"; shared: boolean }
-  | { t: "end"; winner: "X" | "DETECTIVES"; reason: string; players: PlayerInfo[] }
+  | {
+      t: "end";
+      winner: "X" | "DETECTIVES";
+      reason: string;
+      players: PlayerInfo[];
+      /** X hat aufgegeben und den exakten Standort geteilt. */
+      surrender?: {
+        playerId: string;
+        name: string;
+        pos: LatLng | null;
+        at: number;
+      };
+    }
   | { t: "error"; message: string; code?: string }
   | { t: "pong" };
