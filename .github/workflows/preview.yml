@@ -67,7 +67,7 @@ jobs:
         with:
           script: |
             const marker = "<!-- fang-x-pr-preview -->";
-            const body = `${marker}\n### Fang X Vorschau\n\n${process.env.PREVIEW_URL}\n\nDieser Preview-Worker wird beim Schließen oder Mergen des PRs entfernt.`;
+            const body = `${marker}\n### Fang X Vorschau\n\n${process.env.PREVIEW_URL}\n\nDieser Preview-Worker wird beim Schliessen oder Mergen des PRs entfernt.`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const comments = await github.paginate(github.rest.issues.listComments, {

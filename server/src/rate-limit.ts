@@ -8,13 +8,8 @@ interface Bucket {
 }
 
 export class RateLimiter {
-  private state: DurableObjectState;
   private buckets = new Map<string, Bucket>();
   private lastSweep = Date.now();
-
-  constructor(state: DurableObjectState) {
-    this.state = state;
-  }
 
   async fetch(request: Request): Promise<Response> {
     if (request.method !== "POST") {

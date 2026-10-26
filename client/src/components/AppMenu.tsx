@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { docsUrl } from "../lib/docs";
 import { type AlertNotificationPermission, AlertSettings } from "./AlertSettings";
 
 interface AppMenuProps {
@@ -76,7 +77,7 @@ export function AppMenu({
                 ref={closeRef}
                 className="app-menu-close"
                 type="button"
-                aria-label="Menü schließen"
+                aria-label="Menü schliessen"
                 onClick={() => setOpen(false)}
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -97,12 +98,12 @@ export function AppMenu({
 
             <nav className="app-menu-links" aria-label="Weitere Seiten">
               <a
-                href="https://github.com/flohulo/fang-x/wiki/Spieleinstellungen"
+                href={docsUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
               >
-                <span>Spielregeln im Wiki</span>
+                <span>Spielregeln im Handbuch</span>
                 <span aria-hidden="true">↗</span>
               </a>
               <a href="/changelog" onClick={() => setOpen(false)}>

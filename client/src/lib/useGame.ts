@@ -1,4 +1,11 @@
-import type { ClientMessage, LatLng, ObjectiveState, Ruleset, ServerMessage } from "@fang-x/shared";
+import type {
+  ChatMessage,
+  ClientMessage,
+  LatLng,
+  ObjectiveState,
+  Ruleset,
+  ServerMessage,
+} from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
 import { clearPlayerId, loadPlayerId, savePlayerId } from "./session";
 
@@ -21,6 +28,21 @@ export function useGame() {
   const [myId, setMyId] = useState<string | null>(null);
   const [youAreHost, setYouAreHost] = useState(false);
   const [ruleset, setRuleset] = useState<Ruleset | null>(null);
+  const [transitStops, setTransitStops] = useState({ bus: 0, train: 0 });
+  const [revealTimer, setRevealTimer] = useState<{
+    nextRevealAt: number | null;
+    intervalStartedAt: number;
+    indeterminate: boolean;
+  } | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [transitNotice, setTransitNotice] = useState<{
+    mode: "bus" | "train";
+    count: number;
+    bus: number;
+    train: number;
+    at: number;
+  } | null>(null);
+  const [catchPending, setCatchPending] = useState(false);
   const [reveals, setReveals] = useState<any[]>([]);
   const [lastReveal, setLastReveal] = useState<any>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -30,7 +52,11 @@ export function useGame() {
   } | null>(null);
   const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
-  const [gameResult, setGameResult] = useState<{ winner: string; reason: string } | null>(null);
+  const [gameResult, setGameResult] = useState<{
+    winner: string;
+    reason: string;
+    surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
@@ -108,11 +134,20 @@ export function useGame() {
           setPhase(msg.phase);
           setPlayers(msg.players);
           setRuleset(msg.ruleset);
+          setTransitStops(msg.transitStops);
+          setRevealTimer(null);
+          setChatMessages(msg.chat ?? []);
+          setCatchPending(msg.catchPending);
           setYouAreHost(msg.youAreHost);
           setReconnecting(false);
           break;
         case "players":
-          setPlayers(msg.players);
+          setPlayers((current) =>
+            msg.players.map((player) => ({
+              ...player,
+              position: current.find((existing) => existing.id === player.id)?.position ?? null,
+            })),
+          );
           break;
         case "phase":
           setPhase(msg.phase);
@@ -121,6 +156,7 @@ export function useGame() {
             msg.phaseEndsAt === null ? null : msg.phaseEndsAt - msg.serverTime + Date.now(),
           );
           setPlayAreaCenter(msg.playAreaCenter);
+          if (msg.phase !== "RUNNING") setRevealTimer(null);
           if (msg.phase === "LOBBY") {
             setReveals([]);
             setLastReveal(null);
@@ -128,6 +164,10 @@ export function useGame() {
             setGameResult(null);
             setYourPositionIsShared(false);
             setObjective(null);
+            setTransitStops({ bus: 0, train: 0 });
+            setTransitNotice(null);
+            setChatMessages([]);
+            setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
             // Nach Reload/Reconnect: bereits erfolgte Sichtungen nachziehen.
             setReveals(msg.reveals);
@@ -136,6 +176,41 @@ export function useGame() {
           break;
         case "config":
           setRuleset(msg.ruleset);
+          break;
+        case "transitStops":
+          setTransitStops({ bus: msg.bus, train: msg.train });
+          break;
+        case "revealTimer": {
+          const receivedAt = Date.now();
+          const toLocal = (at: number) => at - msg.serverTime + receivedAt;
+          setRevealTimer({
+            nextRevealAt: msg.nextRevealAt === null ? null : toLocal(msg.nextRevealAt),
+            intervalStartedAt: toLocal(msg.intervalStartedAt),
+            indeterminate: msg.indeterminate,
+          });
+          break;
+        }
+        case "chat":
+          setChatMessages((current) => [...current, msg.message].slice(-100));
+          break;
+        case "transitNotice":
+          setTransitNotice({
+            mode: msg.mode,
+            count: msg.count,
+            bus: msg.bus,
+            train: msg.train,
+            at: msg.at,
+          });
+          break;
+        case "catchPending":
+          setCatchPending(msg.pending);
+          break;
+        case "playerPosition":
+          setPlayers((current) =>
+            current.map((player) =>
+              player.id === msg.playerId ? { ...player, position: msg.pos } : player,
+            ),
+          );
           break;
         case "reveal":
           setLastReveal(msg.reveal);
@@ -151,8 +226,10 @@ export function useGame() {
           setYourPositionIsShared(msg.shared);
           break;
         case "end":
-          setGameResult({ winner: msg.winner, reason: msg.reason });
+          setGameResult({ winner: msg.winner, reason: msg.reason, surrender: msg.surrender });
           setPlayers(msg.players);
+          setRevealTimer(null);
+          setChatMessages([]);
           setPhase("ENDED");
           break;
         case "error":
@@ -169,7 +246,10 @@ export function useGame() {
     };
 
     ws.onclose = () => {
-      if (wsRef.current === ws) wsRef.current = null;
+      // Ein bereits ersetzter Socket (z. B. durch einen neuen Beitritt) darf
+      // keinen Reconnect für die aktuelle Verbindung auslösen.
+      if (wsRef.current !== ws) return;
+      wsRef.current = null;
       setConnected(false);
       if (intentionalRef.current) return;
       // Ungeplant getrennt — Platz bleibt serverseitig frei, wir versuchen es erneut.
@@ -189,8 +269,15 @@ export function useGame() {
     attemptRef.current = 0;
     setObjective(null);
     setLastPositionShared(null);
+    setTransitStops({ bus: 0, train: 0 });
+    setTransitNotice(null);
+    setRevealTimer(null);
+    setChatMessages([]);
+    setCatchPending(false);
     sessionRef.current = { code, name, wantsX };
-    wsRef.current?.close();
+    const previous = wsRef.current;
+    wsRef.current = null;
+    previous?.close();
     connect({ code, name, wantsX });
   };
 
@@ -211,6 +298,26 @@ export function useGame() {
     send({ t: "setObjective", target });
   };
 
+  const requestTransitStop = (mode: "bus" | "train", count: number) => {
+    send({ t: "useTransitStop", mode, count });
+  };
+
+  const sendChat = (text: string) => {
+    send({ t: "chat", text });
+  };
+
+  const reportCatch = () => {
+    send({ t: "reportCatch" });
+  };
+
+  const resolveCatch = (caught: boolean) => {
+    send({ t: "resolveCatch", caught });
+  };
+
+  const surrender = () => {
+    send({ t: "surrender" });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -228,13 +335,20 @@ export function useGame() {
     setConnected(false);
     setReconnecting(false);
     setObjective(null);
+    setRevealTimer(null);
+    setChatMessages([]);
   };
 
   // Beim Verlassen der Seite sauber abschalten, ohne Reconnect zu starten.
+  // Darf nur beim Unmount laufen: bei jedem Render würde der gerade
+  // aufgebaute WebSocket sofort wieder geschlossen.
   useEffect(() => {
     return () => {
       intentionalRef.current = true;
-      clearRetryTimer();
+      if (retryTimerRef.current !== null) {
+        window.clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       wsRef.current?.close();
     };
   }, []);
@@ -247,6 +361,11 @@ export function useGame() {
     myId,
     youAreHost,
     ruleset,
+    transitStops,
+    transitNotice,
+    revealTimer,
+    chatMessages,
+    catchPending,
     reveals,
     lastReveal,
     lastPositionShared,
@@ -261,6 +380,11 @@ export function useGame() {
     setRole,
     start,
     setObjectiveTarget,
+    requestTransitStop,
+    sendChat,
+    reportCatch,
+    resolveCatch,
+    surrender,
     sendPosition,
     leave,
     clearError: () => setError(null),

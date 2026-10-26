@@ -43,6 +43,20 @@ function playLiveShareAlarm(context: AudioContext) {
   }
 }
 
+async function showSurrenderNotification(name: string) {
+  const options: NotificationOptions = {
+    body: `${name} hat das Spiel aufgegeben. Der Live-Standort wurde geteilt.`,
+    icon: "/icon-192.png",
+    tag: "fang-x-surrender",
+  };
+  if ("serviceWorker" in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    await registration.showNotification("X hat aufgegeben", options);
+    return;
+  }
+  new Notification("X hat aufgegeben", options);
+}
+
 async function showPositionSharedNotification(at: number, index: number, live: boolean) {
   const options: NotificationOptions = {
     body: live
@@ -114,8 +128,8 @@ export default function App() {
   const [joinError, setJoinError] = useState<string | null>(null);
   const [checkingCode, setCheckingCode] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
-  const [requestingLocation, setRequestingLocation] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [_requestingLocation, setRequestingLocation] = useState(false);
+  const [_locationError, setLocationError] = useState<string | null>(null);
   const [alertsEnabled, setAlertsEnabled] = useState(loadAlertsEnabled);
   const [notificationPermission, setNotificationPermission] = useState<AlertNotificationPermission>(
     () => (typeof Notification === "undefined" ? "unsupported" : Notification.permission),
@@ -124,6 +138,7 @@ export default function App() {
   const changelogPage = useMemo(isChangelogPage, []);
   const resumedRef = useRef(false);
   const lastAlertedPositionRef = useRef<string | null>(null);
+  const surrenderNotifiedRef = useRef<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const game = useGame();
@@ -216,6 +231,20 @@ export default function App() {
       });
   }, [alertsEnabled, game.lastPositionShared, notificationPermission]);
 
+  useEffect(() => {
+    const surrender = game.gameResult?.surrender;
+    if (!surrender) return;
+    const eventId = `${surrender.at}:${surrender.playerId}`;
+    if (surrenderNotifiedRef.current === eventId) return;
+    surrenderNotifiedRef.current = eventId;
+    if (!alertsEnabled || notificationPermission !== "granted") return;
+    const myRole = game.players.find((player) => player.id === game.myId)?.role;
+    if (myRole === "X") return;
+    void showSurrenderNotification(surrender.name).catch((error: unknown) => {
+      console.warn("Benachrichtigung zum Aufgeben konnte nicht angezeigt werden:", error);
+    });
+  }, [alertsEnabled, notificationPermission, game.gameResult, game.myId, game.players]);
+
   // Einladungslink: /?code=ABC234
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);
 
@@ -238,7 +267,7 @@ export default function App() {
       });
   }, [legalPage, changelogPage]);
 
-  const requestLocationAccess = useCallback(() => {
+  const _requestLocationAccess = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationError(
         "Standortfreigabe wird nicht unterstützt. Öffne Fang X über eine sichere HTTPS-Verbindung auf einem Gerät mit GPS.",
@@ -367,7 +396,7 @@ export default function App() {
     };
     // absichtlich nur beim ersten Mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locationReady]);
+  }, [locationReady, game.join]);
 
   if (legalPage) {
     return (
@@ -419,11 +448,21 @@ export default function App() {
         ruleset={game.ruleset}
         lastReveal={game.lastReveal}
         objective={game.objective}
+        transitStops={game.transitStops}
+        transitNotice={game.transitNotice}
+        revealTimer={game.revealTimer}
+        chatMessages={game.chatMessages}
+        catchPending={game.catchPending}
         serverError={game.error}
         yourPositionIsShared={game.yourPositionIsShared}
         gameResult={game.gameResult}
         onPosition={game.sendPosition}
         onSetObjective={game.setObjectiveTarget}
+        onUseTransitStop={game.requestTransitStop}
+        onSendChat={game.sendChat}
+        onReportCatch={game.reportCatch}
+        onResolveCatch={game.resolveCatch}
+        onSurrender={game.surrender}
         onLeave={handleLeave}
       />
     );

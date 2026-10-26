@@ -28,6 +28,18 @@ Dann in einem zweiten Terminal im Projektstamm ausführen:
 npm run test:integration
 ```
 
+## Dokumentation
+
+Das Handbuch liegt unter `docs/` und wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) gebaut. Änderungen an Seiten oder an `mkdocs.yml` vor dem Pull Request lokal prüfen:
+
+```bash
+pip install -r requirements-docs.txt
+mkdocs build --strict
+mkdocs serve
+```
+
+Die Navigation steht in `mkdocs.yml`. Neue Seiten dort eintragen und aus den bestehenden Seiten verlinken, damit sie nicht verwaist sind.
+
 ## Pull Requests
 
 - Erkläre den Anwendungsfall und die Auswirkungen auf Spieler.
@@ -38,7 +50,7 @@ npm run test:integration
 
 ## Sicherheit und Standortdaten
 
-Melde vermutete Sicherheitsprobleme privat gemäß [SECURITY.md](SECURITY.md), nicht als öffentliches Issue. Vermeide Änderungen, die Standortdaten länger speichern oder an mehr Empfänger weitergeben, ohne dies ausdrücklich zu dokumentieren und zu begründen.
+Melde vermutete Sicherheitsprobleme privat gemäss [SECURITY.md](SECURITY.md), nicht als öffentliches Issue. Vermeide Änderungen, die Standortdaten länger speichern oder an mehr Empfänger weitergeben, ohne dies ausdrücklich zu dokumentieren und zu begründen.
 
 ## Lizenz
 

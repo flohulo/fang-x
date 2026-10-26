@@ -47,7 +47,7 @@ export function HomeScreen({
   return (
     <div className="screen">
       <h1>Fang X</h1>
-      <p className="subtitle">Das GPS-Fangspiel für draußen</p>
+      <p className="subtitle">Das GPS-Fangspiel für draussen</p>
 
       {notice && (
         <div className="error" style={{ maxWidth: 420, width: "100%" }}>
@@ -60,7 +60,7 @@ export function HomeScreen({
         <input
           id="player-name"
           type="text"
-          placeholder="z. B. Florian"
+          placeholder="deine Namen im Spiel"
           value={name}
           maxLength={MAX_NAME_LENGTH}
           autoComplete="nickname"
@@ -70,9 +70,7 @@ export function HomeScreen({
 
       <div className="card">
         <h3>Neues Spiel</h3>
-        <p className="card-text">
-          Du legst den Raum an, stellst die Regeln ein und läufst als X vor den Detektiven weg.
-        </p>
+        <p className="card-text">Du legst den Raum an, stellst die Regeln ein.</p>
         <button onClick={() => onCreateGame(name)} disabled={busy}>
           Neues Spiel starten
         </button>

@@ -1,5 +1,6 @@
 node_modules/
 dist/
+site/
 .wrangler/
 *.log
 .DS_Store
