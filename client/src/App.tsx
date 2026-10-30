@@ -93,6 +93,8 @@ function PwaUpdatePrompt() {
     immediate: true,
     onRegisteredSW(_url, registration) {
       if (!registration) return;
+      // Ein früher verschobenes Update wartet bereits: Dialog beim Öffnen erneut zeigen.
+      if (registration.waiting) setNeedRefresh(true);
       const checkForUpdate = () => {
         if (!navigator.onLine) return;
         void registration.update().catch((error: unknown) => {
