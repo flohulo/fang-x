@@ -1,24 +1,24 @@
 {
     "language": {
-        "label": ""
+        "label": "Sprach"
     },
     "common": {
-        "close": "",
-        "cancel": "",
-        "unnamed": "",
-        "roleX": "",
-        "roleDetective": ""
+        "close": "Schlüse",
+        "cancel": "abbräche",
+        "unnamed": "unbenänt",
+        "roleX": "X",
+        "roleDetective": "Detektiv"
     },
     "menu": {
-        "open": "",
-        "close": "",
-        "title": "",
-        "settings": "",
-        "moreLinks": "",
-        "docs": "",
-        "changelog": "",
-        "privacy": "",
-        "imprint": "",
+        "open": "Menü öffnä",
+        "close": "Menü schlüssä",
+        "title": "Menü",
+        "settings": "Istelige",
+        "moreLinks": "witeri site",
+        "docs": "spielräglä im Handbuech",
+        "changelog": "Änderigsverlauf",
+        "privacy": "Datäschutz",
+        "imprint": "Imprässum",
         "translate": ""
     },
     "alerts": {
