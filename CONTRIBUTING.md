@@ -41,7 +41,7 @@ Die Navigation steht in `mkdocs.yml`. Neue Seiten dort eintragen und aus den bes
 
 - Erkläre den Anwendungsfall und die Auswirkungen auf Spieler.
 - Halte Änderungen fokussiert und ergänze Tests für geändertes Verhalten.
-- Verwende für den PR-Titel Conventional Commits, z. B. `feat: Bonusmission ergänzen`, `fix: Fangradius korrigieren` oder `docs: Spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
+- Verwende für den PR-Titel Conventional Commits, z. B. `feat: bonusmission ergänzen`, `fix: fangradius korrigieren` oder `docs: spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Die Beschreibung nach dem Doppelpunkt beginnt mit einem Kleinbuchstaben. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
 - Teile keine echten GPS-Koordinaten, privaten Spielcodes, Zugangsdaten oder persönlichen Daten.
 - Vor einem Pull Request müssen Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
 
