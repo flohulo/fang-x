@@ -2,6 +2,7 @@ import type {
   ChatMessage,
   ClientMessage,
   LatLng,
+  MessageParams,
   ObjectiveState,
   PlayerInfo,
   RevealEvent,
@@ -9,6 +10,7 @@ import type {
   ServerMessage,
 } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
+import type { ServerError } from "./serverMessages";
 import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
 
 /** Spieler inklusive der Position, soweit der Server sie freigibt. */
@@ -17,6 +19,8 @@ export type PlayerView = PlayerInfo & { position?: LatLng | null };
 export interface GameResult {
   winner: string;
   reason: string;
+  reasonCode?: string;
+  reasonParams?: MessageParams;
   surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
 }
 
@@ -63,7 +67,7 @@ export function useGame() {
   const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ServerError | null>(null);
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
 
@@ -230,14 +234,20 @@ export function useGame() {
           setYourPositionIsShared(msg.shared);
           break;
         case "end":
-          setGameResult({ winner: msg.winner, reason: msg.reason, surrender: msg.surrender });
+          setGameResult({
+            winner: msg.winner,
+            reason: msg.reason,
+            reasonCode: msg.reasonCode,
+            reasonParams: msg.reasonParams,
+            surrender: msg.surrender,
+          });
           setPlayers(msg.players);
           setRevealTimer(null);
           setChatMessages([]);
           setPhase("ENDED");
           break;
         case "error":
-          setError(msg.message);
+          setError({ message: msg.message, code: msg.code, params: msg.params });
           if (msg.code && FATAL_CODES.has(msg.code)) {
             intentionalRef.current = true;
             clearRetryTimer();

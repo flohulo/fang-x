@@ -1,0 +1,392 @@
+{
+  "language": {
+    "label": "Language"
+  },
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "unnamed": "Unnamed",
+    "roleX": "X",
+    "roleDetective": "Detective"
+  },
+  "menu": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "title": "Menu",
+    "settings": "Settings",
+    "moreLinks": "More pages",
+    "docs": "Game rules in the manual",
+    "changelog": "Changelog",
+    "privacy": "Privacy",
+    "imprint": "Legal notice",
+    "translate": "Help translate"
+  },
+  "alerts": {
+    "title": "Alert on location reports",
+    "description": "When your location is sent to the detectives or shared live, we alert you with sound and vibration. If X gives up, detectives get a system notification. System notifications are shown if you allow them in your browser.",
+    "denied": "Browser notifications are blocked. Sound and vibration stay active.",
+    "unsupported": "This browser does not support system notifications. Sound and vibration stay active.",
+    "granted": "Alerts and browser notifications are active.",
+    "disable": "Turn alert off",
+    "enable": "Turn alert on"
+  },
+  "notifications": {
+    "surrenderTitle": "X gave up",
+    "surrenderBody": "{{name}} gave up the game. The live location was shared.",
+    "positionLiveTitle": "Warning: location is being shared",
+    "positionLiveBody": "Your location is now being transmitted live to the detectives.",
+    "positionSharedTitle": "Location sent to detectives",
+    "positionSharedBody": "Your location was just sent to the detectives."
+  },
+  "pwa": {
+    "updateTitle": "New version available",
+    "updateText": "A new version of Fang X is available. Install it now; the page will reload in the process.",
+    "reload": "Install & reload",
+    "later": "Later"
+  },
+  "app": {
+    "reconnecting": "Connection lost – reconnecting …",
+    "tooManyGames": "Too many games in a short time. Please wait a moment.",
+    "createFailed": "The game could not be created.",
+    "unknownError": "Unknown error.",
+    "hostName": "Host",
+    "playerName": "Player",
+    "tooManyAttempts": "Too many attempts. Please wait a minute.",
+    "serverUnreachable": "Server unreachable.",
+    "noSuchGame": "No game with code {{code}}. Check the code or start a new game."
+  },
+  "home": {
+    "subtitle": "The GPS chase game for the outdoors",
+    "nameLabel": "Your name",
+    "namePlaceholder": "your name in the game",
+    "newGame": {
+      "title": "New game",
+      "text": "You create the room and set the rules.",
+      "button": "Start new game"
+    },
+    "join": {
+      "title": "Join game",
+      "codeLabel": "Game code",
+      "codePlaceholder": "6 characters",
+      "playAs": "I play as",
+      "roleTitle": "Choose role",
+      "playAsXLabel": "Play as X",
+      "button": "Join game",
+      "checking": "Checking code …",
+      "invite": "Invitation detected — code <1>{{code}}</1> is already filled in."
+    },
+    "privacyNote": "Your location is only sent to other players during an active game. No accounts, emails or location histories are stored.",
+    "version": "Version {{version}}"
+  },
+  "chat": {
+    "title": "Chat",
+    "open": "Open chat",
+    "close": "Close chat",
+    "onlyDuringGame": "Only during the game",
+    "messages": "Chat messages",
+    "empty": "No messages yet.",
+    "placeholder": "Message …",
+    "inputLabel": "Chat message",
+    "send": "Send",
+    "hint": "Chat of the current round – it is deleted when the game ends."
+  },
+  "lobby": {
+    "title": "Game setup",
+    "waiting": {
+      "title": "Waiting for the admin",
+      "text": "The admin sets the game rules and starts the round. Stay in the lobby until the game starts.",
+      "docsLink": "View game rules in the manual ↗"
+    },
+    "geoUnsupported": "This browser does not support location sharing.",
+    "geoDenied": "Location access denied. Allow it in the website settings.",
+    "geoFailed": "Your location could not be determined. Check your GPS and try again.",
+    "shareText": "Up for a round of Fang X? 🕵️ Join with the game code {{code}}!",
+    "codeLabel": "Game code",
+    "shareInvite": "Share invitation",
+    "linkCopied": "Link copied ✓",
+    "copyCode": "Copy code only",
+    "codeCopied": "Code copied ✓",
+    "myPlayer": "My player",
+    "otherPlayers": "Other players",
+    "nobodyYet": "Nobody here yet.",
+    "shareCodeHint": "Share the game code {{code}} to invite other players.",
+    "settings": "Game settings",
+    "rulesetName": "Name of the settings",
+    "rulesetNamePlaceholder": "e.g. Saturday round",
+    "rulesetNameHint": "Appears in the file name of the export after the game.",
+    "rolesFromLobby": "Roles follow directly from the players in the lobby.",
+    "detectivesWait": "Detectives wait during the head start and do not send a location",
+    "detectivesShareLive": "Detectives share their live location with each other during the game",
+    "xSeesDetectives": "X sees detectives",
+    "xSees": {
+      "ALWAYS": "Always – live location of the detectives",
+      "ON_REVEAL": "Only at each reveal",
+      "NEVER": "Never"
+    },
+    "catchRule": "Catch rule",
+    "catchMethod": {
+      "PHOTO_CONFIRMATION": "Photo catch: X confirms the catch",
+      "RADIUS": "Automatic catch within the catch radius"
+    },
+    "xCanSurrender": "Emergency button for X: give up the game and share location",
+    "transitBudget": "Enable public transport budget (per stop)",
+    "transitForX": "Allow public transport for X",
+    "transitForDetectives": "Allow public transport for detectives",
+    "outOfBounds": "Enable play area boundary",
+    "busStopsForX": "Bus stops for X",
+    "trainStopsForX": "Train stops for X",
+    "startPoint": "Starting point (optional)",
+    "startPointUpdate": "Update starting point",
+    "startPointSet": "Use my current location as the starting point",
+    "startPointRemove": "Remove starting point",
+    "startPointDone": "Starting point has been set.",
+    "startPointHint": "Stand at the agreed meeting point to do this. The exact position is only stored for this game.",
+    "duration": "Game duration (minutes)",
+    "headStart": "Head start (minutes)",
+    "countdown": "Countdown before start (seconds)",
+    "firstReveal": "First location report (minutes)",
+    "interval": "Reveal interval (minutes)",
+    "revealRadius": "Reveal radius (meters)",
+    "catchRadius": "Catch radius (meters)",
+    "playArea": "Play area (radius, meters)",
+    "objective": "Enable bonus mission for X",
+    "wikiFooter": "💡 Questions about tactics & settings?",
+    "wikiFooterLink": "Open manual ↗",
+    "start": "Start game",
+    "needX": "At least 1 X needed",
+    "dryRun": "Test run without a detective — nobody is chasing you. For a real round at least one detective has to join (code <1>{{code}}</1>).",
+    "leave": "Leave game",
+    "you": "You",
+    "disconnected": "disconnected",
+    "disconnectedTitle": "Connection lost – the spot stays reserved",
+    "toggleRole": "Switch role",
+    "playerRole": "{{name}}: role {{role}}",
+    "wikiLinkLabel": "Read about this setting in the manual",
+    "wikiLinkTitle": "Read in the manual",
+    "params": {
+      "explain": "Explanation of {{title}}",
+      "infoTitle": "Info about {{title}}",
+      "readMore": "Read in the manual ↗",
+      "duration": {
+        "title": "Game duration",
+        "description": "Total playing time of the round. If the detectives fail to catch X within this time, X wins the game.",
+        "recommendation": "Default: 30 min."
+      },
+      "headStart": {
+        "title": "Head start",
+        "description": "Time in minutes that X has alone before the game begins to build up distance. Detectives have to wait at the starting point in the meantime.",
+        "recommendation": "Default: 0 min. (2–20 min. recommended for a large play area)"
+      },
+      "interval": {
+        "title": "Reveal interval",
+        "description": "Interval in minutes at which X's location is automatically revealed on the map for all detectives.",
+        "recommendation": "Default: 3 min. (shorter intervals make the hunt easier for detectives)"
+      },
+      "firstReveal": {
+        "title": "First location report",
+        "description": "Time after the head start ends until X's location is reported for the first time.",
+        "recommendation": "0 min. = immediately after the head start; after that the configured interval applies."
+      },
+      "revealRadius": {
+        "title": "Reveal radius",
+        "description": "Blur of the reveal on the map. Detectives do not see an exact point but a circle with this radius in which X is located.",
+        "recommendation": "Default: 5 m (practically an exact point; 50–100 m for more hide and seek)"
+      },
+      "catchRadius": {
+        "title": "Catch radius",
+        "description": "Maximum GPS distance in meters between detective and X at which a catch attempt can succeed.",
+        "recommendation": "Default: 30 m (compensates for normal smartphone GPS drift)"
+      },
+      "playArea": {
+        "title": "Play area (radius)",
+        "description": "Radius of action around the shared starting point. If X leaves the area, the exact live location is transmitted as a penalty!",
+        "recommendation": "Default: 700 m"
+      },
+      "objective": {
+        "title": "Bonus mission for X",
+        "description": "During the round X picks a safe target in the play area. If X reaches it, the next reveal is postponed once by 2 minutes.",
+        "recommendation": "Optional: tactical extra goal for X"
+      }
+    }
+  },
+  "game": {
+    "phase": {
+      "COUNTDOWN": "Starts in",
+      "HEADSTART": "Head start",
+      "RUNNING": "Running",
+      "ENDED": "Over"
+    },
+    "phaseTitle": {
+      "COUNTDOWN": "Here we go",
+      "HEADSTART": "Head start running",
+      "RUNNING": "Game running",
+      "ENDED": "Game over"
+    },
+    "winnerX": "X wins!",
+    "winnerDetectives": "Detectives win!",
+    "surrendered": "🚨 {{name}} gave up",
+    "surrenderLive": "The exact live location was transmitted to the detectives.",
+    "surrenderNoPosition": "No location was available.",
+    "openInOsm": "Open location on OpenStreetMap ↗",
+    "backToStart": "Back to the start page",
+    "exportSettings": "Export settings of this round",
+    "settingsExported": "Settings exported ✓",
+    "exportHint": "Rules of this round as a JSON file ({{name}}) – without starting point.",
+    "unnamedRuleset": "unnamed",
+    "youAreX": "You are X",
+    "youAreDetective": "You are a detective",
+    "nextReveal": "Next reveal",
+    "soon": "soon",
+    "timeUndetermined": "Time undetermined",
+    "timeRemaining": "{{time}} left",
+    "leftArea": "⚠️ You left the play area! Your location is now being shared.",
+    "transitNotice": {
+      "label": "Transit report:",
+      "bus_one": "X used one bus stop.",
+      "bus_other": "X used {{count}} bus stops.",
+      "train_one": "X used one train stop.",
+      "train_other": "X used {{count}} train stops.",
+      "dismiss": "Dismiss notice"
+    },
+    "gpsError": "GPS error: {{error}}",
+    "geoUnsupported": "Geolocation is not supported.",
+    "area": {
+      "unknown": "Location unknown",
+      "outside": "{{meters}} m outside",
+      "toEdge": "{{meters}} m to the edge",
+      "none": "No play area boundary"
+    },
+    "gps": {
+      "simulation": "Simulation",
+      "active": "GPS active",
+      "off": "no GPS"
+    },
+    "solo": "Test run · {{code}}",
+    "transitBudget": {
+      "summary": "Transit budget: bus {{busUsed}}/{{busLimit}} · train {{trainUsed}}/{{trainLimit}}",
+      "report": "Report stop",
+      "exhausted": "Transit budget used up.",
+      "reportEveryStop": "Report every stop – the detectives are informed."
+    },
+    "photoCatch": {
+      "reported": "Catch reported",
+      "confirmPrompt": "Confirm once the detectives have taken a photo of you.",
+      "confirm": "Confirm catch",
+      "reject": "Reject",
+      "waiting": "Catch reported – waiting for X to confirm.",
+      "report": "Report photo catch",
+      "rule": "The detectives win when X confirms a catch photo.",
+      "noUpload": "Photos are not uploaded to the app."
+    },
+    "mapCredit": {
+      "satellite": "Satellite imagery: Sentinel-2 cloudless 2025 © <eox>EOX IT Services GmbH</eox> (<cc>CC BY-NC-SA 4.0</cc>) · Labels by <ofm>OpenFreeMap</ofm> · © <osm>OpenStreetMap</osm> · Aerial imagery Switzerland: <swisstopo>© swisstopo</swisstopo>",
+      "street": "Map: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Data from <osm>OpenStreetMap</osm>"
+    },
+    "chooseObjective": "Choose target on map",
+    "cancelChoosing": "Tap the map · Cancel",
+    "simulationMode": "Simulation mode",
+    "enableGps": "Enable GPS",
+    "emergency": "Emergency",
+    "emergencyLabel": "Emergency: give up the game",
+    "leave": "Leave",
+    "surrenderDialog": {
+      "title": "Emergency: give up the game?",
+      "text": "The round ends immediately and the detectives win. Your exact location is transmitted to them once and they are notified.",
+      "keepPlaying": "Keep playing",
+      "confirm": "Give up"
+    },
+    "transitDialog": {
+      "title": "Report transit stops",
+      "text": "Choose the means of transport and the number of stops. The detectives receive a message.",
+      "mode": "Means of transport",
+      "bus": "Bus · {{count}} left",
+      "train": "Train · {{count}} left",
+      "count": "Number of stops",
+      "confirm": "Report"
+    },
+    "hint": {
+      "noPosition": {
+        "title": "No location.",
+        "simulated": "Tap the map to move.",
+        "real": "Tap “Simulation mode” below (or allow GPS) so the game can see you."
+      },
+      "countdownX": "Quickly check your location – your head start begins shortly.",
+      "countdownDetective": "X gets a head start shortly. Get ready.",
+      "headstartSolo": "No detective in the room – you can explore the area at your leisure.",
+      "headstartX": "Move under cover and stay within the play area.",
+      "headstartDetective": "X is off – wait for the first reveal.",
+      "objectivePendingTitle": "Bonus mission available.",
+      "objectivePendingText": "Choose a safe, public place in the play area. If you reach it, your next reveal is postponed by 2 minutes.",
+      "objectiveActiveTitle": "Bonus target set.",
+      "objectiveActiveText": "Reach the marker within {{meters}} m to postpone the next reveal by 2 minutes.",
+      "objectiveDoneTitle": "Bonus mission accomplished!",
+      "objectiveDoneText": "Your next reveal comes 2 minutes later.",
+      "huntedSoloTitle": "Test run without hunters.",
+      "huntedTitle": "You are being hunted.",
+      "huntedSoloText": "Alone in the room: if you leave the circle, your location is shared permanently. For a real round, open a second tab and join with the code.",
+      "huntedText": "Keep moving, stay inside the circle. If you leave it, the server shares your location permanently.",
+      "lastRevealTitle": "Last reveal.",
+      "lastRevealText": "{{seconds}} s ago in the red circle – the radius shows the search area.",
+      "noRevealTitle": "No reveal yet.",
+      "noRevealText": "Wait for the first reveal and stay near the area.",
+      "defaultTitle": "Game running.",
+      "defaultText": "Stay ready."
+    }
+  },
+  "map": {
+    "satellite": "Satellite",
+    "streetMap": "Map",
+    "showSatellite": "Show satellite map",
+    "showStreetMap": "Show street map",
+    "objective": "Mission target",
+    "start": "Start",
+    "startPoint": "Starting point",
+    "startPopup": "Starting point · where the round began",
+    "objectiveReached": "Mission target reached",
+    "objectiveRadius": "Mission target · {{meters}} m"
+  },
+  "errors": {
+    "MESSAGE_TOO_LARGE": "Message too large.",
+    "INVALID_JSON": "Invalid JSON",
+    "NO_GAME": "This game does not exist (any more).",
+    "ROOM_FULL": "This room is full (max. {{max}} players).",
+    "HOST_ONLY": "Only the host can change the settings.",
+    "LOBBY_ONLY": "Settings can only be changed in the lobby.",
+    "INVALID_START_POINT": "The starting point is invalid.",
+    "CHAT_RATE_LIMIT": "Please write more slowly.",
+    "NEED_X": "At least one X is needed to start.",
+    "REVEAL_DEFERRED": "Location ping postponed: X's GPS is currently unavailable.",
+    "OUT_OF_BOUNDS_WARNING": "You are outside the play area – return immediately.",
+    "OBJECTIVE_X_ONLY": "Only X can set a mission target.",
+    "OBJECTIVE_UNAVAILABLE": "The mission target is currently unavailable.",
+    "OBJECTIVE_ALREADY_SET": "The mission target has already been set.",
+    "OBJECTIVE_INVALID": "Invalid target point.",
+    "POSITION_STALE": "Your location is currently not up to date.",
+    "OBJECTIVE_OUTSIDE_AREA": "The target must be inside the play area.",
+    "OBJECTIVE_TOO_CLOSE": "The target must be at least {{meters}} m away.",
+    "SURRENDER_X_ONLY": "Only X can give up the game.",
+    "SURRENDER_DISABLED": "Giving up is not allowed in this round.",
+    "TRANSIT_EXHAUSTED_bus": "The transit budget for bus is used up.",
+    "TRANSIT_EXHAUSTED_train": "The transit budget for train is used up.",
+    "TRANSIT_MIN_ONE": "Please enter at least one stop.",
+    "TRANSIT_REMAINING_bus_one": "Only one bus stop is left.",
+    "TRANSIT_REMAINING_bus_other": "Only {{count}} bus stops are left.",
+    "TRANSIT_REMAINING_train_one": "Only one train stop is left.",
+    "TRANSIT_REMAINING_train_other": "Only {{count}} train stops are left."
+  },
+  "endReasons": {
+    "TIME_UP": "The game time has run out.",
+    "X_LEFT": "X left the game.",
+    "X_OUT_OF_BOUNDS": "X left the play area.",
+    "CAUGHT": "X was caught within the catch radius.",
+    "CAUGHT_CONFIRMED": "X was caught after {{seconds}} s within the catch radius.",
+    "CAUGHT_PHOTO": "X confirmed the catch with a photo.",
+    "SURRENDER_LIVE": "{{name}} gave up. The live location was shared.",
+    "SURRENDER_NO_POSITION": "{{name}} gave up. No location was available."
+  },
+  "legal": {
+    "back": "Back to the game",
+    "germanOnly": "This text is only available in German, and the German version is the legally binding one.",
+    "changelogGermanOnly": "The version history is only available in German."
+  }
+}

@@ -10,6 +10,7 @@ Voraussetzungen: Node.js 22 und npm.
 npm ci
 npm run typecheck
 npm run build
+npm run check:locales
 ```
 
 Für den Integrationstest den Worker in einem Terminal starten:
@@ -36,6 +37,20 @@ mkdocs serve
 ```
 
 Die Navigation steht in `mkdocs.yml`. Neue Seiten dort eintragen und aus den bestehenden Seiten verlinken, damit sie nicht verwaist sind.
+
+## Übersetzen
+
+Deutsch ist die Quellsprache, Englisch der Rückfall. Übersetzen geht ohne Programmieren auf
+[Codeberg Translate](https://translate.codeberg.org/engage/fang-x/).
+
+Wer im Code arbeitet:
+
+- App-Texte stehen in `client/src/locales/<sprache>.json` und werden mit `t("bereich.schluessel")`
+  verwendet. Neue Texte zuerst in `de.json` und `en.json` ergänzen, nie fest im Code schreiben.
+- Servermeldungen tragen einen Code; die Texte dazu stehen unter `errors.*` und `endReasons.*`.
+- `npm run check:locales` prüft Schlüssel und Platzhalter (läuft auch in der CI).
+- Impressum, Datenschutz und Changelog bleiben auf Deutsch.
+- Handbuch: Übersetzungen heissen `docs/<Seite>.<sprache>.md`, z. B. `Spieldauer.en.md`.
 
 ## Pull Requests
 

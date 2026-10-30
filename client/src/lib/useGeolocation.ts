@@ -1,5 +1,6 @@
 import type { LatLng } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
+import i18n from "../i18n";
 
 export function useGeolocation(enabled: boolean, onPosition: (pos: LatLng) => void) {
   const [position, setPosition] = useState<LatLng | null>(null);
@@ -19,7 +20,7 @@ export function useGeolocation(enabled: boolean, onPosition: (pos: LatLng) => vo
     }
 
     if (!("geolocation" in navigator)) {
-      setError("Geolocation wird nicht unterstützt.");
+      setError(i18n.t("game.geoUnsupported"));
       return;
     }
 

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import changelogRaw from "../../CHANGELOG.md?raw";
 
 export interface ChangelogSection {
@@ -126,6 +127,7 @@ function renderInline(text: string): ReactNode[] {
 }
 
 export function ChangelogScreen() {
+  const { t, i18n } = useTranslation();
   return (
     <div className="screen legal-screen">
       <article className="card legal changelog">
@@ -144,10 +146,12 @@ export function ChangelogScreen() {
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Zurück zum Spiel
+            {t("legal.back")}
           </a>
           <span className="changelog-topbar-label">Fang X · Versionsverlauf</span>
         </div>
+
+        {i18n.resolvedLanguage !== "de" && <p className="config-hint">{t("legal.changelogGermanOnly")}</p>}
 
         <header className="changelog-header">
           <span className="legal-badge">Das ist neu</span>

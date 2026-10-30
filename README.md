@@ -94,6 +94,13 @@ mkdocs serve
 Die Seite wird bei Änderungen an `docs/` oder `mkdocs.yml` automatisch über den Workflow
 `.github/workflows/deploy-docs.yml` auf GitHub Pages veröffentlicht.
 
+## Übersetzen
+
+Fang X gibt es auf Deutsch (Quellsprache) und Englisch. Weitere Sprachen werden über
+[Weblate](https://translate.codeberg.org/engage/fang-x/) gepflegt – ohne Programmierkenntnisse, direkt
+im Browser. Wie das funktioniert und wie eine neue Sprache dazukommt, steht in
+[CONTRIBUTING.md](CONTRIBUTING.md#übersetzen).
+
 ## Mitmachen
 
 Fehlerberichte und Verbesserungsvorschläge sind willkommen. Nutze dafür die

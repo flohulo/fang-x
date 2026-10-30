@@ -34,6 +34,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Check translations
+        run: npm run check:locales
+
       - name: Build
         run: npm run build
 

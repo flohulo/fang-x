@@ -1,0 +1,392 @@
+{
+  "language": {
+    "label": "Sprache"
+  },
+  "common": {
+    "close": "Schliessen",
+    "cancel": "Abbrechen",
+    "unnamed": "Unbenannt",
+    "roleX": "X",
+    "roleDetective": "Detektiv"
+  },
+  "menu": {
+    "open": "Menü öffnen",
+    "close": "Menü schliessen",
+    "title": "Menü",
+    "settings": "Einstellungen",
+    "moreLinks": "Weitere Seiten",
+    "docs": "Spielregeln im Handbuch",
+    "changelog": "Changelog",
+    "privacy": "Datenschutz",
+    "imprint": "Impressum",
+    "translate": "Bei der Übersetzung helfen"
+  },
+  "alerts": {
+    "title": "Alarm bei Standortmeldung",
+    "description": "Wenn dein Standort an die Detektive übermittelt oder live geteilt wird, alarmieren wir dich mit Ton und Vibration. Gibt X auf, werden Detektive mit einer Systembenachrichtigung informiert. Eine Systembenachrichtigung gibt es, wenn du sie im Browser erlaubst.",
+    "denied": "Browser-Benachrichtigungen sind blockiert. Ton und Vibration bleiben aktiv.",
+    "unsupported": "Systembenachrichtigungen werden von diesem Browser nicht unterstützt. Ton und Vibration bleiben aktiv.",
+    "granted": "Alarm und Browser-Benachrichtigungen sind aktiv.",
+    "disable": "Alarm ausschalten",
+    "enable": "Alarm aktivieren"
+  },
+  "notifications": {
+    "surrenderTitle": "X hat aufgegeben",
+    "surrenderBody": "{{name}} hat das Spiel aufgegeben. Der Live-Standort wurde geteilt.",
+    "positionLiveTitle": "Achtung: Standort wird geteilt",
+    "positionLiveBody": "Dein Standort wird jetzt live an die Detektive übertragen.",
+    "positionSharedTitle": "Standort an Detektive übermittelt",
+    "positionSharedBody": "Dein Standort wurde gerade an die Detektive übermittelt."
+  },
+  "pwa": {
+    "updateTitle": "Neue Version verfügbar",
+    "updateText": "Eine neue Version von Fang X ist verfügbar. Installiere sie jetzt; die Seite wird dabei neu geladen.",
+    "reload": "Installieren & neu laden",
+    "later": "Später"
+  },
+  "app": {
+    "reconnecting": "Verbindung verloren – verbinde neu …",
+    "tooManyGames": "Zu viele Spiele in kurzer Zeit. Bitte kurz warten.",
+    "createFailed": "Spiel konnte nicht erstellt werden.",
+    "unknownError": "Unbekannter Fehler.",
+    "hostName": "Host",
+    "playerName": "Spieler",
+    "tooManyAttempts": "Zu viele Versuche. Bitte eine Minute warten.",
+    "serverUnreachable": "Server nicht erreichbar.",
+    "noSuchGame": "Kein Spiel mit dem Code {{code}}. Prüfe den Code oder starte ein neues Spiel."
+  },
+  "home": {
+    "subtitle": "Das GPS-Fangspiel für draussen",
+    "nameLabel": "Dein Name",
+    "namePlaceholder": "dein Name im Spiel",
+    "newGame": {
+      "title": "Neues Spiel",
+      "text": "Du legst den Raum an, stellst die Regeln ein.",
+      "button": "Neues Spiel starten"
+    },
+    "join": {
+      "title": "Spiel beitreten",
+      "codeLabel": "Spiel-Code",
+      "codePlaceholder": "6 Zeichen",
+      "playAs": "Ich spiele als",
+      "roleTitle": "Rolle wählen",
+      "playAsXLabel": "Als X spielen",
+      "button": "Spiel beitreten",
+      "checking": "Prüfe Code …",
+      "invite": "Einladung erkannt — Code <1>{{code}}</1> ist schon eingetragen."
+    },
+    "privacyNote": "Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen. Es werden keine Konten, E-Mails oder Standortverläufe gespeichert.",
+    "version": "Version {{version}}"
+  },
+  "chat": {
+    "title": "Chat",
+    "open": "Chat öffnen",
+    "close": "Chat schliessen",
+    "onlyDuringGame": "Nur während des Spiels",
+    "messages": "Chatnachrichten",
+    "empty": "Noch keine Nachrichten.",
+    "placeholder": "Nachricht …",
+    "inputLabel": "Chatnachricht",
+    "send": "Senden",
+    "hint": "Chat der laufenden Runde – nach Spielende wird er gelöscht."
+  },
+  "lobby": {
+    "title": "Spielvorbereitung",
+    "waiting": {
+      "title": "Warte auf den Admin",
+      "text": "Der Admin legt die Spielregeln fest und startet die Runde. Bleib in der Lobby, bis das Spiel gestartet wird.",
+      "docsLink": "Spielregeln im Handbuch ansehen ↗"
+    },
+    "geoUnsupported": "Standortfreigabe wird von diesem Browser nicht unterstützt.",
+    "geoDenied": "Standortzugriff abgelehnt. Erlaube ihn in den Website-Einstellungen.",
+    "geoFailed": "Standort konnte nicht ermittelt werden. Prüfe GPS und versuche es erneut.",
+    "shareText": "Lust auf eine Runde Fang X? 🕵️ Komm mit dem Spiel-Code {{code}} dazu!",
+    "codeLabel": "Spiel-Code",
+    "shareInvite": "Einladung teilen",
+    "linkCopied": "Link kopiert ✓",
+    "copyCode": "Nur Code kopieren",
+    "codeCopied": "Code kopiert ✓",
+    "myPlayer": "Mein Spieler",
+    "otherPlayers": "Mitspieler",
+    "nobodyYet": "Noch niemand dabei.",
+    "shareCodeHint": "Teile den Spiel-Code {{code}}, um Mitspieler einzuladen.",
+    "settings": "Spieleinstellungen",
+    "rulesetName": "Name der Einstellungen",
+    "rulesetNamePlaceholder": "z. B. Samstagsrunde",
+    "rulesetNameHint": "Erscheint im Dateinamen des Exports nach dem Spiel.",
+    "rolesFromLobby": "Die Rollen ergeben sich direkt aus den Mitspielern in der Lobby.",
+    "detectivesWait": "Detektive warten während des Vorsprungs und senden keinen Standort",
+    "detectivesShareLive": "Detektive teilen während des Spiels gegenseitig ihren Live-Standort",
+    "xSeesDetectives": "X sieht Detektive",
+    "xSees": {
+      "ALWAYS": "Immer – Live-Standort der Detektive",
+      "ON_REVEAL": "Nur bei jeder Sichtung",
+      "NEVER": "Nie"
+    },
+    "catchRule": "Fangregel",
+    "catchMethod": {
+      "PHOTO_CONFIRMATION": "Foto-Fang: X bestätigt den Fang",
+      "RADIUS": "Automatischer Fang im Fangradius"
+    },
+    "xCanSurrender": "Notfall-Knopf für X: Spiel aufgeben und Standort teilen",
+    "transitBudget": "ÖV-Budget aktivieren (pro Haltestelle)",
+    "transitForX": "Öffentlichen Verkehr für X erlauben",
+    "transitForDetectives": "Öffentlichen Verkehr für Detektive erlauben",
+    "outOfBounds": "Spielfeldrand aktivieren",
+    "busStopsForX": "Bus-Haltestellen für X",
+    "trainStopsForX": "Zug-Haltestellen für X",
+    "startPoint": "Startpunkt (optional)",
+    "startPointUpdate": "Startpunkt aktualisieren",
+    "startPointSet": "Hier meinen Standort als Startpunkt festlegen",
+    "startPointRemove": "Startpunkt entfernen",
+    "startPointDone": "Startpunkt wurde festgelegt.",
+    "startPointHint": "Stelle dich dafür an den vereinbarten Treffpunkt. Die genaue Position wird nur für dieses Spiel gespeichert.",
+    "duration": "Spieldauer (Minuten)",
+    "headStart": "Vorsprung (Minuten)",
+    "countdown": "Countdown vor dem Start (Sekunden)",
+    "firstReveal": "Erste Standortmeldung (Minuten)",
+    "interval": "Reveal-Intervall (Minuten)",
+    "revealRadius": "Sichtradius (Meter)",
+    "catchRadius": "Fangradius (Meter)",
+    "playArea": "Spielgebiet (Radius, Meter)",
+    "objective": "Bonusmission für X aktivieren",
+    "wikiFooter": "💡 Fragen zu Taktiken & Einstellungen?",
+    "wikiFooterLink": "Handbuch öffnen ↗",
+    "start": "Spiel starten",
+    "needX": "Mindestens 1 X nötig",
+    "dryRun": "Probelauf ohne Detektiv — dich jagt niemand. Für eine echte Runde muss mindestens ein Detektiv beitreten (Code <1>{{code}}</1>).",
+    "leave": "Spiel verlassen",
+    "you": "Du",
+    "disconnected": "getrennt",
+    "disconnectedTitle": "Verbindung getrennt – Platz bleibt frei",
+    "toggleRole": "Rolle umschalten",
+    "playerRole": "{{name}}: Rolle {{role}}",
+    "wikiLinkLabel": "Diese Einstellung im Handbuch nachlesen",
+    "wikiLinkTitle": "Im Handbuch nachlesen",
+    "params": {
+      "explain": "Erklärung zu {{title}}",
+      "infoTitle": "Info zu {{title}}",
+      "readMore": "Im Handbuch nachlesen ↗",
+      "duration": {
+        "title": "Spieldauer",
+        "description": "Gesamte Spielzeit der Runde. Schaffen die Detektive es innerhalb dieser Zeit nicht, X zu fangen, gewinnt X das Spiel.",
+        "recommendation": "Standard: 30 Min."
+      },
+      "headStart": {
+        "title": "Vorsprung",
+        "description": "Zeit in Minuten, die X vor Spielbeginn alleine hat, um Distanz aufzubauen. Detektive müssen währenddessen am Startpunkt warten.",
+        "recommendation": "Standard: 0 Min. (bei grossem Spielgebiet 2–20 Min. empfohlen)"
+      },
+      "interval": {
+        "title": "Reveal-Intervall",
+        "description": "Takt in Minuten, in dem der Standort von X automatisch für alle Detektive auf der Karte aufgedeckt wird.",
+        "recommendation": "Standard: 3 Min. (kürzere Abstände erleichtern Detektiven die Jagd)"
+      },
+      "firstReveal": {
+        "title": "Erste Standortmeldung",
+        "description": "Zeit nach dem Ende des Vorsprungs, bis der Standort von X zum ersten Mal gemeldet wird.",
+        "recommendation": "0 Min. = sofort nach dem Vorsprung; danach gilt das eingestellte Intervall."
+      },
+      "revealRadius": {
+        "title": "Sichtradius",
+        "description": "Unschärfe der Aufdeckung auf der Karte. Detektive sehen keinen exakten Punkt, sondern einen Kreis mit diesem Radius, in dem sich X aufhält.",
+        "recommendation": "Standard: 5 m (quasi exakter Punkt; 50–100 m für mehr Versteckspiel)"
+      },
+      "catchRadius": {
+        "title": "Fangradius",
+        "description": "Maximaler GPS-Abstand zwischen Detektiv und X in Metern, bei dem der Fangversuch erfolgreich ausgelöst werden kann.",
+        "recommendation": "Standard: 30 m (gleicht normale Smartphone-GPS-Schwankungen aus)"
+      },
+      "playArea": {
+        "title": "Spielgebiet (Radius)",
+        "description": "Aktionsradius um den gemeinsamen Startpunkt. Verlässt X das Gebiet, wird zur Strafe der exakte Live-Standort übertragen!",
+        "recommendation": "Standard: 700 m"
+      },
+      "objective": {
+        "title": "Bonusmission für X",
+        "description": "X wählt während der Runde ein sicheres Ziel im Spielgebiet. Erreicht X es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.",
+        "recommendation": "Optional: Taktisches Zusatzziel für X"
+      }
+    }
+  },
+  "game": {
+    "phase": {
+      "COUNTDOWN": "Start in",
+      "HEADSTART": "Vorsprung",
+      "RUNNING": "Läuft",
+      "ENDED": "Ende"
+    },
+    "phaseTitle": {
+      "COUNTDOWN": "Gleich geht's los",
+      "HEADSTART": "Vorsprung läuft",
+      "RUNNING": "Spiel läuft",
+      "ENDED": "Spiel beendet"
+    },
+    "winnerX": "X gewinnt!",
+    "winnerDetectives": "Detektive gewinnen!",
+    "surrendered": "🚨 {{name}} hat aufgegeben",
+    "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
+    "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
+    "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "backToStart": "Zurück zur Startseite",
+    "exportSettings": "Einstellungen dieser Runde exportieren",
+    "settingsExported": "Einstellungen exportiert ✓",
+    "exportHint": "Regeln dieser Runde als JSON-Datei ({{name}}) – ohne Startpunkt.",
+    "unnamedRuleset": "ohne Namen",
+    "youAreX": "Du bist X",
+    "youAreDetective": "Du bist Detektiv",
+    "nextReveal": "Nächste Sichtung",
+    "soon": "bald",
+    "timeUndetermined": "Zeitpunkt unbestimmt",
+    "timeRemaining": "Noch {{time}}",
+    "leftArea": "⚠️ Du hast das Spielfeld verlassen! Dein Standort wird jetzt geteilt.",
+    "transitNotice": {
+      "label": "ÖV-Meldung:",
+      "bus_one": "X hat eine Bus-Haltestelle genutzt.",
+      "bus_other": "X hat {{count}} Bus-Haltestellen genutzt.",
+      "train_one": "X hat eine Zug-Haltestelle genutzt.",
+      "train_other": "X hat {{count}} Zug-Haltestellen genutzt.",
+      "dismiss": "Hinweis schliessen"
+    },
+    "gpsError": "GPS-Fehler: {{error}}",
+    "geoUnsupported": "Geolocation wird nicht unterstützt.",
+    "area": {
+      "unknown": "Standort unbekannt",
+      "outside": "{{meters}} m ausserhalb",
+      "toEdge": "{{meters}} m bis zum Rand",
+      "none": "Kein Spielfeldrand"
+    },
+    "gps": {
+      "simulation": "Simulation",
+      "active": "GPS aktiv",
+      "off": "kein GPS"
+    },
+    "solo": "Probelauf · {{code}}",
+    "transitBudget": {
+      "summary": "ÖV-Budget: Bus {{busUsed}}/{{busLimit}} · Zug {{trainUsed}}/{{trainLimit}}",
+      "report": "Halt melden",
+      "exhausted": "ÖV-Budget aufgebraucht.",
+      "reportEveryStop": "Bei jedem Halt melden – die Detektive werden informiert."
+    },
+    "photoCatch": {
+      "reported": "Fang gemeldet",
+      "confirmPrompt": "Bestätige, wenn die Detektive ein Foto von dir gemacht haben.",
+      "confirm": "Fang bestätigen",
+      "reject": "Ablehnen",
+      "waiting": "Fang gemeldet – warte auf die Bestätigung von X.",
+      "report": "Foto-Fang melden",
+      "rule": "Die Detektive gewinnen, wenn X ein Fangfoto bestätigt.",
+      "noUpload": "Fotos werden nicht in die App hochgeladen."
+    },
+    "mapCredit": {
+      "satellite": "Satellitenbild: Sentinel-2 cloudless 2025 © <eox>EOX IT Services GmbH</eox> (<cc>CC BY-NC-SA 4.0</cc>) · Beschriftung von <ofm>OpenFreeMap</ofm> · © <osm>OpenStreetMap</osm> · Luftbild Schweiz: <swisstopo>© swisstopo</swisstopo>",
+      "street": "Karte: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Daten von <osm>OpenStreetMap</osm>"
+    },
+    "chooseObjective": "Ziel auf Karte wählen",
+    "cancelChoosing": "Karte antippen · Abbrechen",
+    "simulationMode": "Simulationsmodus",
+    "enableGps": "GPS aktivieren",
+    "emergency": "Notfall",
+    "emergencyLabel": "Notfall: Spiel aufgeben",
+    "leave": "Verlassen",
+    "surrenderDialog": {
+      "title": "Notfall: Spiel aufgeben?",
+      "text": "Die Runde endet sofort und die Detektive gewinnen. Dein exakter Standort wird einmalig an sie übertragen und sie werden benachrichtigt.",
+      "keepPlaying": "Weiterspielen",
+      "confirm": "Aufgeben"
+    },
+    "transitDialog": {
+      "title": "ÖV-Haltestellen melden",
+      "text": "Wähle Verkehrsmittel und Anzahl der Haltestellen. Die Detektive erhalten eine Nachricht.",
+      "mode": "Verkehrsmittel",
+      "bus": "Bus · noch {{count}}",
+      "train": "Zug · noch {{count}}",
+      "count": "Anzahl Haltestellen",
+      "confirm": "Melden"
+    },
+    "hint": {
+      "noPosition": {
+        "title": "Kein Standort.",
+        "simulated": "Tippe auf die Karte, um dich zu bewegen.",
+        "real": "Tippe unten auf „Simulationsmodus“ (oder erlaube GPS), damit das Spiel dich sieht."
+      },
+      "countdownX": "Prüfe kurz deinen Standort – gleich startet dein Vorsprung.",
+      "countdownDetective": "X bekommt gleich Vorsprung. Mach dich bereit.",
+      "headstartSolo": "Kein Detektiv im Raum – du kannst in Ruhe das Gebiet erkunden.",
+      "headstartX": "Bewege dich in Deckung und bleib im Spielgebiet.",
+      "headstartDetective": "X läuft los – warte auf die erste Sichtung.",
+      "objectivePendingTitle": "Bonusmission verfügbar.",
+      "objectivePendingText": "Wähle einen sicheren, öffentlichen Ort im Spielgebiet. Erreichst du ihn, wird deine nächste Sichtung um 2 Minuten verschoben.",
+      "objectiveActiveTitle": "Bonusziel gesetzt.",
+      "objectiveActiveText": "Erreiche die Markierung innerhalb von {{meters}} m, um die nächste Sichtung um 2 Minuten zu verschieben.",
+      "objectiveDoneTitle": "Bonusmission geschafft!",
+      "objectiveDoneText": "Deine nächste Sichtung kommt 2 Minuten später.",
+      "huntedSoloTitle": "Probelauf ohne Jäger.",
+      "huntedTitle": "Du wirst gejagt.",
+      "huntedSoloText": "Allein im Raum: Verlässt du den Kreis, wird dein Standort dauerhaft geteilt. Öffne für eine echte Runde einen zweiten Tab und tritt mit dem Code bei.",
+      "huntedText": "Bewege dich, bleib im Kreis. Verlässt du ihn, teilt der Server deinen Standort dauerhaft.",
+      "lastRevealTitle": "Letzte Sichtung.",
+      "lastRevealText": "Vor {{seconds}} s im roten Kreis – der Radius zeigt den Suchbereich.",
+      "noRevealTitle": "Noch keine Sichtung.",
+      "noRevealText": "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets.",
+      "defaultTitle": "Spiel läuft.",
+      "defaultText": "Halte dich bereit."
+    }
+  },
+  "map": {
+    "satellite": "Satellit",
+    "streetMap": "Karte",
+    "showSatellite": "Satellitenkarte anzeigen",
+    "showStreetMap": "Strassenkarte anzeigen",
+    "objective": "Missionsziel",
+    "start": "Start",
+    "startPoint": "Startpunkt",
+    "startPopup": "Startpunkt · hier begann die Runde",
+    "objectiveReached": "Missionsziel erreicht",
+    "objectiveRadius": "Missionsziel · {{meters}} m"
+  },
+  "errors": {
+    "MESSAGE_TOO_LARGE": "Nachricht zu gross.",
+    "INVALID_JSON": "Ungültiges JSON",
+    "NO_GAME": "Dieses Spiel gibt es nicht (mehr).",
+    "ROOM_FULL": "Dieser Raum ist voll (max. {{max}} Spieler).",
+    "HOST_ONLY": "Nur der Host kann konfigurieren.",
+    "LOBBY_ONLY": "Konfiguration nur in der Lobby.",
+    "INVALID_START_POINT": "Der Startpunkt ist ungültig.",
+    "CHAT_RATE_LIMIT": "Bitte langsamer schreiben.",
+    "NEED_X": "Für den Start braucht es mindestens ein X.",
+    "REVEAL_DEFERRED": "Standort-Ping verschoben: X-GPS ist gerade nicht verfügbar.",
+    "OUT_OF_BOUNDS_WARNING": "Du bist ausserhalb des Spielgebiets – kehre sofort zurück.",
+    "OBJECTIVE_X_ONLY": "Nur X kann ein Missionsziel setzen.",
+    "OBJECTIVE_UNAVAILABLE": "Das Missionsziel ist gerade nicht verfügbar.",
+    "OBJECTIVE_ALREADY_SET": "Das Missionsziel wurde bereits festgelegt.",
+    "OBJECTIVE_INVALID": "Ungültiger Zielpunkt.",
+    "POSITION_STALE": "Dein Standort ist gerade nicht aktuell.",
+    "OBJECTIVE_OUTSIDE_AREA": "Das Ziel muss innerhalb des Spielgebiets liegen.",
+    "OBJECTIVE_TOO_CLOSE": "Das Ziel muss mindestens {{meters}} m entfernt sein.",
+    "SURRENDER_X_ONLY": "Nur X kann das Spiel aufgeben.",
+    "SURRENDER_DISABLED": "Aufgeben ist in dieser Runde nicht vorgesehen.",
+    "TRANSIT_EXHAUSTED_bus": "Das ÖV-Budget für Bus ist aufgebraucht.",
+    "TRANSIT_EXHAUSTED_train": "Das ÖV-Budget für Zug ist aufgebraucht.",
+    "TRANSIT_MIN_ONE": "Bitte gib mindestens eine Haltestelle an.",
+    "TRANSIT_REMAINING_bus_one": "Für Bus ist nur noch eine Haltestelle übrig.",
+    "TRANSIT_REMAINING_bus_other": "Für Bus sind nur noch {{count}} Haltestellen übrig.",
+    "TRANSIT_REMAINING_train_one": "Für Zug ist nur noch eine Haltestelle übrig.",
+    "TRANSIT_REMAINING_train_other": "Für Zug sind nur noch {{count}} Haltestellen übrig."
+  },
+  "endReasons": {
+    "TIME_UP": "Die Spieldauer ist abgelaufen.",
+    "X_LEFT": "X hat das Spiel verlassen.",
+    "X_OUT_OF_BOUNDS": "X hat das Spielgebiet verlassen.",
+    "CAUGHT": "X wurde im Fangradius gestellt.",
+    "CAUGHT_CONFIRMED": "X wurde nach {{seconds}} s im Fangradius gestellt.",
+    "CAUGHT_PHOTO": "X hat den Fang mit Foto bestätigt.",
+    "SURRENDER_LIVE": "{{name}} hat aufgegeben. Der Live-Standort wurde geteilt.",
+    "SURRENDER_NO_POSITION": "{{name}} hat aufgegeben. Ein Standort war nicht verfügbar."
+  },
+  "legal": {
+    "germanOnly": "Dieser Text ist nur auf Deutsch verfügbar und in dieser Fassung verbindlich.",
+    "back": "Zurück zum Spiel",
+    "changelogGermanOnly": "Der Versionsverlauf ist nur auf Deutsch verfügbar."
+  }
+}

@@ -26,7 +26,6 @@ theme:
         icon: material/brightness-4
         name: Zum hellen Modus wechseln
   features:
-    - navigation.instant
     - navigation.tracking
     - navigation.sections
     - navigation.top
@@ -66,8 +65,37 @@ markdown_extensions:
       alternate_style: true
 
 plugins:
-  - search:
-      lang: de
+  - search
+  # Mehrsprachiges Handbuch: Deutsch ist die Quelle (Seite.md), Übersetzungen heissen
+  # Seite.<sprache>.md (z. B. Spieldauer.en.md). Fehlt eine Übersetzung, wird die deutsche Seite gezeigt.
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: de
+          default: true
+          name: Deutsch
+          build: true
+        - locale: en
+          name: English
+          build: true
+          site_name: Fang X Manual
+          site_description: Game rules, settings and tips for Fang X – the GPS chase game for the outdoors.
+          nav_translations:
+            Startseite: Home
+            Erste Schritte: Getting started
+            Spieleinstellungen: Game settings
+            Übersicht: Overview
+            Spieldauer: Game duration
+            Vorsprung für X: Head start for X
+            Reveal-Intervall: Reveal interval
+            Sichtradius: Reveal radius
+            Fangradius: Catch radius
+            Spielgebiet: Play area
+            Bonusmission für X: Bonus mission for X
+            Notfall-Knopf: Emergency button
 
 extra:
   social:

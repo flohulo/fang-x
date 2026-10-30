@@ -1,5 +1,6 @@
 import type { ChatMessage } from "@fang-x/shared";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ChatPanelProps {
   messages: ChatMessage[];
@@ -7,14 +8,15 @@ interface ChatPanelProps {
   onSend: (text: string) => void;
 }
 
-function formatTime(at: number): string {
-  return new Date(at).toLocaleTimeString("de-CH", {
+function formatTime(at: number, locale: string): string {
+  return new Date(at).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
 export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const [unread, setUnread] = useState(0);
@@ -60,7 +62,7 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
         type="button"
         className={`chat-fab${open ? " is-open" : ""}`}
         onClick={() => setOpen((value) => !value)}
-        aria-label={open ? "Chat schliessen" : "Chat öffnen"}
+        aria-label={open ? t("chat.close") : t("chat.open")}
         aria-expanded={open}
         aria-controls="game-chat-window"
       >
@@ -71,14 +73,14 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
       </button>
 
       {open && (
-        <section className="chat-window" id="game-chat-window" aria-label="Chat">
+        <section className="chat-window" id="game-chat-window" aria-label={t("chat.title")}>
           <header className="chat-window-head">
-            <strong>Chat</strong>
-            <span className="chat-window-sub">Nur während des Spiels</span>
+            <strong>{t("chat.title")}</strong>
+            <span className="chat-window-sub">{t("chat.onlyDuringGame")}</span>
             <button
               type="button"
               className="chat-close"
-              aria-label="Chat schliessen"
+              aria-label={t("chat.close")}
               onClick={() => setOpen(false)}
             >
               ×
@@ -90,10 +92,10 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
             ref={listRef}
             role="log"
             aria-live="polite"
-            aria-label="Chatnachrichten"
+            aria-label={t("chat.messages")}
           >
             {messages.length === 0 ? (
-              <p className="chat-empty">Noch keine Nachrichten.</p>
+              <p className="chat-empty">{t("chat.empty")}</p>
             ) : (
               messages.map((message) => (
                 <div
@@ -104,7 +106,7 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
                     <span className="chat-author" style={{ color: message.color }}>
                       {message.name}
                     </span>
-                    <span className="chat-time">{formatTime(message.at)}</span>
+                    <span className="chat-time">{formatTime(message.at, i18n.language)}</span>
                   </div>
                   <p>{message.text}</p>
                 </div>
@@ -117,17 +119,15 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
               type="text"
               value={draft}
               maxLength={300}
-              placeholder="Nachricht …"
-              aria-label="Chatnachricht"
+              placeholder={t("chat.placeholder")}
+              aria-label={t("chat.inputLabel")}
               onChange={(event) => setDraft(event.target.value)}
             />
             <button type="submit" disabled={!draft.trim()}>
-              Senden
+              {t("chat.send")}
             </button>
           </form>
-          <small className="chat-hint">
-            Chat der laufenden Runde – nach Spielende wird er gelöscht.
-          </small>
+          <small className="chat-hint">{t("chat.hint")}</small>
         </section>
       )}
     </>
