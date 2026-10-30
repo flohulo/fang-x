@@ -1,6 +1,8 @@
 import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
 import { distanceMeters } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { TFunction } from "i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { ChatPanel } from "../components/ChatPanel";
 import { MapView } from "../components/MapView";
 import {
@@ -8,6 +10,7 @@ import {
   downloadSettingsExport,
   settingsExportFileName,
 } from "../lib/settingsExport";
+import { formatEndReason } from "../lib/serverMessages";
 import { useGeolocation } from "../lib/useGeolocation";
 import type { GameResult, PlayerView } from "../lib/useGame";
 
@@ -51,18 +54,17 @@ interface GameScreenProps {
 
 const FALLBACK_CENTER: LatLng = { lat: 47.3769, lng: 8.5417 };
 
-const PHASE_LABEL: Record<string, string> = {
-  COUNTDOWN: "Start in",
-  HEADSTART: "Vorsprung",
-  RUNNING: "Läuft",
-  ENDED: "Ende",
-};
+function externalLink(href: string) {
+  // Der Linktext kommt aus der Übersetzung (Trans füllt ihn ein).
+  return <a href={href} target="_blank" rel="noopener noreferrer" />;
+}
 
-const PHASE_TITLE: Record<string, string> = {
-  COUNTDOWN: "Gleich geht's los",
-  HEADSTART: "Vorsprung läuft",
-  RUNNING: "Spiel läuft",
-  ENDED: "Spiel beendet",
+const MAP_CREDIT_LINKS = {
+  eox: externalLink("https://cloudless.eox.at"),
+  cc: externalLink("https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de"),
+  ofm: externalLink("https://openfreemap.org"),
+  osm: externalLink("https://www.openstreetmap.org/copyright"),
+  swisstopo: externalLink("https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10"),
 };
 
 function formatDuration(ms: number): string {
@@ -101,6 +103,7 @@ export function GameScreen({
   onSurrender,
   onLeave,
 }: GameScreenProps) {
+  const { t } = useTranslation();
   const [mapCenter, setMapCenter] = useState<LatLng | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSimHint, setShowSimHint] = useState(false);
@@ -244,7 +247,7 @@ export function GameScreen({
     pos: p.id === myId ? position : (p.position ?? null),
   }));
 
-  const hint = buildHint({
+  const hint = buildHint(t, {
     phase,
     isX,
     isSolo,
@@ -323,15 +326,13 @@ export function GameScreen({
         )}
         <div className="card" style={{ textAlign: "center" }}>
           <h2 style={{ margin: "0 0 16px", fontSize: "1.5rem" }}>
-            {gameResult.winner === "X" ? "X gewinnt!" : "Detektive gewinnen!"}
+            {gameResult.winner === "X" ? t("game.winnerX") : t("game.winnerDetectives")}
           </h2>
           {surrender && (
             <div className="surrender-result" role="status">
-              <strong>🚨 {surrender.name} hat aufgegeben</strong>
+              <strong>{t("game.surrendered", { name: surrender.name })}</strong>
               <span>
-                {surrender.pos
-                  ? "Der exakte Live-Standort wurde an die Detektive übertragen."
-                  : "Ein Standort war nicht verfügbar."}
+                {surrender.pos ? t("game.surrenderLive") : t("game.surrenderNoPosition")}
               </span>
               {surrender.pos && (
                 <a
@@ -339,14 +340,20 @@ export function GameScreen({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Standort auf OpenStreetMap öffnen ↗
+                  {t("game.openInOsm")}
                 </a>
               )}
             </div>
           )}
-          <p style={{ color: "var(--text-dim)" }}>{gameResult.reason}</p>
+          <p style={{ color: "var(--text-dim)" }}>
+            {formatEndReason(t, {
+              reason: gameResult.reason,
+              code: gameResult.reasonCode,
+              params: gameResult.reasonParams,
+            })}
+          </p>
           <button onClick={onLeave} style={{ marginTop: 24 }}>
-            Zurück zur Startseite
+            {t("game.backToStart")}
           </button>
           {ruleset && (
             <>
@@ -356,12 +363,10 @@ export function GameScreen({
                 onClick={exportSettings}
                 style={{ marginTop: 8 }}
               >
-                {settingsExported
-                  ? "Einstellungen exportiert ✓"
-                  : "Einstellungen dieser Runde exportieren"}
+                {settingsExported ? t("game.settingsExported") : t("game.exportSettings")}
               </button>
               <p className="config-hint" style={{ marginTop: 12 }}>
-                {`Regeln dieser Runde als JSON-Datei (${ruleset.name.trim() || "ohne Namen"}) – ohne Startpunkt.`}
+                {t("game.exportHint", { name: ruleset.name.trim() || t("game.unnamedRuleset") })}
               </p>
             </>
           )}
@@ -386,10 +391,10 @@ export function GameScreen({
 
         <div className="map-overlay">
           <div className="map-overlay-row">
-            <span className={`phase-badge phase-${phase}`}>{PHASE_LABEL[phase] ?? phase}</span>
+            <span className={`phase-badge phase-${phase}`}>{t(`game.phase.${phase}`, { defaultValue: phase })}</span>
             {timeLeft !== null && <span className="map-timer">{formatDuration(timeLeft)}</span>}
             <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
-              {isX ? "Du bist X" : "Du bist Detektiv"}
+              {isX ? t("game.youAreX") : t("game.youAreDetective")}
             </span>
           </div>
         </div>
@@ -403,22 +408,22 @@ export function GameScreen({
             aria-live="off"
           >
             <div className="reveal-progress-head">
-              <span>Nächste Sichtung</span>
+              <span>{t("game.nextReveal")}</span>
               <span>
-                {revealTimer.indeterminate ? "bald" : formatDuration(revealRemainingMs ?? 0)}
+                {revealTimer.indeterminate ? t("game.soon") : formatDuration(revealRemainingMs ?? 0)}
               </span>
             </div>
             <div
               className="reveal-progress-track"
               role="progressbar"
-              aria-label="Nächste Sichtung"
+              aria-label={t("game.nextReveal")}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={revealTimer.indeterminate ? undefined : Math.round(revealProgress)}
               aria-valuetext={
                 revealTimer.indeterminate
-                  ? "Zeitpunkt unbestimmt"
-                  : `Noch ${formatDuration(revealRemainingMs ?? 0)}`
+                  ? t("game.timeUndetermined")
+                  : t("game.timeRemaining", { time: formatDuration(revealRemainingMs ?? 0) })
               }
             >
               <div
@@ -431,7 +436,7 @@ export function GameScreen({
 
         {yourPositionIsShared && (
           <div className="alert-banner" style={{ top: 64 }}>
-            ⚠️ Du hast das Spielfeld verlassen! Dein Standort wird jetzt geteilt.
+            {t("game.leftArea")}
           </div>
         )}
 
@@ -448,15 +453,15 @@ export function GameScreen({
         {visibleTransitNotice && !isX && (
           <div className="transit-notice" role="status">
             <span>
-              <strong>ÖV-Meldung:</strong> X hat{" "}
-              {visibleTransitNotice.count === 1 ? "eine" : visibleTransitNotice.count}{" "}
-              {visibleTransitNotice.mode === "bus" ? "Bus-Haltestelle" : "Zug-Haltestelle"}
-              {visibleTransitNotice.count === 1 ? "" : "n"} genutzt.
+              <strong>{t("game.transitNotice.label")}</strong>{" "}
+              {t(`game.transitNotice.${visibleTransitNotice.mode}`, {
+                count: visibleTransitNotice.count,
+              })}
             </span>
             <button
               type="button"
               className="transit-notice-close"
-              aria-label="Hinweis schliessen"
+              aria-label={t("game.transitNotice.dismiss")}
               onClick={() => setDismissedTransitNoticeAt(visibleTransitNotice.at)}
             >
               ×
@@ -466,7 +471,7 @@ export function GameScreen({
 
         {error && !simulated && (
           <div className="alert-banner" style={{ bottom: 200 }}>
-            GPS-Fehler: {error}
+            {t("game.gpsError", { error })}
           </div>
         )}
 
@@ -477,16 +482,16 @@ export function GameScreen({
             >
               {ruleset?.map?.outOfBoundsEnabled
                 ? metersToEdge === null
-                  ? "Standort unbekannt"
+                  ? t("game.area.unknown")
                   : isOutside
-                    ? `${Math.abs(metersToEdge)} m ausserhalb`
-                    : `${metersToEdge} m bis zum Rand`
-                : "Kein Spielfeldrand"}
+                    ? t("game.area.outside", { meters: Math.abs(metersToEdge) })
+                    : t("game.area.toEdge", { meters: metersToEdge })
+                : t("game.area.none")}
             </span>
             <span className={`gps-chip${position === null ? " is-off" : ""}`}>
-              {simulated ? "Simulation" : position ? "GPS aktiv" : "kein GPS"}
+              {simulated ? t("game.gps.simulation") : position ? t("game.gps.active") : t("game.gps.off")}
             </span>
-            {isSolo && <span className="solo-chip">Probelauf · {code}</span>}
+            {isSolo && <span className="solo-chip">{t("game.solo", { code })}</span>}
           </div>
 
           <p className="game-hint">
@@ -496,8 +501,12 @@ export function GameScreen({
             <div className="transit-budget">
               <div className="transit-budget-head">
                 <span>
-                  ÖV-Budget: Bus {transitStops.bus}/{busStopsLimit} · Zug {transitStops.train}/
-                  {trainStopsLimit}
+                  {t("game.transitBudget.summary", {
+                    busUsed: transitStops.bus,
+                    busLimit: busStopsLimit,
+                    trainUsed: transitStops.train,
+                    trainLimit: trainStopsLimit,
+                  })}
                 </span>
                 {canUseTransitBudget && (
                   <button
@@ -506,14 +515,14 @@ export function GameScreen({
                     disabled={busRemaining + trainRemaining === 0}
                     onClick={openTransitDialog}
                   >
-                    Halt melden
+                    {t("game.transitBudget.report")}
                   </button>
                 )}
               </div>
               <small>
                 {busRemaining + trainRemaining === 0
-                  ? "ÖV-Budget aufgebraucht."
-                  : "Bei jedem Halt melden – die Detektive werden informiert."}
+                  ? t("game.transitBudget.exhausted")
+                  : t("game.transitBudget.reportEveryStop")}
               </small>
             </div>
           )}
@@ -522,120 +531,73 @@ export function GameScreen({
               {catchPending ? (
                 isX ? (
                   <>
-                    <strong>Fang gemeldet</strong>
-                    <span>Bestätige, wenn die Detektive ein Foto von dir gemacht haben.</span>
+                    <strong>{t("game.photoCatch.reported")}</strong>
+                    <span>{t("game.photoCatch.confirmPrompt")}</span>
                     <div className="transit-budget-actions">
                       <button type="button" onClick={() => onResolveCatch(true)}>
-                        Fang bestätigen
+                        {t("game.photoCatch.confirm")}
                       </button>
                       <button
                         type="button"
                         className="secondary"
                         onClick={() => onResolveCatch(false)}
                       >
-                        Ablehnen
+                        {t("game.photoCatch.reject")}
                       </button>
                     </div>
                   </>
                 ) : (
-                  <span>Fang gemeldet – warte auf die Bestätigung von X.</span>
+                  <span>{t("game.photoCatch.waiting")}</span>
                 )
               ) : canReportPhotoCatch ? (
                 <button type="button" onClick={onReportCatch}>
-                  Foto-Fang melden
+                  {t("game.photoCatch.report")}
                 </button>
               ) : (
-                <span>Die Detektive gewinnen, wenn X ein Fangfoto bestätigt.</span>
+                <span>{t("game.photoCatch.rule")}</span>
               )}
-              <small>Fotos werden nicht in die App hochgeladen.</small>
+              <small>{t("game.photoCatch.noUpload")}</small>
             </div>
           )}
 
           <p className="map-credit">
-            {satelliteOn ? (
-              <>
-                Satellitenbild: Sentinel-2 cloudless 2025 ©{" "}
-                <a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">
-                  EOX IT Services GmbH
-                </a>{" "}
-                (
-                <a
-                  href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  CC BY-NC-SA 4.0
-                </a>
-                ) · Beschriftung von{" "}
-                <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
-                  OpenFreeMap
-                </a>{" "}
-                · ©{" "}
-                <a
-                  href="https://www.openstreetmap.org/copyright"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  OpenStreetMap
-                </a>{" "}
-                · Luftbild Schweiz:{" "}
-                <a
-                  href="https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  © swisstopo
-                </a>
-              </>
-            ) : (
-              <>
-                Karte: ©{" "}
-                <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
-                  OpenFreeMap
-                </a>{" "}
-                · © OpenMapTiles · Daten von{" "}
-                <a
-                  href="https://www.openstreetmap.org/copyright"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  OpenStreetMap
-                </a>
-              </>
-            )}
+            <Trans
+              i18nKey={satelliteOn ? "game.mapCredit.satellite" : "game.mapCredit.street"}
+              components={MAP_CREDIT_LINKS}
+            />
           </p>
         </div>
 
         <div className="map-bottom-controls">
           {canChooseObjective && !choosingObjective && (
-            <button onClick={() => setChoosingObjective(true)}>Ziel auf Karte wählen</button>
+            <button onClick={() => setChoosingObjective(true)}>{t("game.chooseObjective")}</button>
           )}
           {choosingObjective && (
             <button className="secondary" onClick={() => setChoosingObjective(false)}>
-              Karte antippen · Abbrechen
+              {t("game.cancelChoosing")}
             </button>
           )}
           {!choosingObjective && !simulated && (
             <button className="secondary" onClick={handleSimMode}>
-              Simulationsmodus
+              {t("game.simulationMode")}
             </button>
           )}
           {!choosingObjective && simulated && (
             <button className="secondary" onClick={enableRealGps}>
-              GPS aktivieren
+              {t("game.enableGps")}
             </button>
           )}
           {canSurrender && !choosingObjective && (
             <button
               className="danger"
               type="button"
-              aria-label="Notfall: Spiel aufgeben"
+              aria-label={t("game.emergencyLabel")}
               onClick={() => setSurrenderDialogOpen(true)}
             >
-              Notfall
+              {t("game.emergency")}
             </button>
           )}
-          <button onClick={onLeave}>Verlassen</button>
+          <button onClick={onLeave}>{t("game.leave")}</button>
         </div>
 
         <ChatPanel messages={chatMessages} myId={myId} onSend={onSendChat} />
@@ -654,18 +616,15 @@ export function GameScreen({
               aria-labelledby="surrender-dialog-title"
               aria-describedby="surrender-dialog-description"
             >
-              <h2 id="surrender-dialog-title">Notfall: Spiel aufgeben?</h2>
-              <p id="surrender-dialog-description">
-                Die Runde endet sofort und die Detektive gewinnen. Dein exakter Standort wird
-                einmalig an sie übertragen und sie werden benachrichtigt.
-              </p>
+              <h2 id="surrender-dialog-title">{t("game.surrenderDialog.title")}</h2>
+              <p id="surrender-dialog-description">{t("game.surrenderDialog.text")}</p>
               <div className="transit-dialog-actions">
                 <button
                   type="button"
                   className="secondary"
                   onClick={() => setSurrenderDialogOpen(false)}
                 >
-                  Weiterspielen
+                  {t("game.surrenderDialog.keepPlaying")}
                 </button>
                 <button
                   type="button"
@@ -675,7 +634,7 @@ export function GameScreen({
                     onSurrender();
                   }}
                 >
-                  Aufgeben
+                  {t("game.surrenderDialog.confirm")}
                 </button>
               </div>
             </section>
@@ -695,13 +654,10 @@ export function GameScreen({
               aria-modal="true"
               aria-labelledby="transit-dialog-title"
             >
-              <h2 id="transit-dialog-title">ÖV-Haltestellen melden</h2>
-              <p>
-                Wähle Verkehrsmittel und Anzahl der Haltestellen. Die Detektive erhalten eine
-                Nachricht.
-              </p>
+              <h2 id="transit-dialog-title">{t("game.transitDialog.title")}</h2>
+              <p>{t("game.transitDialog.text")}</p>
 
-              <div className="transit-mode-toggle" role="group" aria-label="Verkehrsmittel">
+              <div className="transit-mode-toggle" role="group" aria-label={t("game.transitDialog.mode")}>
                 <button
                   type="button"
                   className={transitMode === "bus" ? undefined : "secondary"}
@@ -709,7 +665,7 @@ export function GameScreen({
                   disabled={busRemaining === 0}
                   onClick={() => chooseTransitMode("bus")}
                 >
-                  Bus · noch {busRemaining}
+                  {t("game.transitDialog.bus", { count: busRemaining })}
                 </button>
                 <button
                   type="button"
@@ -718,11 +674,11 @@ export function GameScreen({
                   disabled={trainRemaining === 0}
                   onClick={() => chooseTransitMode("train")}
                 >
-                  Zug · noch {trainRemaining}
+                  {t("game.transitDialog.train", { count: trainRemaining })}
                 </button>
               </div>
 
-              <label htmlFor="transit-count">Anzahl Haltestellen</label>
+              <label htmlFor="transit-count">{t("game.transitDialog.count")}</label>
               <select
                 id="transit-count"
                 value={transitCount}
@@ -743,10 +699,10 @@ export function GameScreen({
                   className="secondary"
                   onClick={() => setTransitDialogOpen(false)}
                 >
-                  Abbrechen
+                  {t("common.cancel")}
                 </button>
                 <button type="button" disabled={transitRemaining < 1} onClick={confirmTransitStops}>
-                  Melden
+                  {t("game.transitDialog.confirm")}
                 </button>
               </div>
             </section>
@@ -757,97 +713,90 @@ export function GameScreen({
   );
 }
 
-function buildHint({
-  phase,
-  isX,
-  isSolo,
-  hasPosition,
-  simulated,
-  lastReveal,
-  objective,
-  phaseActive,
-}: {
-  phase: string;
-  isX: boolean;
-  isSolo: boolean;
-  hasPosition: boolean;
-  simulated: boolean;
-  lastReveal: RevealEvent | null;
-  objective: ObjectiveState | null;
-  phaseActive: boolean;
-}): { title: string; text: string } {
+function buildHint(
+  t: TFunction,
+  {
+    phase,
+    isX,
+    isSolo,
+    hasPosition,
+    simulated,
+    lastReveal,
+    objective,
+    phaseActive,
+  }: {
+    phase: string;
+    isX: boolean;
+    isSolo: boolean;
+    hasPosition: boolean;
+    simulated: boolean;
+    lastReveal: RevealEvent | null;
+    objective: ObjectiveState | null;
+    phaseActive: boolean;
+  },
+): { title: string; text: string } {
   if (!hasPosition && phaseActive) {
     return {
-      title: "Kein Standort.",
-      text: simulated
-        ? "Tippe auf die Karte, um dich zu bewegen."
-        : "Tippe unten auf „Simulationsmodus“ (oder erlaube GPS), damit das Spiel dich sieht.",
+      title: t("game.hint.noPosition.title"),
+      text: simulated ? t("game.hint.noPosition.simulated") : t("game.hint.noPosition.real"),
     };
   }
 
   switch (phase) {
     case "COUNTDOWN":
-      return isX
-        ? {
-            title: `${PHASE_TITLE.COUNTDOWN}.`,
-            text: "Prüfe kurz deinen Standort – gleich startet dein Vorsprung.",
-          }
-        : {
-            title: `${PHASE_TITLE.COUNTDOWN}.`,
-            text: "X bekommt gleich Vorsprung. Mach dich bereit.",
-          };
+      return {
+        title: `${t("game.phaseTitle.COUNTDOWN")}.`,
+        text: isX ? t("game.hint.countdownX") : t("game.hint.countdownDetective"),
+      };
 
     case "HEADSTART":
-      return isX
-        ? {
-            title: `${PHASE_TITLE.HEADSTART}.`,
-            text: isSolo
-              ? "Kein Detektiv im Raum – du kannst in Ruhe das Gebiet erkunden."
-              : "Bewege dich in Deckung und bleib im Spielgebiet.",
-          }
-        : {
-            title: `${PHASE_TITLE.HEADSTART}.`,
-            text: "X läuft los – warte auf die erste Sichtung.",
-          };
+      return {
+        title: `${t("game.phaseTitle.HEADSTART")}.`,
+        text: isX
+          ? isSolo
+            ? t("game.hint.headstartSolo")
+            : t("game.hint.headstartX")
+          : t("game.hint.headstartDetective"),
+      };
 
     case "RUNNING":
       if (isX) {
         if (objective?.status === "PENDING") {
           return {
-            title: "Bonusmission verfügbar.",
-            text: "Wähle einen sicheren, öffentlichen Ort im Spielgebiet. Erreichst du ihn, wird deine nächste Sichtung um 2 Minuten verschoben.",
+            title: t("game.hint.objectivePendingTitle"),
+            text: t("game.hint.objectivePendingText"),
           };
         }
         if (objective?.status === "ACTIVE") {
           return {
-            title: "Bonusziel gesetzt.",
-            text: `Erreiche die Markierung innerhalb von ${objective.radiusMeters} m, um die nächste Sichtung um 2 Minuten zu verschieben.`,
+            title: t("game.hint.objectiveActiveTitle"),
+            text: t("game.hint.objectiveActiveText", { meters: objective.radiusMeters }),
           };
         }
         if (objective?.status === "COMPLETED") {
           return {
-            title: "Bonusmission geschafft!",
-            text: "Deine nächste Sichtung kommt 2 Minuten später.",
+            title: t("game.hint.objectiveDoneTitle"),
+            text: t("game.hint.objectiveDoneText"),
           };
         }
         return {
-          title: isSolo ? "Probelauf ohne Jäger." : "Du wirst gejagt.",
-          text: isSolo
-            ? "Allein im Raum: Verlässt du den Kreis, wird dein Standort dauerhaft geteilt. Öffne für eine echte Runde einen zweiten Tab und tritt mit dem Code bei."
-            : "Bewege dich, bleib im Kreis. Verlässt du ihn, teilt der Server deinen Standort dauerhaft.",
+          title: isSolo ? t("game.hint.huntedSoloTitle") : t("game.hint.huntedTitle"),
+          text: isSolo ? t("game.hint.huntedSoloText") : t("game.hint.huntedText"),
         };
       }
       return lastReveal
         ? {
-            title: "Letzte Sichtung.",
-            text: `Vor ${Math.max(0, Math.round((Date.now() - lastReveal.at) / 1000))} s im roten Kreis – der Radius zeigt den Suchbereich.`,
+            title: t("game.hint.lastRevealTitle"),
+            text: t("game.hint.lastRevealText", {
+              seconds: Math.max(0, Math.round((Date.now() - lastReveal.at) / 1000)),
+            }),
           }
         : {
-            title: "Noch keine Sichtung.",
-            text: "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets.",
+            title: t("game.hint.noRevealTitle"),
+            text: t("game.hint.noRevealText"),
           };
 
     default:
-      return { title: "Spiel läuft.", text: "Halte dich bereit." };
+      return { title: t("game.hint.defaultTitle"), text: t("game.hint.defaultText") };
   }
 }

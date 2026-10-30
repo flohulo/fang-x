@@ -14,6 +14,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { LatLng, ObjectiveState, RevealEvent } from "@fang-x/shared";
 import { circlePolygon } from "@fang-x/shared";
 import type { Feature, Polygon } from "geojson";
+import i18n from "../i18n";
 
 setWorkerUrl(mapLibreWorkerUrl);
 
@@ -60,6 +61,7 @@ const GAME_LAYER_IDS = new Set([
 class SatelliteControl implements IControl {
   private container: HTMLDivElement | null = null;
   private button: HTMLButtonElement | null = null;
+  private active = false;
 
   constructor(private readonly onToggle: () => void) {}
 
@@ -70,19 +72,19 @@ class SatelliteControl implements IControl {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "map-satellite-btn";
-    button.textContent = "Satellit";
-    button.title = "Satellitenkarte anzeigen";
-    button.setAttribute("aria-label", "Satellitenkarte anzeigen");
     button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", this.onToggle);
 
     container.appendChild(button);
     this.container = container;
     this.button = button;
+    this.render();
+    i18n.on("languageChanged", this.render);
     return container;
   }
 
   onRemove() {
+    i18n.off("languageChanged", this.render);
     this.button?.removeEventListener("click", this.onToggle);
     this.container?.remove();
     this.container = null;
@@ -90,14 +92,20 @@ class SatelliteControl implements IControl {
   }
 
   setActive(active: boolean) {
+    this.active = active;
+    this.render();
+  }
+
+  private readonly render = () => {
     if (!this.button) return;
-    this.button.textContent = active ? "Karte" : "Satellit";
+    const active = this.active;
+    this.button.textContent = active ? i18n.t("map.streetMap") : i18n.t("map.satellite");
     this.button.classList.toggle("is-active", active);
     this.button.setAttribute("aria-pressed", String(active));
-    const label = active ? "Strassenkarte anzeigen" : "Satellitenkarte anzeigen";
+    const label = active ? i18n.t("map.showStreetMap") : i18n.t("map.showSatellite");
     this.button.title = label;
     this.button.setAttribute("aria-label", label);
-  }
+  };
 }
 
 function applySatelliteMode(
@@ -457,15 +465,15 @@ export function MapView({
         .getPopup()
         ?.setText(
           objective.status === "COMPLETED"
-            ? "Missionsziel erreicht"
-            : `Missionsziel · ${objective.radiusMeters} m`,
+            ? i18n.t("map.objectiveReached")
+            : i18n.t("map.objectiveRadius", { meters: objective.radiusMeters }),
         );
       return;
     }
 
     const el = document.createElement("div");
     el.textContent = "Z";
-    el.setAttribute("aria-label", "Missionsziel");
+    el.setAttribute("aria-label", i18n.t("map.objective"));
     el.style.width = "32px";
     el.style.height = "32px";
     el.style.display = "grid";
@@ -482,8 +490,8 @@ export function MapView({
       .setPopup(
         new Popup().setText(
           objective.status === "COMPLETED"
-            ? "Missionsziel erreicht"
-            : `Missionsziel · ${objective.radiusMeters} m`,
+            ? i18n.t("map.objectiveReached")
+            : i18n.t("map.objectiveRadius", { meters: objective.radiusMeters }),
         ),
       )
       .addTo(map);
@@ -510,14 +518,14 @@ export function MapView({
 
     const el = document.createElement("div");
     el.className = "start-marker";
-    el.textContent = "Start";
-    el.setAttribute("aria-label", "Startpunkt");
+    el.textContent = i18n.t("map.start");
+    el.setAttribute("aria-label", i18n.t("map.startPoint"));
 
     // Über dem eigentlichen Punkt, damit die Markierung nicht auf dem
     // Spieler-Marker liegt, wenn X noch am Startpunkt steht.
     startMarkerRef.current = new Marker({ element: el, anchor: "bottom", offset: [0, -16] })
       .setLngLat([startLng, startLat])
-      .setPopup(new Popup().setText("Startpunkt · hier begann die Runde"))
+      .setPopup(new Popup().setText(i18n.t("map.startPopup")))
       .addTo(map);
   }, [startLat, startLng]);
 

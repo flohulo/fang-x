@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { docsUrl } from "../lib/docs";
 import { type AlertNotificationPermission, AlertSettings } from "./AlertSettings";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+
+/** Weblate-Projekt, in dem die Übersetzungen gepflegt werden. */
+const TRANSLATE_URL = "https://hosted.weblate.org/engage/fang-x/";
 
 interface AppMenuProps {
   alertsEnabled: boolean;
@@ -17,6 +22,7 @@ export function AppMenu({
   onDisableAlerts,
   isGame,
 }: AppMenuProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -47,7 +53,7 @@ export function AppMenu({
           ref={triggerRef}
           className={`app-menu-trigger${isGame ? " is-game" : ""}`}
           type="button"
-          aria-label="Menü öffnen"
+          aria-label={t("menu.open")}
           aria-expanded={false}
           aria-controls="app-menu-panel"
           onClick={() => setOpen(true)}
@@ -71,13 +77,13 @@ export function AppMenu({
             <div className="app-menu-header">
               <div>
                 <span className="app-menu-eyebrow">Fang X</span>
-                <h2 id="app-menu-title">Menü</h2>
+                <h2 id="app-menu-title">{t("menu.title")}</h2>
               </div>
               <button
                 ref={closeRef}
                 className="app-menu-close"
                 type="button"
-                aria-label="Menü schliessen"
+                aria-label={t("menu.close")}
                 onClick={() => setOpen(false)}
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -87,7 +93,8 @@ export function AppMenu({
             </div>
 
             <section className="app-menu-section" aria-labelledby="app-menu-settings-title">
-              <h3 id="app-menu-settings-title">Einstellungen</h3>
+              <h3 id="app-menu-settings-title">{t("menu.settings")}</h3>
+              <LanguageSwitcher />
               <AlertSettings
                 enabled={alertsEnabled}
                 notificationPermission={notificationPermission}
@@ -96,24 +103,28 @@ export function AppMenu({
               />
             </section>
 
-            <nav className="app-menu-links" aria-label="Weitere Seiten">
+            <nav className="app-menu-links" aria-label={t("menu.moreLinks")}>
               <a
                 href={docsUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
               >
-                <span>Spielregeln im Handbuch</span>
+                <span>{t("menu.docs")}</span>
                 <span aria-hidden="true">↗</span>
               </a>
               <a href="/changelog" onClick={() => setOpen(false)}>
-                Changelog
+                {t("menu.changelog")}
               </a>
               <a href="/datenschutz" onClick={() => setOpen(false)}>
-                Datenschutz
+                {t("menu.privacy")}
               </a>
               <a href="/impressum" onClick={() => setOpen(false)}>
-                Impressum
+                {t("menu.imprint")}
+              </a>
+              <a href={TRANSLATE_URL} target="_blank" rel="noopener noreferrer">
+                <span>{t("menu.translate")}</span>
+                <span aria-hidden="true">↗</span>
               </a>
             </nav>
           </aside>

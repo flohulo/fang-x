@@ -8,6 +8,9 @@ export type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
 export type Role = "X" | "DETECTIVE" | "HOST";
 
+/** Platzhalter für übersetzbare Servermeldungen (z. B. { meters: 25 }). */
+export type MessageParams = Record<string, string | number>;
+
 // --- Client → Server ---
 
 export type ClientMessage =
@@ -139,7 +142,10 @@ export type ServerMessage =
   | {
       t: "end";
       winner: "X" | "DETECTIVES";
+      /** Deutscher Klartext als Rückfall; Clients übersetzen bevorzugt `reasonCode`. */
       reason: string;
+      reasonCode?: string;
+      reasonParams?: MessageParams;
       players: PlayerInfo[];
       /** X hat aufgegeben und den exakten Standort geteilt. */
       surrender?: {
@@ -149,5 +155,11 @@ export type ServerMessage =
         at: number;
       };
     }
-  | { t: "error"; message: string; code?: string }
+  | {
+      t: "error";
+      /** Deutscher Klartext als Rückfall; Clients übersetzen bevorzugt `code`. */
+      message: string;
+      code?: string;
+      params?: MessageParams;
+    }
   | { t: "pong" };

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface LegalInfo {
   email: string;
@@ -18,6 +19,7 @@ export function isPlaceholder(value: string): boolean {
 export const LEGAL_COMPLETE = LEGAL.email.trim() !== "" && LEGAL.updated.trim() !== "";
 
 export function LegalScreen({ page: initialPage }: { page: "impressum" | "datenschutz" }) {
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState<"impressum" | "datenschutz">(initialPage);
   const [copied, setCopied] = useState(false);
 
@@ -54,7 +56,7 @@ export function LegalScreen({ page: initialPage }: { page: "impressum" | "datens
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Zurück zum Spiel
+            {t("legal.back")}
           </a>
 
           <div className="legal-nav-tabs">
@@ -77,6 +79,8 @@ export function LegalScreen({ page: initialPage }: { page: "impressum" | "datens
             </a>
           </div>
         </div>
+
+        {i18n.resolvedLanguage !== "de" && <p className="config-hint">{t("legal.germanOnly")}</p>}
 
         {currentPage === "impressum" ? (
           <Impressum copied={copied} onCopyEmail={copyEmail} />

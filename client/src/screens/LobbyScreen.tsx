@@ -1,6 +1,7 @@
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
 import { DEFAULT_RULESET } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { docsUrl } from "../lib/docs";
 import { inviteUrl } from "../lib/invite";
 import type { PlayerView } from "../lib/useGame";
@@ -28,6 +29,7 @@ export function LobbyScreen({
   onStart,
   onLeave,
 }: LobbyScreenProps) {
+  const { t } = useTranslation();
   const [localRuleset, setLocalRuleset] = useState<Ruleset>(ruleset ?? DEFAULT_RULESET);
   const [copied, setCopied] = useState<null | "link" | "code">(null);
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
@@ -67,7 +69,7 @@ export function LobbyScreen({
   const setStartLocation = () => {
     setStartLocationError(null);
     if (!navigator.geolocation) {
-      setStartLocationError("Standortfreigabe wird von diesem Browser nicht unterstützt.");
+      setStartLocationError(t("lobby.geoUnsupported"));
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -79,8 +81,8 @@ export function LobbyScreen({
       (error) => {
         setStartLocationError(
           error.code === error.PERMISSION_DENIED
-            ? "Standortzugriff abgelehnt. Erlaube ihn in den Website-Einstellungen."
-            : "Standort konnte nicht ermittelt werden. Prüfe GPS und versuche es erneut.",
+            ? t("lobby.geoDenied")
+            : t("lobby.geoFailed"),
         );
       },
       { enableHighAccuracy: true, maximumAge: 10_000, timeout: 15_000 },
@@ -94,7 +96,7 @@ export function LobbyScreen({
 
   const shareInvite = async () => {
     const url = inviteUrl(code, window.location.origin);
-    const text = `Lust auf eine Runde Fang X? 🕵️ Komm mit dem Spiel-Code ${code} dazu!`;
+    const text = t("lobby.shareText", { code });
     if (navigator.share) {
       try {
         await navigator.share({ title: "Fang X", text, url });
@@ -127,34 +129,31 @@ export function LobbyScreen({
 
   return (
     <div className="screen">
-      <h1>Spielvorbereitung</h1>
+      <h1>{t("lobby.title")}</h1>
 
       {!youAreHost && (
         <div className="card lobby-waiting-card">
-          <h3>Warte auf den Admin</h3>
-          <p>
-            Der Admin legt die Spielregeln fest und startet die Runde. Bleib in der Lobby, bis das
-            Spiel gestartet wird.
-          </p>
+          <h3>{t("lobby.waiting.title")}</h3>
+          <p>{t("lobby.waiting.text")}</p>
           <a href={docsUrl()} target="_blank" rel="noopener noreferrer">
-            Spielregeln im Handbuch ansehen ↗
+            {t("lobby.waiting.docsLink")}
           </a>
         </div>
       )}
 
       <div className="card">
-        <label>Spiel-Code</label>
+        <label>{t("lobby.codeLabel")}</label>
         <div className="code-display">{code}</div>
         <button onClick={shareInvite} style={{ marginTop: 12 }}>
-          {copied === "link" ? "Link kopiert ✓" : "Einladung teilen"}
+          {copied === "link" ? t("lobby.linkCopied") : t("lobby.shareInvite")}
         </button>
         <button className="secondary" style={{ marginTop: 8 }} onClick={copyCode}>
-          {copied === "code" ? "Code kopiert ✓" : "Nur Code kopieren"}
+          {copied === "code" ? t("lobby.codeCopied") : t("lobby.copyCode")}
         </button>
       </div>
 
       <div className="card">
-        <h3>Mein Spieler</h3>
+        <h3>{t("lobby.myPlayer")}</h3>
         {myId && (
           <ul className="players-list">
             <PlayerRow
@@ -168,13 +167,13 @@ export function LobbyScreen({
 
       <div className="card">
         <h3>
-          Mitspieler
+          {t("lobby.otherPlayers")}
           {others.length > 0 && <span className="count-badge">{others.length}</span>}
         </h3>
         {others.length === 0 ? (
           <p className="empty-hint">
-            Noch niemand dabei.
-            <span>Teile den Spiel-Code {code}, um Mitspieler einzuladen.</span>
+            {t("lobby.nobodyYet")}
+            <span>{t("lobby.shareCodeHint", { code })}</span>
           </p>
         ) : (
           <ul className="players-list">
@@ -193,23 +192,23 @@ export function LobbyScreen({
 
       {youAreHost && (
         <div className="card">
-          <h3>Spieleinstellungen</h3>
+          <h3>{t("lobby.settings")}</h3>
           <div className="config-field">
             <div className="config-label-row">
-              <label htmlFor="cfg-ruleset-name">Name der Einstellungen</label>
+              <label htmlFor="cfg-ruleset-name">{t("lobby.rulesetName")}</label>
             </div>
             <input
               id="cfg-ruleset-name"
               type="text"
               maxLength={40}
-              placeholder="z. B. Samstagsrunde"
+              placeholder={t("lobby.rulesetNamePlaceholder")}
               value={localRuleset.name}
               onChange={(event) => handleConfigure({ name: event.target.value })}
             />
-            <p className="config-hint">Erscheint im Dateinamen des Exports nach dem Spiel.</p>
+            <p className="config-hint">{t("lobby.rulesetNameHint")}</p>
           </div>
           <div className="optional-game-settings">
-            <p>Die Rollen ergeben sich direkt aus den Mitspielern in der Lobby.</p>
+            <p>{t("lobby.rolesFromLobby")}</p>
             <ConfigOptionHelp>
               <label className="objective-option">
                 <input
@@ -219,7 +218,7 @@ export function LobbyScreen({
                     updateNested("game", { detectivesWaitDuringHeadStart: event.target.checked })
                   }
                 />
-                Detektive warten während des Vorsprungs und senden keinen Standort
+                {t("lobby.detectivesWait")}
               </label>
             </ConfigOptionHelp>
             <ConfigOptionHelp>
@@ -233,12 +232,12 @@ export function LobbyScreen({
                     })
                   }
                 />
-                Detektive teilen während des Spiels gegenseitig ihren Live-Standort
+                {t("lobby.detectivesShareLive")}
               </label>
             </ConfigOptionHelp>
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-x-sees-detectives">X sieht Detektive</label>
+                <label htmlFor="cfg-x-sees-detectives">{t("lobby.xSeesDetectives")}</label>
                 <WikiInfoLink />
               </div>
               <select
@@ -250,14 +249,14 @@ export function LobbyScreen({
                   })
                 }
               >
-                <option value="ALWAYS">Immer – Live-Standort der Detektive</option>
-                <option value="ON_REVEAL">Nur bei jeder Sichtung</option>
-                <option value="NEVER">Nie</option>
+                <option value="ALWAYS">{t("lobby.xSees.ALWAYS")}</option>
+                <option value="ON_REVEAL">{t("lobby.xSees.ON_REVEAL")}</option>
+                <option value="NEVER">{t("lobby.xSees.NEVER")}</option>
               </select>
             </div>
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-catch-method">Fangregel</label>
+                <label htmlFor="cfg-catch-method">{t("lobby.catchRule")}</label>
                 <WikiInfoLink />
               </div>
               <select
@@ -270,8 +269,10 @@ export function LobbyScreen({
                   })
                 }
               >
-                <option value="PHOTO_CONFIRMATION">Foto-Fang: X bestätigt den Fang</option>
-                <option value="RADIUS">Automatischer Fang im Fangradius</option>
+                <option value="PHOTO_CONFIRMATION">
+                  {t("lobby.catchMethod.PHOTO_CONFIRMATION")}
+                </option>
+                <option value="RADIUS">{t("lobby.catchMethod.RADIUS")}</option>
               </select>
             </div>
             <ConfigOptionHelp>
@@ -283,7 +284,7 @@ export function LobbyScreen({
                     updateNested("catch", { xCanSurrender: event.target.checked })
                   }
                 />
-                Notfall-Knopf für X: Spiel aufgeben und Standort teilen
+                {t("lobby.xCanSurrender")}
               </label>
             </ConfigOptionHelp>
             <ConfigOptionHelp>
@@ -300,7 +301,7 @@ export function LobbyScreen({
                     })
                   }
                 />
-                ÖV-Budget aktivieren (pro Haltestelle)
+                {t("lobby.transitBudget")}
               </label>
             </ConfigOptionHelp>
             <ConfigOptionHelp>
@@ -318,7 +319,7 @@ export function LobbyScreen({
                     })
                   }
                 />
-                Öffentlichen Verkehr für X erlauben
+                {t("lobby.transitForX")}
               </label>
             </ConfigOptionHelp>
             <ConfigOptionHelp>
@@ -334,7 +335,7 @@ export function LobbyScreen({
                     })
                   }
                 />
-                Öffentlichen Verkehr für Detektive erlauben
+                {t("lobby.transitForDetectives")}
               </label>
             </ConfigOptionHelp>
             <ConfigOptionHelp>
@@ -346,7 +347,7 @@ export function LobbyScreen({
                     updateNested("map", { outOfBoundsEnabled: event.target.checked })
                   }
                 />
-                Spielfeldrand aktivieren
+                {t("lobby.outOfBounds")}
               </label>
             </ConfigOptionHelp>
             {localRuleset.movement.xTransitBudget.enabled && (
@@ -354,7 +355,7 @@ export function LobbyScreen({
                 <div className="config-grid">
                   <div className="config-field">
                     <div className="config-label-row">
-                      <label htmlFor="cfg-bus-stops">Bus-Haltestellen für X</label>
+                      <label htmlFor="cfg-bus-stops">{t("lobby.busStopsForX")}</label>
                       <WikiInfoLink />
                     </div>
                     <input
@@ -374,7 +375,7 @@ export function LobbyScreen({
                   </div>
                   <div className="config-field">
                     <div className="config-label-row">
-                      <label htmlFor="cfg-train-stops">Zug-Haltestellen für X</label>
+                      <label htmlFor="cfg-train-stops">{t("lobby.trainStopsForX")}</label>
                       <WikiInfoLink />
                     </div>
                     <input
@@ -397,13 +398,13 @@ export function LobbyScreen({
             )}
             <div className="config-field">
               <div className="config-label-row">
-                <label>Startpunkt (optional)</label>
+                <label>{t("lobby.startPoint")}</label>
                 <WikiInfoLink />
               </div>
               <button className="secondary" type="button" onClick={setStartLocation}>
                 {localRuleset.map.startLocation
-                  ? "Startpunkt aktualisieren"
-                  : "Hier meinen Standort als Startpunkt festlegen"}
+                  ? t("lobby.startPointUpdate")
+                  : t("lobby.startPointSet")}
               </button>
               {localRuleset.map.startLocation && (
                 <button
@@ -412,27 +413,24 @@ export function LobbyScreen({
                   onClick={() => updateNested("map", { startLocation: null })}
                   style={{ marginTop: 8 }}
                 >
-                  Startpunkt entfernen
+                  {t("lobby.startPointRemove")}
                 </button>
               )}
               {localRuleset.map.startLocation && (
-                <p className="config-hint">Startpunkt wurde festgelegt.</p>
+                <p className="config-hint">{t("lobby.startPointDone")}</p>
               )}
               {startLocationError && (
                 <p className="error" role="alert">
                   {startLocationError}
                 </p>
               )}
-              <p className="config-hint">
-                Stelle dich dafür an den vereinbarten Treffpunkt. Die genaue Position wird nur für
-                dieses Spiel gespeichert.
-              </p>
+              <p className="config-hint">{t("lobby.startPointHint")}</p>
             </div>
           </div>
           <div className="config-grid">
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-duration">Spieldauer (Minuten)</label>
+                <label htmlFor="cfg-duration">{t("lobby.duration")}</label>
                 <ParamInfoButton
                   paramKey="duration"
                   isOpen={activeInfoKey === "duration"}
@@ -463,7 +461,7 @@ export function LobbyScreen({
 
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-headstart">Vorsprung (Minuten)</label>
+                <label htmlFor="cfg-headstart">{t("lobby.headStart")}</label>
                 <ParamInfoButton
                   paramKey="headStart"
                   isOpen={activeInfoKey === "headStart"}
@@ -494,7 +492,7 @@ export function LobbyScreen({
 
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-countdown">Countdown vor dem Start (Sekunden)</label>
+                <label htmlFor="cfg-countdown">{t("lobby.countdown")}</label>
                 <WikiInfoLink />
               </div>
               <input
@@ -513,7 +511,7 @@ export function LobbyScreen({
 
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-first-reveal">Erste Standortmeldung (Minuten)</label>
+                <label htmlFor="cfg-first-reveal">{t("lobby.firstReveal")}</label>
                 <ParamInfoButton
                   paramKey="firstReveal"
                   isOpen={activeInfoKey === "firstReveal"}
@@ -545,7 +543,7 @@ export function LobbyScreen({
 
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-interval">Reveal-Intervall (Minuten)</label>
+                <label htmlFor="cfg-interval">{t("lobby.interval")}</label>
                 <ParamInfoButton
                   paramKey="interval"
                   isOpen={activeInfoKey === "interval"}
@@ -576,7 +574,7 @@ export function LobbyScreen({
 
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-revealradius">Sichtradius (Meter)</label>
+                <label htmlFor="cfg-revealradius">{t("lobby.revealRadius")}</label>
                 <ParamInfoButton
                   paramKey="revealRadius"
                   isOpen={activeInfoKey === "revealRadius"}
@@ -608,7 +606,7 @@ export function LobbyScreen({
             {localRuleset.catch.method === "RADIUS" && (
               <div className="config-field">
                 <div className="config-label-row">
-                  <label htmlFor="cfg-catchradius">Fangradius (Meter)</label>
+                  <label htmlFor="cfg-catchradius">{t("lobby.catchRadius")}</label>
                   <ParamInfoButton
                     paramKey="catchRadius"
                     isOpen={activeInfoKey === "catchRadius"}
@@ -640,7 +638,7 @@ export function LobbyScreen({
 
             <div className="config-field">
               <div className="config-label-row">
-                <label htmlFor="cfg-playarea">Spielgebiet (Radius, Meter)</label>
+                <label htmlFor="cfg-playarea">{t("lobby.playArea")}</label>
                 <ParamInfoButton
                   paramKey="playArea"
                   isOpen={activeInfoKey === "playArea"}
@@ -679,7 +677,7 @@ export function LobbyScreen({
                   checked={localRuleset.objective.enabled}
                   onChange={(e) => updateNested("objective", { enabled: e.target.checked })}
                 />
-                Bonusmission für X aktivieren
+                {t("lobby.objective")}
               </label>
               <ParamInfoButton
                 paramKey="objective"
@@ -699,32 +697,31 @@ export function LobbyScreen({
           </div>
 
           <div className="config-wiki-footer">
-            <span className="config-wiki-footer-text">💡 Fragen zu Taktiken & Einstellungen?</span>
+            <span className="config-wiki-footer-text">{t("lobby.wikiFooter")}</span>
             <a
               href={docsUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="config-wiki-footer-link"
             >
-              Handbuch öffnen ↗
+              {t("lobby.wikiFooterLink")}
             </a>
           </div>
 
           <button onClick={onStart} disabled={!canStart} style={{ marginTop: 16 }}>
-            {!hasX ? "Mindestens 1 X nötig" : "Spiel starten"}
+            {!hasX ? t("lobby.needX") : t("lobby.start")}
           </button>
 
           {hasX && !hasDetective && (
             <p className="config-hint">
-              Probelauf ohne Detektiv — dich jagt niemand. Für eine echte Runde muss mindestens ein
-              Detektiv beitreten (Code <strong>{code}</strong>).
+              <Trans i18nKey="lobby.dryRun" values={{ code }} components={{ 1: <strong /> }} />
             </p>
           )}
         </div>
       )}
 
       <button className="secondary lobby-leave-button" onClick={onLeave}>
-        Spiel verlassen
+        {t("lobby.leave")}
       </button>
     </div>
   );
@@ -741,10 +738,11 @@ function PlayerRow({
   onToggleRole: (wantsX: boolean) => void;
   canToggle?: boolean;
 }) {
+  const { t } = useTranslation();
   if (!player) return null;
 
   const canEdit = isMe || canToggle;
-  const roleText = player.wantsX ? "X" : "Detektiv";
+  const roleText = player.wantsX ? t("common.roleX") : t("common.roleDetective");
 
   return (
     <li className={`player-row${isMe ? " is-me" : ""}`}>
@@ -753,22 +751,22 @@ function PlayerRow({
       </span>
 
       <span className="player-name">
-        {player.name || "Unbenannt"}
-        {isMe && <span className="me-badge">Du</span>}
+        {player.name || t("common.unnamed")}
+        {isMe && <span className="me-badge">{t("lobby.you")}</span>}
         {player.connected === false && (
-          <span className="offline-badge" title="Verbindung getrennt – Platz bleibt frei">
-            getrennt
+          <span className="offline-badge" title={t("lobby.disconnectedTitle")}>
+            {t("lobby.disconnected")}
           </span>
         )}
       </span>
 
       {canEdit ? (
-        <label className="role-toggle" title="Rolle umschalten">
+        <label className="role-toggle" title={t("lobby.toggleRole")}>
           <input
             type="checkbox"
             checked={!!player.wantsX}
             onChange={(e) => onToggleRole(e.target.checked)}
-            aria-label={`${player.name}: Rolle ${roleText}`}
+            aria-label={t("lobby.playerRole", { name: player.name, role: roleText })}
           />
           <span className="role-label">{roleText}</span>
           <span className="role-track" aria-hidden="true">
@@ -783,14 +781,15 @@ function PlayerRow({
 }
 
 function WikiInfoLink() {
+  const { t } = useTranslation();
   return (
     <a
       href={docsUrl()}
       target="_blank"
       rel="noopener noreferrer"
       className="param-info-btn param-info-link"
-      aria-label="Diese Einstellung im Handbuch nachlesen"
-      title="Im Handbuch nachlesen"
+      aria-label={t("lobby.wikiLinkLabel")}
+      title={t("lobby.wikiLinkTitle")}
     >
       i
     </a>
@@ -806,91 +805,39 @@ function ConfigOptionHelp({ children }: { children: ReactNode }) {
   );
 }
 
-interface ParamInfo {
-  title: string;
-  description: string;
-  recommendation: string;
-  wikiPage: string;
-}
+/** Handbuchseite je Parameter; Titel, Beschreibung und Empfehlung stehen in den Übersetzungen. */
+const PARAM_WIKI_PAGES = {
+  duration: "Spieldauer",
+  headStart: "Vorsprung-fuer-X",
+  interval: "Reveal-Intervall",
+  firstReveal: "Reveal-Intervall",
+  revealRadius: "Sichtradius",
+  catchRadius: "Fangradius",
+  playArea: "Spielgebiet",
+  objective: "Bonusmission-fuer-X",
+} as const;
 
-const PARAM_INFOS: Record<string, ParamInfo> = {
-  duration: {
-    title: "Spieldauer",
-    description:
-      "Gesamte Spielzeit der Runde. Schaffen die Detektive es innerhalb dieser Zeit nicht, X zu fangen, gewinnt X das Spiel.",
-    recommendation: "Standard: 30 Min.",
-    wikiPage: "Spieldauer",
-  },
-  headStart: {
-    title: "Vorsprung",
-    description:
-      "Zeit in Minuten, die X vor Spielbeginn alleine hat, um Distanz aufzubauen. Detektive müssen währenddessen am Startpunkt warten.",
-    recommendation: "Standard: 0 Min. (bei grossem Spielgebiet 2–20 Min. empfohlen)",
-    wikiPage: "Vorsprung-fuer-X",
-  },
-  interval: {
-    title: "Reveal-Intervall",
-    description:
-      "Takt in Minuten, in dem der Standort von X automatisch für alle Detektive auf der Karte aufgedeckt wird.",
-    recommendation: "Standard: 3 Min. (kürzere Abstände erleichtern Detektiven die Jagd)",
-    wikiPage: "Reveal-Intervall",
-  },
-  firstReveal: {
-    title: "Erste Standortmeldung",
-    description:
-      "Zeit nach dem Ende des Vorsprungs, bis der Standort von X zum ersten Mal gemeldet wird.",
-    recommendation: "0 Min. = sofort nach dem Vorsprung; danach gilt das eingestellte Intervall.",
-    wikiPage: "Reveal-Intervall",
-  },
-  revealRadius: {
-    title: "Sichtradius",
-    description:
-      "Unschärfe der Aufdeckung auf der Karte. Detektive sehen keinen exakten Punkt, sondern einen Kreis mit diesem Radius, in dem sich X aufhält.",
-    recommendation: "Standard: 5 m (quasi exakter Punkt; 50–100 m für mehr Versteckspiel)",
-    wikiPage: "Sichtradius",
-  },
-  catchRadius: {
-    title: "Fangradius",
-    description:
-      "Maximaler GPS-Abstand zwischen Detektiv und X in Metern, bei dem der Fangversuch erfolgreich ausgelöst werden kann.",
-    recommendation: "Standard: 30 m (gleicht normale Smartphone-GPS-Schwankungen aus)",
-    wikiPage: "Fangradius",
-  },
-  playArea: {
-    title: "Spielgebiet (Radius)",
-    description:
-      "Aktionsradius um den gemeinsamen Startpunkt. Verlässt X das Gebiet, wird zur Strafe der exakte Live-Standort übertragen!",
-    recommendation: "Standard: 700 m",
-    wikiPage: "Spielgebiet",
-  },
-  objective: {
-    title: "Bonusmission für X",
-    description:
-      "X wählt während der Runde ein sicheres Ziel im Spielgebiet. Erreicht X es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.",
-    recommendation: "Optional: Taktisches Zusatzziel für X",
-    wikiPage: "Bonusmission-fuer-X",
-  },
-};
+type ParamKey = keyof typeof PARAM_WIKI_PAGES;
 
 function ParamInfoButton({
   paramKey,
   isOpen,
   onToggle,
 }: {
-  paramKey: keyof typeof PARAM_INFOS;
+  paramKey: ParamKey;
   isOpen: boolean;
   onToggle: () => void;
 }) {
-  const info = PARAM_INFOS[paramKey];
-  if (!info) return null;
+  const { t } = useTranslation();
+  const title = t(`lobby.params.${paramKey}.title`);
 
   return (
     <button
       type="button"
       className={`param-info-btn${isOpen ? " is-active" : ""}`}
-      aria-label={`Erklärung zu ${info.title}`}
+      aria-label={t("lobby.params.explain", { title })}
       aria-expanded={isOpen}
-      title={`Info zu ${info.title}`}
+      title={t("lobby.params.infoTitle", { title })}
       onClick={(e) => {
         e.stopPropagation();
         onToggle();
@@ -906,12 +853,11 @@ function ParamPopover({
   align = "left",
   onClose,
 }: {
-  paramKey: keyof typeof PARAM_INFOS;
+  paramKey: ParamKey;
   align?: "left" | "right";
   onClose: () => void;
 }) {
-  const info = PARAM_INFOS[paramKey];
-  if (!info) return null;
+  const { t } = useTranslation();
 
   return (
     <div
@@ -920,25 +866,25 @@ function ParamPopover({
       onClick={(e) => e.stopPropagation()}
     >
       <div className="param-popover-header">
-        <span className="param-popover-title">{info.title}</span>
+        <span className="param-popover-title">{t(`lobby.params.${paramKey}.title`)}</span>
         <button
           type="button"
           className="param-popover-close"
-          aria-label="Schliessen"
+          aria-label={t("common.close")}
           onClick={onClose}
         >
           ×
         </button>
       </div>
-      <p className="param-popover-desc">{info.description}</p>
-      <div className="param-popover-badge">{info.recommendation}</div>
+      <p className="param-popover-desc">{t(`lobby.params.${paramKey}.description`)}</p>
+      <div className="param-popover-badge">{t(`lobby.params.${paramKey}.recommendation`)}</div>
       <a
-        href={docsUrl(info.wikiPage)}
+        href={docsUrl(PARAM_WIKI_PAGES[paramKey])}
         target="_blank"
         rel="noopener noreferrer"
         className="param-popover-wiki"
       >
-        Im Handbuch nachlesen ↗
+        {t("lobby.params.readMore")}
       </a>
     </div>
   );

@@ -95,6 +95,12 @@ interface Player {
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
 // X hat aufgegeben: exakter Standort beim Aufgeben (einmalig, kein Verlauf).
+/** Maschinenlesbarer Grund des Spielendes, damit Clients ihn in der eigenen Sprache anzeigen. */
+interface EndDetail {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 interface SurrenderInfo {
   playerId: string;
   name: string;
@@ -127,6 +133,7 @@ interface RoomSnapshot {
   objective: ObjectiveState | null;
   winner: "X" | "DETECTIVES" | null;
   endReason: string | null;
+  endDetail?: EndDetail | null;
   surrender?: SurrenderInfo | null;
   transitStops?: { bus: number; train: number };
   catchPending?: boolean;
@@ -157,6 +164,7 @@ export class GameRoom {
   private playAreaCenter: LatLng | null = null;
   private winner: "X" | "DETECTIVES" | null = null;
   private endReason: string | null = null;
+  private endDetail: EndDetail | null = null;
   private surrenderInfo: SurrenderInfo | null = null;
   private transitStops = { bus: 0, train: 0 };
   private chatMessages: ChatMessage[] = [];
@@ -237,6 +245,7 @@ export class GameRoom {
         : null,
       winner: this.winner,
       endReason: this.endReason,
+      endDetail: this.endDetail,
       surrender: this.surrenderInfo,
       transitStops: this.transitStops,
       catchPending: this.catchPending,
@@ -281,6 +290,7 @@ export class GameRoom {
     this.objective = snap.objective ?? null;
     this.winner = snap.winner;
     this.endReason = snap.endReason;
+    this.endDetail = snap.endDetail ?? null;
     this.surrenderInfo = snap.surrender ?? null;
     this.transitStops = snap.transitStops ?? { bus: 0, train: 0 };
     this.catchPending = snap.catchPending ?? false;
@@ -380,7 +390,7 @@ export class GameRoom {
         return true;
       }
       if (this.phaseEndsAt !== null && now >= this.phaseEndsAt) {
-        this.endGame("X", "Die Spieldauer ist abgelaufen.");
+        this.endGame("X", "Die Spieldauer ist abgelaufen.", undefined, { code: "TIME_UP" });
         return true;
       }
     }
@@ -428,6 +438,7 @@ export class GameRoom {
     this.objective = null;
     this.winner = null;
     this.endReason = null;
+    this.endDetail = null;
     this.xPositions.length = 0;
     this.chatMessages.length = 0;
     void this.state.storage.deleteAll().catch(() => {});
@@ -454,7 +465,7 @@ export class GameRoom {
       tokens -= 1;
 
       if (typeof event.data !== "string" || event.data.length > MAX_MESSAGE_BYTES) {
-        this.sendTo(ws, { t: "error", message: "Nachricht zu groß." });
+        this.sendTo(ws, { t: "error", message: "Nachricht zu groß.", code: "MESSAGE_TOO_LARGE" });
         return;
       }
 
@@ -462,7 +473,7 @@ export class GameRoom {
       try {
         msg = JSON.parse(event.data);
       } catch {
-        this.sendTo(ws, { t: "error", message: "Ungültiges JSON" });
+        this.sendTo(ws, { t: "error", message: "Ungültiges JSON", code: "INVALID_JSON" });
         return;
       }
       if (!msg || typeof msg !== "object") return;
@@ -518,6 +529,7 @@ export class GameRoom {
                 t: "error",
                 message: `Dieser Raum ist voll (max. ${MAX_PLAYERS} Spieler).`,
                 code: "ROOM_FULL",
+                params: { max: MAX_PLAYERS },
               });
               closed = true;
               try {
@@ -561,6 +573,9 @@ export class GameRoom {
               t: "end",
               winner: this.winner,
               reason: this.endReason,
+              ...(this.endDetail
+                ? { reasonCode: this.endDetail.code, reasonParams: this.endDetail.params }
+                : {}),
               players: this.getPlayerInfos(),
               ...(this.surrenderInfo ? { surrender: this.surrenderInfo } : {}),
             });
@@ -571,11 +586,19 @@ export class GameRoom {
         }
         case "configure": {
           if (!player?.isHost) {
-            this.sendTo(ws, { t: "error", message: "Nur der Host kann konfigurieren." });
+            this.sendTo(ws, {
+              t: "error",
+              message: "Nur der Host kann konfigurieren.",
+              code: "HOST_ONLY",
+            });
             return;
           }
           if (this.phase !== "LOBBY") {
-            this.sendTo(ws, { t: "error", message: "Konfiguration nur in der Lobby." });
+            this.sendTo(ws, {
+              t: "error",
+              message: "Konfiguration nur in der Lobby.",
+              code: "LOBBY_ONLY",
+            });
             return;
           }
           const nextRuleset = mergeRuleset(msg.ruleset);
@@ -583,7 +606,11 @@ export class GameRoom {
             nextRuleset.map.startLocation !== null &&
             !isValidPosition(nextRuleset.map.startLocation)
           ) {
-            this.sendTo(ws, { t: "error", message: "Der Startpunkt ist ungültig." });
+            this.sendTo(ws, {
+              t: "error",
+              message: "Der Startpunkt ist ungültig.",
+              code: "INVALID_START_POINT",
+            });
             return;
           }
           this.ruleset = nextRuleset;
@@ -617,7 +644,11 @@ export class GameRoom {
           const cutoff = Date.now() - CHAT_WINDOW_MS;
           while (chatTimes.length > 0 && chatTimes[0] < cutoff) chatTimes.shift();
           if (chatTimes.length >= CHAT_BURST) {
-            this.sendTo(ws, { t: "error", message: "Bitte langsamer schreiben." });
+            this.sendTo(ws, {
+              t: "error",
+              message: "Bitte langsamer schreiben.",
+              code: "CHAT_RATE_LIMIT",
+            });
             break;
           }
           chatTimes.push(Date.now());
@@ -642,7 +673,11 @@ export class GameRoom {
           if (!player?.isHost) return;
           if (this.phase !== "LOBBY") return;
           if (![...this.players.values()].some((p) => p.wantsX)) {
-            this.sendTo(ws, { t: "error", message: "Für den Start braucht es mindestens ein X." });
+            this.sendTo(ws, {
+              t: "error",
+              message: "Für den Start braucht es mindestens ein X.",
+              code: "NEED_X",
+            });
             return;
           }
           this.startGame();
@@ -776,7 +811,7 @@ export class GameRoom {
     if ((this.phase === "RUNNING" || this.phase === "HEADSTART") && p.role === "X") {
       const anyXLeft = [...this.players.values()].some((pl) => pl.role === "X");
       if (!anyXLeft) {
-        this.endGame("DETECTIVES", "X hat das Spiel verlassen.");
+        this.endGame("DETECTIVES", "X hat das Spiel verlassen.", undefined, { code: "X_LEFT" });
         return;
       }
     }
@@ -829,6 +864,7 @@ export class GameRoom {
       : null;
     this.winner = null;
     this.endReason = null;
+    this.endDetail = null;
     this.lastRevealIndex = 0;
     this.lastRevealAt = 0;
     this.nextRevealAt = null;
@@ -934,6 +970,7 @@ export class GameRoom {
         this.sendTo(x.ws, {
           t: "error",
           message: "Standort-Ping verschoben: X-GPS ist gerade nicht verfügbar.",
+          code: "REVEAL_DEFERRED",
         });
       }
       this.nextRevealAt = now + 5_000;
@@ -1013,7 +1050,9 @@ export class GameRoom {
       if (this.xCurrentlyOutOfBounds || now - this.xOutsideSince < graceMs) return;
 
       if (penalty === "INSTANT_LOSS") {
-        this.endGame("DETECTIVES", "X hat das Spielgebiet verlassen.");
+        this.endGame("DETECTIVES", "X hat das Spielgebiet verlassen.", undefined, {
+          code: "X_OUT_OF_BOUNDS",
+        });
         return;
       }
       this.xCurrentlyOutOfBounds = true;
@@ -1022,6 +1061,7 @@ export class GameRoom {
         this.sendTo(x.ws, {
           t: "error",
           message: "Du bist außerhalb des Spielgebiets – kehre sofort zurück.",
+          code: "OUT_OF_BOUNDS_WARNING",
         });
         this.persist();
         return;
@@ -1061,29 +1101,46 @@ export class GameRoom {
   private setObjective(player: Player | null, target: LatLng) {
     if (player?.role !== "X") {
       if (player)
-        this.sendTo(player.ws, { t: "error", message: "Nur X kann ein Missionsziel setzen." });
+        this.sendTo(player.ws, {
+          t: "error",
+          message: "Nur X kann ein Missionsziel setzen.",
+          code: "OBJECTIVE_X_ONLY",
+        });
       return;
     }
     if (this.phase !== "RUNNING" || !this.ruleset.objective.enabled) {
       this.sendTo(player.ws, {
         t: "error",
         message: "Das Missionsziel ist gerade nicht verfügbar.",
+        code: "OBJECTIVE_UNAVAILABLE",
       });
       return;
     }
     if (this.objective?.status !== "PENDING") {
-      this.sendTo(player.ws, { t: "error", message: "Das Missionsziel wurde bereits festgelegt." });
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Das Missionsziel wurde bereits festgelegt.",
+        code: "OBJECTIVE_ALREADY_SET",
+      });
       return;
     }
     if (!isValidPosition(target) || !this.playAreaCenter) {
-      this.sendTo(player.ws, { t: "error", message: "Ungültiger Zielpunkt." });
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Ungültiger Zielpunkt.",
+        code: "OBJECTIVE_INVALID",
+      });
       return;
     }
 
     const now = Date.now();
     const positionFreshFor = this.ruleset.movement.minUpdateSeconds * 3 * 1000;
     if (!player.position || now - player.lastPositionAt > positionFreshFor) {
-      this.sendTo(player.ws, { t: "error", message: "Dein Standort ist gerade nicht aktuell." });
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Dein Standort ist gerade nicht aktuell.",
+        code: "POSITION_STALE",
+      });
       return;
     }
 
@@ -1092,6 +1149,7 @@ export class GameRoom {
       this.sendTo(player.ws, {
         t: "error",
         message: "Das Ziel muss innerhalb des Spielgebiets liegen.",
+        code: "OBJECTIVE_OUTSIDE_AREA",
       });
       return;
     }
@@ -1100,6 +1158,8 @@ export class GameRoom {
       this.sendTo(player.ws, {
         t: "error",
         message: `Das Ziel muss mindestens ${Math.round(minimumDistance)} m entfernt sein.`,
+        code: "OBJECTIVE_TOO_CLOSE",
+        params: { meters: Math.round(minimumDistance) },
       });
       return;
     }
@@ -1162,6 +1222,10 @@ export class GameRoom {
           confirmMs > 0
             ? `X wurde nach ${this.ruleset.catch.confirmSeconds}s im Fangradius gestellt.`
             : "X wurde im Fangradius gestellt.",
+          undefined,
+          confirmMs > 0
+            ? { code: "CAUGHT_CONFIRMED", params: { seconds: this.ruleset.catch.confirmSeconds } }
+            : { code: "CAUGHT" },
         );
         return;
       }
@@ -1174,7 +1238,7 @@ export class GameRoom {
 
     // Laufzeit abgelaufen → X gewinnt (Alarm ist die Referenz, das hier ist Netz und Doppel)
     if (this.phaseEndsAt && now >= this.phaseEndsAt) {
-      this.endGame("X", "Die Spieldauer ist abgelaufen.");
+      this.endGame("X", "Die Spieldauer ist abgelaufen.", undefined, { code: "TIME_UP" });
       return;
     }
 
@@ -1226,7 +1290,11 @@ export class GameRoom {
   private surrender(player: Player | null) {
     if (player?.role !== "X") {
       if (player) {
-        this.sendTo(player.ws, { t: "error", message: "Nur X kann das Spiel aufgeben." });
+        this.sendTo(player.ws, {
+          t: "error",
+          message: "Nur X kann das Spiel aufgeben.",
+          code: "SURRENDER_X_ONLY",
+        });
       }
       return;
     }
@@ -1235,6 +1303,7 @@ export class GameRoom {
       this.sendTo(player.ws, {
         t: "error",
         message: "Aufgeben ist in dieser Runde nicht vorgesehen.",
+        code: "SURRENDER_DISABLED",
       });
       return;
     }
@@ -1246,15 +1315,25 @@ export class GameRoom {
         ? `${player.name} hat aufgegeben. Der Live-Standort wurde geteilt.`
         : `${player.name} hat aufgegeben. Ein Standort war nicht verfügbar.`,
       { playerId: player.id, name: player.name, pos, at: Date.now() },
+      {
+        code: pos ? "SURRENDER_LIVE" : "SURRENDER_NO_POSITION",
+        params: { name: player.name },
+      },
     );
   }
 
-  private endGame(winner: "X" | "DETECTIVES", reason: string, surrender?: SurrenderInfo) {
+  private endGame(
+    winner: "X" | "DETECTIVES",
+    reason: string,
+    surrender?: SurrenderInfo,
+    detail?: EndDetail,
+  ) {
     this.surrenderInfo = surrender ?? null;
     this.phase = "ENDED";
     this.objective = null;
     this.winner = winner;
     this.endReason = reason;
+    this.endDetail = detail ?? null;
     this.catchPending = false;
     this.chatMessages.length = 0;
     this.phaseEndsAt = null;
@@ -1266,6 +1345,7 @@ export class GameRoom {
       t: "end",
       winner,
       reason,
+      ...(detail ? { reasonCode: detail.code, reasonParams: detail.params } : {}),
       players: this.getPlayerInfos(),
       ...(surrender ? { surrender } : {}),
     });
@@ -1303,6 +1383,8 @@ export class GameRoom {
       this.sendTo(player.ws, {
         t: "error",
         message: `Das ÖV-Budget für ${label} ist aufgebraucht.`,
+        code: "TRANSIT_EXHAUSTED",
+        params: { mode },
       });
       return;
     }
@@ -1312,6 +1394,7 @@ export class GameRoom {
       this.sendTo(player.ws, {
         t: "error",
         message: "Bitte gib mindestens eine Haltestelle an.",
+        code: "TRANSIT_MIN_ONE",
       });
       return;
     }
@@ -1319,6 +1402,8 @@ export class GameRoom {
       this.sendTo(player.ws, {
         t: "error",
         message: `Für ${label} sind nur noch ${remaining} Haltestelle${remaining === 1 ? "" : "n"} übrig.`,
+        code: "TRANSIT_REMAINING",
+        params: { mode, count: remaining },
       });
       return;
     }
@@ -1382,7 +1467,9 @@ export class GameRoom {
       return;
     }
     if (caught) {
-      this.endGame("DETECTIVES", "X hat den Fang mit Foto bestätigt.");
+      this.endGame("DETECTIVES", "X hat den Fang mit Foto bestätigt.", undefined, {
+        code: "CAUGHT_PHOTO",
+      });
       return;
     }
     this.catchPending = false;
@@ -1401,6 +1488,7 @@ export class GameRoom {
     this.objective = null;
     this.winner = null;
     this.endReason = null;
+    this.endDetail = null;
     this.surrenderInfo = null;
     this.ruleset = {
       ...this.ruleset,

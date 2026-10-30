@@ -1,10 +1,13 @@
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChangelogScreen } from "./changelog";
 import type { AlertNotificationPermission } from "./components/AlertSettings";
 import { AppMenu } from "./components/AppMenu";
+import i18n from "./i18n";
 import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
+import { formatServerError } from "./lib/serverMessages";
 import { clearSession, loadSession, saveSession } from "./lib/session";
 import { useGame } from "./lib/useGame";
 import { GameScreen } from "./screens/GameScreen";
@@ -45,27 +48,29 @@ function playLiveShareAlarm(context: AudioContext) {
 
 async function showSurrenderNotification(name: string) {
   const options: NotificationOptions = {
-    body: `${name} hat das Spiel aufgegeben. Der Live-Standort wurde geteilt.`,
+    body: i18n.t("notifications.surrenderBody", { name }),
     icon: "/icon-192.png",
     tag: "fang-x-surrender",
   };
   if ("serviceWorker" in navigator) {
     const registration = await navigator.serviceWorker.ready;
-    await registration.showNotification("X hat aufgegeben", options);
+    await registration.showNotification(i18n.t("notifications.surrenderTitle"), options);
     return;
   }
-  new Notification("X hat aufgegeben", options);
+  new Notification(i18n.t("notifications.surrenderTitle"), options);
 }
 
 async function showPositionSharedNotification(at: number, index: number, live: boolean) {
   const options: NotificationOptions = {
     body: live
-      ? "Dein Standort wird jetzt live an die Detektive übertragen."
-      : "Dein Standort wurde gerade an die Detektive übermittelt.",
+      ? i18n.t("notifications.positionLiveBody")
+      : i18n.t("notifications.positionSharedBody"),
     icon: "/icon-192.png",
     tag: `fang-x-position-${index}-${at}`,
   };
-  const title = live ? "Achtung: Standort wird geteilt" : "Standort an Detektive übermittelt";
+  const title = live
+    ? i18n.t("notifications.positionLiveTitle")
+    : i18n.t("notifications.positionSharedTitle");
   if ("serviceWorker" in navigator) {
     const registration = await navigator.serviceWorker.ready;
     await registration.showNotification(title, options);
@@ -86,6 +91,7 @@ function isChangelogPage(): boolean {
 }
 
 function PwaUpdatePrompt() {
+  const { t } = useTranslation();
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -107,15 +113,13 @@ function PwaUpdatePrompt() {
         aria-labelledby="pwa-update-title"
         aria-describedby="pwa-update-description"
       >
-        <h2 id="pwa-update-title">Neue Version verfügbar</h2>
-        <p id="pwa-update-description">
-          Eine neue Version von Fang X ist verfügbar. Lade die Seite neu, um sie zu verwenden.
-        </p>
+        <h2 id="pwa-update-title">{t("pwa.updateTitle")}</h2>
+        <p id="pwa-update-description">{t("pwa.updateText")}</p>
         <button type="button" onClick={() => void updateServiceWorker(true)}>
-          Jetzt neu laden
+          {t("pwa.reload")}
         </button>
         <button className="secondary" type="button" onClick={() => setNeedRefresh(false)}>
-          Später
+          {t("pwa.later")}
         </button>
       </section>
     </div>
@@ -123,6 +127,7 @@ function PwaUpdatePrompt() {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const [screen, setScreen] = useState<Screen>("home");
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -305,22 +310,22 @@ export default function App() {
       try {
         const res = await fetch("/api/games", { method: "POST" });
         if (res.status === 429) {
-          throw new Error("Zu viele Spiele in kurzer Zeit. Bitte kurz warten.");
+          throw new Error(t("app.tooManyGames"));
         }
-        if (!res.ok) throw new Error("Spiel konnte nicht erstellt werden.");
+        if (!res.ok) throw new Error(t("app.createFailed"));
         const { code } = await res.json();
-        const displayName = name.trim() || "Host";
+        const displayName = name.trim() || t("app.hostName");
         saveSession({ code, name: displayName, wantsX: true });
         setGameCode(code);
         game.join(code, displayName, true);
         setScreen("lobby");
       } catch (err: any) {
-        setJoinError(err?.message ?? "Unbekannter Fehler.");
+        setJoinError(err?.message ?? t("app.unknownError"));
       } finally {
         setCheckingCode(false);
       }
     },
-    [game],
+    [game, t],
   );
 
   const joinGame = useCallback(
@@ -332,29 +337,27 @@ export default function App() {
         // Tippfehler still einen neuen, leeren Raum erzeugen.
         const res = await fetch(`/api/games/${encodeURIComponent(code)}`);
         if (res.status === 429) {
-          throw new Error("Zu viele Versuche. Bitte eine Minute warten.");
+          throw new Error(t("app.tooManyAttempts"));
         }
-        if (!res.ok) throw new Error("Server nicht erreichbar.");
+        if (!res.ok) throw new Error(t("app.serverUnreachable"));
         const { exists } = (await res.json()) as { exists: boolean };
         if (!exists) {
-          setJoinError(
-            `Kein Spiel mit dem Code ${code}. Prüfe den Code oder starte ein neues Spiel.`,
-          );
+          setJoinError(t("app.noSuchGame", { code }));
           return;
         }
 
-        const displayName = name.trim() || "Spieler";
+        const displayName = name.trim() || t("app.playerName");
         saveSession({ code, name: displayName, wantsX });
         game.join(code, displayName, wantsX);
         setGameCode(code);
         setScreen("lobby");
       } catch (err: any) {
-        setJoinError(err?.message ?? "Unbekannter Fehler.");
+        setJoinError(err?.message ?? t("app.unknownError"));
       } finally {
         setCheckingCode(false);
       }
     },
-    [game],
+    [game, t],
   );
 
   const handleLeave = useCallback(() => {
@@ -416,11 +419,13 @@ export default function App() {
     );
   }
 
+  const gameErrorText = game.error ? formatServerError(t, game.error) : null;
+
   const content =
     screen === "home" || !game.myId ? (
       <HomeScreen
         initialCode={initialCode}
-        notice={joinError ?? game.error}
+        notice={joinError ?? gameErrorText}
         busy={checkingCode}
         onCreateGame={createGame}
         onJoinGame={joinGame}
@@ -453,7 +458,7 @@ export default function App() {
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
         catchPending={game.catchPending}
-        serverError={game.error}
+        serverError={gameErrorText}
         yourPositionIsShared={game.yourPositionIsShared}
         gameResult={game.gameResult}
         onPosition={game.sendPosition}
@@ -471,7 +476,7 @@ export default function App() {
     <>
       {game.reconnecting && (
         <div className="reconnect-banner" role="status">
-          Verbindung verloren – verbinde neu …
+          {t("app.reconnecting")}
         </div>
       )}
       <AppMenu

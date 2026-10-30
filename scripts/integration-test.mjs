@@ -205,6 +205,10 @@ async function run() {
     (m) => m.t === "error" && m.message.includes("Nur X"),
   );
   assert(unauthorizedObjective.message.includes("Nur X"), "Nur X darf ein Missionsziel setzen");
+  assert(
+    unauthorizedObjective.code === "OBJECTIVE_X_ONLY",
+    "Fehlermeldungen tragen einen übersetzbaren Code",
+  );
   host.ws.send(
     JSON.stringify({
       t: "setObjective",
@@ -245,6 +249,7 @@ async function run() {
   console.log("\nWarte auf Spielende...");
   const end = await det.waitFor((m) => m.t === "end", 10000);
   assert(end.winner === "DETECTIVES", `Spielende: ${end.winner} gewinnt (${end.reason})`);
+  assert(typeof end.reasonCode === "string", `Spielende trägt einen Grund-Code (${end.reasonCode})`);
 
   // Chat ist nach dem Spielende gesperrt
   host.ws.send(JSON.stringify({ t: "chat", text: "Nach dem Spiel" }));
@@ -441,6 +446,10 @@ async function run() {
     (m) => m.t === "error" && m.message.includes("nur noch 1 Haltestelle"),
   );
   assert(overBudget.t === "error", "Mehr Haltestellen als das Restbudget werden abgelehnt");
+  assert(
+    overBudget.code === "TRANSIT_REMAINING" && overBudget.params?.mode === "bus" && overBudget.params?.count === 1,
+    "ÖV-Restbudget-Fehler trägt Code und Parameter",
+  );
   mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 1 }));
   await mrX.waitFor((m) => m.t === "transitStops" && m.bus === 3);
   mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 1 }));
