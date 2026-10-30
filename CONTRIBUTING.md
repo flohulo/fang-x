@@ -45,9 +45,9 @@ der Rückfall für Texte, die in einer Sprache noch fehlen.
 
 ### Mitübersetzen (ohne Programmieren)
 
-Übersetzungen der App werden auf [Weblate](https://hosted.weblate.org/engage/fang-x/) gepflegt:
+Übersetzungen der App werden auf [Weblate](https://translate.codeberg.org/engage/fang-x/) gepflegt:
 Anmelden, Sprache wählen (oder eine neue anfordern) und Texte im Browser übersetzen. Weblate
-schickt die Änderungen als Pull Request ins Repository, die CI prüft sie automatisch. Platzhalter
+übernimmt die Änderungen über einen Pull Request ins Repository, die CI prüft sie automatisch. Platzhalter
 wie `{{name}}` oder `<1>…</1>` bleiben unverändert; nur der Text drumherum wird übersetzt.
 
 ### Texte im Code ändern
@@ -75,8 +75,9 @@ wie `{{name}}` oder `<1>…</1>` bleiben unverändert; nur der Text drumherum wi
 
 ### Weblate einrichten (für Maintainer)
 
-Projekt auf <https://hosted.weblate.org/> anlegen (Libre-Hosting für Open Source) und eine
-Komponente für die App erstellen:
+Die Übersetzungen laufen über [Codeberg Translate](https://translate.codeberg.org/), die kostenlose
+Weblate-Instanz von Codeberg für freie Software. Dort ein Projekt „Fang X“ beantragen bzw. anlegen
+und eine Komponente für die App erstellen:
 
 | Feld | Wert |
 |---|---|
@@ -85,7 +86,12 @@ Komponente für die App erstellen:
 | Basisdatei für einsprachige Dateien | `client/src/locales/de.json` |
 | Dateiformat | i18next JSON file (v4) |
 | Neue Übersetzungen | „Neue Sprachdatei anlegen“ |
-| Zusammenführung | Pull Request (GitHub), Commit-Nachrichten im Stil `chore(i18n): …` |
+
+Damit die Änderungen ins Repository kommen, braucht Weblate Schreibrechte auf einen eigenen Branch
+(z. B. `weblate`), etwa über einen Deploy-Key mit Schreibzugriff, den Weblate in den
+Komponenteneinstellungen anzeigt. Dieser Branch wird dann per Pull Request nach `main` übernommen.
+Ein Webhook auf `https://translate.codeberg.org/hooks/github/` sorgt dafür, dass Weblate Änderungen
+am Repository sofort mitbekommt.
 
 Das Handbuch-Markdown wird per Pull Request übersetzt (siehe oben).
 

@@ -5,7 +5,7 @@ import { type AlertNotificationPermission, AlertSettings } from "./AlertSettings
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 /** Weblate-Projekt, in dem die Übersetzungen gepflegt werden. */
-const TRANSLATE_URL = "https://hosted.weblate.org/engage/fang-x/";
+const TRANSLATE_URL = "https://translate.codeberg.org/engage/fang-x/";
 
 interface AppMenuProps {
   alertsEnabled: boolean;

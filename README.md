@@ -97,7 +97,7 @@ Die Seite wird bei Änderungen an `docs/` oder `mkdocs.yml` automatisch über de
 ## Übersetzen
 
 Fang X gibt es auf Deutsch (Quellsprache) und Englisch. Weitere Sprachen werden über
-[Weblate](https://hosted.weblate.org/engage/fang-x/) gepflegt – ohne Programmierkenntnisse, direkt
+[Weblate](https://translate.codeberg.org/engage/fang-x/) gepflegt – ohne Programmierkenntnisse, direkt
 im Browser. Wie das funktioniert und wie eine neue Sprache dazukommt, steht in
 [CONTRIBUTING.md](CONTRIBUTING.md#übersetzen).
 
