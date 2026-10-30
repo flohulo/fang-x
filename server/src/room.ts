@@ -430,6 +430,7 @@ export class GameRoom {
         this.sendTo(ws, { t: "error", message: "Ungültiges JSON" });
         return;
       }
+      if (!msg || typeof msg !== "object") return;
 
       switch (msg.t) {
         case "join": {
@@ -539,14 +540,15 @@ export class GameRoom {
             this.sendTo(ws, { t: "error", message: "Konfiguration nur in der Lobby." });
             return;
           }
-          this.ruleset = mergeRuleset(msg.ruleset);
+          const nextRuleset = mergeRuleset(msg.ruleset);
           if (
-            this.ruleset.map.startLocation !== null &&
-            !isValidPosition(this.ruleset.map.startLocation)
+            nextRuleset.map.startLocation !== null &&
+            !isValidPosition(nextRuleset.map.startLocation)
           ) {
             this.sendTo(ws, { t: "error", message: "Der Startpunkt ist ungültig." });
             return;
           }
+          this.ruleset = nextRuleset;
           this.lastActiveAt = Date.now();
           this.broadcast({ t: "config", ruleset: this.ruleset });
           this.persist();
@@ -558,7 +560,7 @@ export class GameRoom {
           const target = this.players.get(msg.playerId);
           if (!target) return;
           if (player.id !== msg.playerId && !player.isHost) return;
-          target.wantsX = msg.wantsX;
+          target.wantsX = msg.wantsX === true;
           this.broadcastPlayers();
           this.persist();
           break;
@@ -665,7 +667,7 @@ export class GameRoom {
 
     const player: Player = {
       id,
-      name: (name ?? "").trim().slice(0, 20) || "Spieler",
+      name: (typeof name === "string" ? name : "").trim().slice(0, 20) || "Spieler",
       role,
       isHost,
       wantsX,

@@ -23,8 +23,8 @@ export function distanceMeters(a: LatLng, b: LatLng): number {
 
 // Punkt um `meters` in zufälliger Richtung verschieben (für Reveal-Jitter)
 export function jitterPoint(p: LatLng, meters: number): LatLng {
-  // Zufälliger Winkel, durchschnittlicher Versatz ~meters/2 (gut genug)
-  const angle = Math.random() * 2 * Math.PI;
+  // Zufälliger Winkel in Grad (destinationPoint erwartet Grad, nicht Bogenmaß)
+  const angle = Math.random() * 360;
   const dist = Math.random() * meters;
   return destinationPoint(p, angle, dist);
 }
