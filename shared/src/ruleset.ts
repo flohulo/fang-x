@@ -1,5 +1,10 @@
 // Regelwerk-Schema — kanonisch nach docs/spielregeln.md (v1.1)
 // Regeln sind Daten, kein Code. Jeder Parameter: Typ, Bereich, Default.
+//
+// Vom Server noch nicht ausgewertet (reserviert fürs Schema): overtime*, pauseAllowed,
+// speedCheckGraceSeconds, jumpDetectionMeters, maxSpeedKmh, detectiveOutOfBoundsPenalty,
+// anyDetectiveWins, win.*, roles.* außer xCount-Zuordnung über wantsX, privacy.*.
+// TELEPORT_BACK wirkt wie WARNING: der Server kann niemanden versetzen.
 
 import type { LatLng } from "./geo";
 

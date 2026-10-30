@@ -2,6 +2,7 @@
 
 const SESSION_KEY = "fangx:session";
 const PLAYER_KEY_PREFIX = "fangx:player:";
+const TOKEN_KEY_PREFIX = "fangx:token:";
 
 export interface StoredSession {
   code: string;
@@ -57,10 +58,16 @@ export function loadPlayerId(code: string): string | null {
   return safeRead(PLAYER_KEY_PREFIX + code);
 }
 
-export function savePlayerId(code: string, playerId: string) {
+export function loadPlayerToken(code: string): string | null {
+  return safeRead(TOKEN_KEY_PREFIX + code);
+}
+
+export function savePlayerId(code: string, playerId: string, token: string) {
   safeWrite(PLAYER_KEY_PREFIX + code, playerId);
+  safeWrite(TOKEN_KEY_PREFIX + code, token);
 }
 
 export function clearPlayerId(code: string) {
   safeRemove(PLAYER_KEY_PREFIX + code);
+  safeRemove(TOKEN_KEY_PREFIX + code);
 }

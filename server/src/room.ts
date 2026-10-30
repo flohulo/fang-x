@@ -62,6 +62,17 @@ const OBJECTIVE_REVEAL_DELAY_MS = 2 * 60_000;
 const MAX_CHAT_MESSAGES = 100;
 const MAX_CHAT_TEXT_LENGTH = 300;
 
+/** Pro Verbindung: maximale Nachrichtengröße und Nachrichtenrate. */
+const MAX_MESSAGE_BYTES = 32_000;
+const MESSAGE_BURST = 40;
+const MESSAGES_PER_SECOND = 10;
+/** Chat zusätzlich drosseln: höchstens CHAT_BURST Nachrichten je CHAT_WINDOW_MS. */
+const CHAT_BURST = 5;
+const CHAT_WINDOW_MS = 5_000;
+/** Tick-Abstand: 1 s, solange Live-Standort, Gebietsfrist oder Fang-Bestätigung laufen. */
+const TICK_FAST_MS = 1_000;
+const TICK_IDLE_MS = 5_000;
+
 const STATE_KEY = "room";
 
 interface Player {
@@ -72,6 +83,8 @@ interface Player {
   isHost: boolean;
   wantsX: boolean;
   color: string;
+  /** Geheimes Reconnect-Token; null nur bei Plätzen aus älteren Snapshots. */
+  token: string | null;
   ws: WebSocket | null;
   connected: boolean;
   disconnectedAt: number | null;
@@ -101,6 +114,7 @@ interface RoomSnapshot {
     isHost: boolean;
     wantsX: boolean;
     color: string;
+    token?: string | null;
   }>;
   ruleset: Ruleset;
   phaseEndsAt: number | null;
@@ -127,7 +141,11 @@ export class GameRoom {
   private phase: Phase = "LOBBY";
   private phaseEndsAt: number | null = null;
   private gameStartedAt: number | null = null;
-  private tickTimer: ReturnType<typeof setInterval> | null = null;
+  private tickTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Seit wann X außerhalb des Gebiets ist (nur im Speicher, für die Frist). */
+  private xOutsideSince: number | null = null;
+  /** Seit wann ein X im Fangradius ist, je X-Spieler (nur im Speicher). */
+  private catchSince = new Map<string, number>();
   private lastRevealIndex = 0;
   private lastRevealAt = 0;
   private nextRevealAt: number | null = null;
@@ -200,6 +218,7 @@ export class GameRoom {
         isHost: p.isHost,
         wantsX: p.wantsX,
         color: p.color,
+        token: p.token,
       })),
       ruleset: this.ruleset,
       phaseEndsAt: this.phaseEndsAt,
@@ -272,6 +291,7 @@ export class GameRoom {
     for (const p of snap.players) {
       this.players.set(p.id, {
         ...p,
+        token: p.token ?? null,
         ws: null,
         connected: false,
         // Nach einem Neustart beginnt die Reconnect-Frist neu.
@@ -422,14 +442,30 @@ export class GameRoom {
     let player: Player | null = null;
     let closed = false;
 
+    let tokens = MESSAGE_BURST;
+    let tokensAt = Date.now();
+    const chatTimes: number[] = [];
+
     ws.addEventListener("message", (event) => {
+      const now = Date.now();
+      tokens = Math.min(MESSAGE_BURST, tokens + ((now - tokensAt) / 1000) * MESSAGES_PER_SECOND);
+      tokensAt = now;
+      if (tokens < 1) return;
+      tokens -= 1;
+
+      if (typeof event.data !== "string" || event.data.length > MAX_MESSAGE_BYTES) {
+        this.sendTo(ws, { t: "error", message: "Nachricht zu groß." });
+        return;
+      }
+
       let msg: ClientMessage;
       try {
-        msg = JSON.parse(event.data as string);
+        msg = JSON.parse(event.data);
       } catch {
         this.sendTo(ws, { t: "error", message: "Ungültiges JSON" });
         return;
       }
+      if (!msg || typeof msg !== "object") return;
 
       switch (msg.t) {
         case "join": {
@@ -456,8 +492,9 @@ export class GameRoom {
           }
 
           // Reconnect: bekannte Spieler-ID übernimmt den alten Platz.
+          // Die ID ist für alle sichtbar, nur mit passendem Token wird übernommen.
           const known = msg.playerId ? this.players.get(msg.playerId) : undefined;
-          if (known) {
+          if (known && (known.token === null || known.token === msg.token)) {
             if (known.ws && known.ws !== ws) {
               try {
                 known.ws.close(4001, "An anderer Stelle weiterverbunden");
@@ -465,6 +502,7 @@ export class GameRoom {
                 // Alte Verbindung war schon tot.
               }
             }
+            known.token ??= crypto.randomUUID();
             known.ws = ws;
             known.connected = true;
             known.disconnectedAt = null;
@@ -496,6 +534,7 @@ export class GameRoom {
           this.sendTo(ws, {
             t: "joined",
             playerId: player.id,
+            token: player.token ?? "",
             phase: this.phase,
             players: this.getPlayerInfos(),
             ruleset: this.ruleset,
@@ -539,14 +578,15 @@ export class GameRoom {
             this.sendTo(ws, { t: "error", message: "Konfiguration nur in der Lobby." });
             return;
           }
-          this.ruleset = mergeRuleset(msg.ruleset);
+          const nextRuleset = mergeRuleset(msg.ruleset);
           if (
-            this.ruleset.map.startLocation !== null &&
-            !isValidPosition(this.ruleset.map.startLocation)
+            nextRuleset.map.startLocation !== null &&
+            !isValidPosition(nextRuleset.map.startLocation)
           ) {
             this.sendTo(ws, { t: "error", message: "Der Startpunkt ist ungültig." });
             return;
           }
+          this.ruleset = nextRuleset;
           this.lastActiveAt = Date.now();
           this.broadcast({ t: "config", ruleset: this.ruleset });
           this.persist();
@@ -558,7 +598,7 @@ export class GameRoom {
           const target = this.players.get(msg.playerId);
           if (!target) return;
           if (player.id !== msg.playerId && !player.isHost) return;
-          target.wantsX = msg.wantsX;
+          target.wantsX = msg.wantsX === true;
           this.broadcastPlayers();
           this.persist();
           break;
@@ -574,6 +614,13 @@ export class GameRoom {
           break;
         }
         case "chat": {
+          const cutoff = Date.now() - CHAT_WINDOW_MS;
+          while (chatTimes.length > 0 && chatTimes[0] < cutoff) chatTimes.shift();
+          if (chatTimes.length >= CHAT_BURST) {
+            this.sendTo(ws, { t: "error", message: "Bitte langsamer schreiben." });
+            break;
+          }
+          chatTimes.push(Date.now());
           this.postChatMessage(player, msg.text);
           break;
         }
@@ -626,6 +673,7 @@ export class GameRoom {
           if (player.role === "X") {
             this.checkXOutOfBounds(player);
             this.checkObjective(player);
+            this.checkCatch();
           } else {
             this.broadcastDetectivePosition(player, msg.pos);
             this.checkCatch();
@@ -665,11 +713,12 @@ export class GameRoom {
 
     const player: Player = {
       id,
-      name: (name ?? "").trim().slice(0, 20) || "Spieler",
+      name: (typeof name === "string" ? name : "").trim().slice(0, 20) || "Spieler",
       role,
       isHost,
       wantsX,
       color,
+      token: crypto.randomUUID(),
       ws,
       connected: true,
       disconnectedAt: null,
@@ -837,7 +886,20 @@ export class GameRoom {
 
   private ensureTick() {
     if (this.tickTimer) return;
-    this.tickTimer = setInterval(() => this.tick(), 1000);
+    this.scheduleTick();
+  }
+
+  private scheduleTick() {
+    const busy =
+      this.xCurrentlyOutOfBounds || this.xOutsideSince !== null || this.catchSince.size > 0;
+    this.tickTimer = setTimeout(
+      () => {
+        this.tickTimer = null;
+        this.tick();
+        if (this.phase === "RUNNING") this.ensureTick();
+      },
+      busy ? TICK_FAST_MS : TICK_IDLE_MS,
+    );
   }
 
   private computeNextRevealDelay(): number {
@@ -881,17 +943,18 @@ export class GameRoom {
       return;
     }
 
+    // Sichtradius ggf. über die Zeit verkleinern — einmal je Sichtung, nicht je X.
+    let radius = this.ruleset.reveal.revealRadiusMeters;
+    if (this.ruleset.reveal.radiusShrinkEnabled) {
+      const shrunk =
+        this.ruleset.reveal.revealRadiusMeters -
+        this.lastRevealIndex * this.ruleset.reveal.radiusShrinkStepMeters;
+      radius = Math.max(this.ruleset.reveal.radiusFloorMeters, shrunk);
+    }
+    const revealIndex = this.lastRevealIndex + 1;
+
     for (const x of xPlayers) {
       if (!x.position) continue;
-
-      // Sichtradius ggf. über die Zeit verkleinern
-      let radius = this.ruleset.reveal.revealRadiusMeters;
-      if (this.ruleset.reveal.radiusShrinkEnabled) {
-        const shrunk =
-          this.ruleset.reveal.revealRadiusMeters -
-          this.lastRevealIndex * this.ruleset.reveal.radiusShrinkStepMeters;
-        radius = Math.max(this.ruleset.reveal.radiusFloorMeters, shrunk);
-      }
 
       // Jitter: gemeldete Position versetzt, um Detektive zu täuschen
       const reportedPos =
@@ -899,7 +962,6 @@ export class GameRoom {
           ? jitterPoint(x.position, this.ruleset.reveal.jitterMeters)
           : { ...x.position };
 
-      this.lastRevealIndex++;
       this.lastRevealAt = now;
       this.xPositions.push({ pos: reportedPos, at: now, radius });
       if (this.xPositions.length > 50) this.xPositions.shift();
@@ -908,7 +970,7 @@ export class GameRoom {
         pos: reportedPos,
         radiusMeters: radius,
         at: now,
-        index: this.lastRevealIndex,
+        index: revealIndex,
         isLive: false,
       };
 
@@ -917,11 +979,12 @@ export class GameRoom {
         this.sendTo(x.ws, {
           t: "positionShared",
           at: now,
-          index: this.lastRevealIndex,
+          index: revealIndex,
           live: false,
         });
       }
     }
+    this.lastRevealIndex = revealIndex;
 
     if (this.ruleset.reveal.xSeesDetectives === "ON_REVEAL") {
       this.broadcastDetectiveSnapshotToX();
@@ -941,10 +1004,30 @@ export class GameRoom {
     if (!center) return;
     const dist = distanceMeters(x.position, center);
     const outside = dist > this.ruleset.map.playAreaRadiusMeters;
+    const penalty = this.ruleset.map.outOfBoundsPenalty;
 
-    if (outside && !this.xCurrentlyOutOfBounds) {
-      // Grenze verlassen → LIVE_SHARE aktivieren
+    if (outside) {
+      const now = Date.now();
+      this.xOutsideSince ??= now;
+      const graceMs = Math.max(0, this.ruleset.map.outOfBoundsGraceSeconds) * 1000;
+      if (this.xCurrentlyOutOfBounds || now - this.xOutsideSince < graceMs) return;
+
+      if (penalty === "INSTANT_LOSS") {
+        this.endGame("DETECTIVES", "X hat das Spielgebiet verlassen.");
+        return;
+      }
       this.xCurrentlyOutOfBounds = true;
+      if (penalty !== "LIVE_SHARE") {
+        // WARNING / TELEPORT_BACK: ein Server kann niemanden versetzen, X wird gewarnt.
+        this.sendTo(x.ws, {
+          t: "error",
+          message: "Du bist außerhalb des Spielgebiets – kehre sofort zurück.",
+        });
+        this.persist();
+        return;
+      }
+
+      // Grenze verlassen → LIVE_SHARE aktivieren
       this.sendTo(x.ws, { t: "yourPositionIsShared", shared: true });
 
       const liveReveal: RevealEvent = {
@@ -962,11 +1045,16 @@ export class GameRoom {
         live: true,
       });
       this.persist();
-    } else if (!outside && this.xCurrentlyOutOfBounds) {
-      // Zurück im Gebiet → Live-Tracking stoppen
-      this.xCurrentlyOutOfBounds = false;
-      this.sendTo(x.ws, { t: "yourPositionIsShared", shared: false });
-      this.persist();
+    } else {
+      this.xOutsideSince = null;
+      if (this.xCurrentlyOutOfBounds) {
+        // Zurück im Gebiet → Live-Tracking stoppen
+        this.xCurrentlyOutOfBounds = false;
+        if (penalty === "LIVE_SHARE") {
+          this.sendTo(x.ws, { t: "yourPositionIsShared", shared: false });
+        }
+        this.persist();
+      }
     }
   }
 
@@ -1051,6 +1139,9 @@ export class GameRoom {
     const xPlayers = [...this.players.values()].filter((p) => p.role === "X" && p.position);
     const detectives = [...this.players.values()].filter((p) => p.role !== "X" && p.position);
 
+    const confirmMs = Math.max(0, this.ruleset.catch.confirmSeconds) * 1000;
+    const now = Date.now();
+
     for (const x of xPlayers) {
       if (!x.position) continue;
       const xPos = x.position;
@@ -1059,10 +1150,18 @@ export class GameRoom {
       );
 
       const required = Math.max(1, this.ruleset.catch.teamCatchRequired);
-      if (catching.length >= required) {
+      if (catching.length < required) {
+        this.catchSince.delete(x.id);
+        continue;
+      }
+      const since = this.catchSince.get(x.id) ?? now;
+      this.catchSince.set(x.id, since);
+      if (now - since >= confirmMs) {
         this.endGame(
           "DETECTIVES",
-          `X wurde nach ${this.ruleset.catch.confirmSeconds}s im Fangradius gestellt.`,
+          confirmMs > 0
+            ? `X wurde nach ${this.ruleset.catch.confirmSeconds}s im Fangradius gestellt.`
+            : "X wurde im Fangradius gestellt.",
         );
         return;
       }
@@ -1092,6 +1191,17 @@ export class GameRoom {
         };
         this.broadcast({ t: "reveal", reveal: liveReveal });
       }
+    }
+
+    // Fristen, die ohne neue Position ablaufen müssen (Gebietsfrist, Fang-Bestätigung)
+    const x = [...this.players.values()].find((p) => p.role === "X" && p.position);
+    if (x && this.xOutsideSince !== null) {
+      this.checkXOutOfBounds(x);
+      if (this.phase !== "RUNNING") return;
+    }
+    if (this.catchSince.size > 0) {
+      this.checkCatch();
+      if (this.phase !== "RUNNING") return;
     }
 
     // Stale-Positions-Aufräumen (Datenminimierung: alte Standorte verwerfen)
@@ -1307,9 +1417,11 @@ export class GameRoom {
 
   private stopTick() {
     if (this.tickTimer) {
-      clearInterval(this.tickTimer);
+      clearTimeout(this.tickTimer);
       this.tickTimer = null;
     }
+    this.xOutsideSince = null;
+    this.catchSince.clear();
   }
 
   private phaseMessage(): ServerMessage {

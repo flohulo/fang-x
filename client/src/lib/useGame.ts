@@ -3,11 +3,22 @@ import type {
   ClientMessage,
   LatLng,
   ObjectiveState,
+  PlayerInfo,
+  RevealEvent,
   Ruleset,
   ServerMessage,
 } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
-import { clearPlayerId, loadPlayerId, savePlayerId } from "./session";
+import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
+
+/** Spieler inklusive der Position, soweit der Server sie freigibt. */
+export type PlayerView = PlayerInfo & { position?: LatLng | null };
+
+export interface GameResult {
+  winner: string;
+  reason: string;
+  surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
+}
 
 interface Session {
   code: string;
@@ -24,7 +35,7 @@ export function useGame() {
   const [phase, setPhase] = useState<string>("LOBBY");
   const [phaseEndsAt, setPhaseEndsAt] = useState<number | null>(null);
   const [playAreaCenter, setPlayAreaCenter] = useState<LatLng | null>(null);
-  const [players, setPlayers] = useState<any[]>([]);
+  const [players, setPlayers] = useState<PlayerView[]>([]);
   const [myId, setMyId] = useState<string | null>(null);
   const [youAreHost, setYouAreHost] = useState(false);
   const [ruleset, setRuleset] = useState<Ruleset | null>(null);
@@ -43,8 +54,7 @@ export function useGame() {
     at: number;
   } | null>(null);
   const [catchPending, setCatchPending] = useState(false);
-  const [reveals, setReveals] = useState<any[]>([]);
-  const [lastReveal, setLastReveal] = useState<any>(null);
+  const [lastReveal, setLastReveal] = useState<RevealEvent | null>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
     at: number;
     index: number;
@@ -52,11 +62,7 @@ export function useGame() {
   } | null>(null);
   const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
-  const [gameResult, setGameResult] = useState<{
-    winner: string;
-    reason: string;
-    surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
-  } | null>(null);
+  const [gameResult, setGameResult] = useState<GameResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
@@ -116,6 +122,7 @@ export function useGame() {
           wantsX: session.wantsX,
           // Aus einer früheren Verbindung: übernimmt den alten Platz im Raum.
           playerId: loadPlayerId(session.code) ?? undefined,
+          token: loadPlayerToken(session.code) ?? undefined,
         } as ClientMessage),
       );
     };
@@ -130,7 +137,7 @@ export function useGame() {
       switch (msg.t) {
         case "joined":
           setMyId(msg.playerId);
-          savePlayerId(session.code, msg.playerId);
+          savePlayerId(session.code, msg.playerId, msg.token);
           setPhase(msg.phase);
           setPlayers(msg.players);
           setRuleset(msg.ruleset);
@@ -158,7 +165,6 @@ export function useGame() {
           setPlayAreaCenter(msg.playAreaCenter);
           if (msg.phase !== "RUNNING") setRevealTimer(null);
           if (msg.phase === "LOBBY") {
-            setReveals([]);
             setLastReveal(null);
             setLastPositionShared(null);
             setGameResult(null);
@@ -169,8 +175,7 @@ export function useGame() {
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
-            // Nach Reload/Reconnect: bereits erfolgte Sichtungen nachziehen.
-            setReveals(msg.reveals);
+            // Nach Reload/Reconnect: letzte Sichtung nachziehen.
             setLastReveal(msg.reveals[msg.reveals.length - 1]);
           }
           break;
@@ -214,7 +219,6 @@ export function useGame() {
           break;
         case "reveal":
           setLastReveal(msg.reveal);
-          setReveals((prev) => [...prev, msg.reveal]);
           break;
         case "positionShared":
           setLastPositionShared({ at: msg.at, index: msg.index, live: msg.live });
@@ -366,7 +370,6 @@ export function useGame() {
     revealTimer,
     chatMessages,
     catchPending,
-    reveals,
     lastReveal,
     lastPositionShared,
     objective,
