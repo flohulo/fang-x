@@ -74,7 +74,6 @@ zweiten Terminal im Projektordner:
 ```bash
 npm run typecheck
 npm run build
-npx @biomejs/biome ci .
 npm run test:integration
 ```
 
