@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.4.0...fang-x-v0.5.0) (2026-10-30)
+
+
+### Features
+
+* diverse hinweisfelder ([#24](https://github.com/flohulo/fang-x/issues/24)) ([28d9472](https://github.com/flohulo/fang-x/commit/28d9472d67f655fd0f04fa0d1d077d0db392734e))
+* neue map mit satelliten, öv, chat, weitere einstellungen, aufgeben button, neues wiki ([#27](https://github.com/flohulo/fang-x/issues/27)) ([b6a5dcc](https://github.com/flohulo/fang-x/commit/b6a5dcc13b275a6b2706e154b65396c674b0a508))
+* notification ([#26](https://github.com/flohulo/fang-x/issues/26)) ([9e6c988](https://github.com/flohulo/fang-x/commit/9e6c988c6084c51da99da028ac4958fdafd6a910))
+
 ## [0.4.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.3.0...fang-x-v0.4.0) (2026-10-22)
 
 ### Features
