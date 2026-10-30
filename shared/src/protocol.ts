@@ -18,6 +18,8 @@ export type ClientMessage =
       wantsX: boolean;
       /** Aus einer früheren Sitzung — damit ein Reconnect den Platz übernimmt */
       playerId?: string;
+      /** Geheimes Token zur playerId; ohne passendes Token gibt es einen neuen Platz. */
+      token?: string;
     }
   | { t: "configure"; ruleset: Ruleset }
   | { t: "setRole"; playerId: string; wantsX: boolean }
@@ -81,6 +83,8 @@ export type ServerMessage =
   | {
       t: "joined";
       playerId: string;
+      /** Geheimnis für den Reconnect — wird nur an diesen Spieler gesendet. */
+      token: string;
       phase: Phase;
       players: PlayerInfo[];
       ruleset: Ruleset;

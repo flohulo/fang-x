@@ -3,10 +3,11 @@ import { DEFAULT_RULESET } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
 import { docsUrl } from "../lib/docs";
 import { inviteUrl } from "../lib/invite";
+import type { PlayerView } from "../lib/useGame";
 
 interface LobbyScreenProps {
   code: string;
-  players: any[];
+  players: PlayerView[];
   myId: string | null;
   youAreHost: boolean;
   ruleset: Ruleset | null;
@@ -735,7 +736,7 @@ function PlayerRow({
   onToggleRole,
   canToggle = true,
 }: {
-  player: any;
+  player: PlayerView | undefined;
   isMe: boolean;
   onToggleRole: (wantsX: boolean) => void;
   canToggle?: boolean;

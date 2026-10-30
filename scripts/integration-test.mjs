@@ -115,7 +115,7 @@ async function run() {
         game: { durationMinutes: 0.5, headStartMinutes: 0.1, countdownSeconds: 0.2 },
         reveal: { intervalMinutes: 0.1, firstRevealAfterMinutes: 0.05 },
         catch: { radiusMeters: 50 },
-        map: { playAreaRadiusMeters: 100 },
+        map: { playAreaRadiusMeters: 100, outOfBoundsGraceSeconds: 0 },
         objective: { enabled: true },
       },
     }),
@@ -297,6 +297,7 @@ async function run() {
       name: "B",
       wantsX: false,
       playerId: bJoined.playerId,
+      token: bJoined.token,
     }),
   );
   const b2Joined = await b2.waitFor((m) => m.t === "joined");
@@ -309,6 +310,15 @@ async function run() {
     5000,
   );
   assert(true, "Beide Spieler wieder verbunden");
+
+  // Fremde Spieler-ID ohne Token darf den Platz nicht übernehmen
+  const thief = await connect(code2);
+  thief.ws.send(
+    JSON.stringify({ t: "join", code: code2, name: "Dieb", wantsX: false, playerId: bJoined.playerId }),
+  );
+  const thiefJoined = await thief.waitFor((m) => m.t === "joined");
+  assert(thiefJoined.playerId !== bJoined.playerId, "Platz lässt sich ohne Token nicht übernehmen");
+  thief.ws.close();
 
   // 12. Unbekannter Spiel-Code wird abgelehnt (kein stiller neuer Raum)
   console.log("\n=== Unbekannter Code ===");

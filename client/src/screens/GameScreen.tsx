@@ -1,4 +1,4 @@
-import type { ChatMessage, LatLng, ObjectiveState, Ruleset } from "@fang-x/shared";
+import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
 import { distanceMeters } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatPanel } from "../components/ChatPanel";
@@ -9,16 +9,17 @@ import {
   settingsExportFileName,
 } from "../lib/settingsExport";
 import { useGeolocation } from "../lib/useGeolocation";
+import type { GameResult, PlayerView } from "../lib/useGame";
 
 interface GameScreenProps {
   code: string;
   phase: string;
   phaseEndsAt: number | null;
   playAreaCenter: LatLng | null;
-  players: any[];
+  players: PlayerView[];
   myId: string | null;
   ruleset: Ruleset | null;
-  lastReveal: any;
+  lastReveal: RevealEvent | null;
   objective: ObjectiveState | null;
   transitStops: { bus: number; train: number };
   transitNotice: {
@@ -37,7 +38,7 @@ interface GameScreenProps {
   catchPending: boolean;
   serverError: string | null;
   yourPositionIsShared: boolean;
-  gameResult: any;
+  gameResult: GameResult | null;
   onPosition: (pos: LatLng) => void;
   onSetObjective: (target: LatLng) => void;
   onUseTransitStop: (mode: "bus" | "train", count: number) => void;
@@ -771,7 +772,7 @@ function buildHint({
   isSolo: boolean;
   hasPosition: boolean;
   simulated: boolean;
-  lastReveal: any;
+  lastReveal: RevealEvent | null;
   objective: ObjectiveState | null;
   phaseActive: boolean;
 }): { title: string; text: string } {
