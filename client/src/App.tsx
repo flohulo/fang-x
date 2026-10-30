@@ -91,6 +91,22 @@ function PwaUpdatePrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     immediate: true,
+    onRegisteredSW(_url, registration) {
+      if (!registration) return;
+      const checkForUpdate = () => {
+        if (!navigator.onLine) return;
+        void registration.update().catch((error: unknown) => {
+          console.warn("PWA-Updateprüfung fehlgeschlagen:", error);
+        });
+      };
+      // Beim Öffnen sofort prüfen, danach bei Rückkehr in die App, bei Netz und regelmäßig.
+      checkForUpdate();
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") checkForUpdate();
+      });
+      window.addEventListener("online", checkForUpdate);
+      window.setInterval(checkForUpdate, 30 * 60 * 1000);
+    },
     onRegisterError(error) {
       console.warn("Service Worker konnte nicht registriert werden:", error);
     },
@@ -109,10 +125,10 @@ function PwaUpdatePrompt() {
       >
         <h2 id="pwa-update-title">Neue Version verfügbar</h2>
         <p id="pwa-update-description">
-          Eine neue Version von Fang X ist verfügbar. Lade die Seite neu, um sie zu verwenden.
+          Eine neue Version von Fang X ist verfügbar. Installiere sie jetzt; die Seite wird dabei neu geladen.
         </p>
         <button type="button" onClick={() => void updateServiceWorker(true)}>
-          Jetzt neu laden
+          Installieren &amp; neu laden
         </button>
         <button className="secondary" type="button" onClick={() => setNeedRefresh(false)}>
           Später
