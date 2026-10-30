@@ -40,8 +40,8 @@
   },
   "pwa": {
     "updateTitle": "Neue Version verfügbar",
-    "updateText": "Eine neue Version von Fang X ist verfügbar. Lade die Seite neu, um sie zu verwenden.",
-    "reload": "Jetzt neu laden",
+    "updateText": "Eine neue Version von Fang X ist verfügbar. Installiere sie jetzt; die Seite wird dabei neu geladen.",
+    "reload": "Installieren & neu laden",
     "later": "Später"
   },
   "app": {

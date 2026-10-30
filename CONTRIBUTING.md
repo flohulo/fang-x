@@ -40,66 +40,23 @@ Die Navigation steht in `mkdocs.yml`. Neue Seiten dort eintragen und aus den bes
 
 ## Übersetzen
 
-Texte der App und das Handbuch sind mehrsprachig. **Deutsch ist die Quellsprache**, Englisch ist
-der Rückfall für Texte, die in einer Sprache noch fehlen.
+Deutsch ist die Quellsprache, Englisch der Rückfall. Übersetzen geht ohne Programmieren auf
+[Codeberg Translate](https://translate.codeberg.org/engage/fang-x/).
 
-### Mitübersetzen (ohne Programmieren)
+Wer im Code arbeitet:
 
-Übersetzungen der App werden auf [Weblate](https://translate.codeberg.org/engage/fang-x/) gepflegt:
-Anmelden, Sprache wählen (oder eine neue anfordern) und Texte im Browser übersetzen. Weblate
-übernimmt die Änderungen über einen Pull Request ins Repository, die CI prüft sie automatisch. Platzhalter
-wie `{{name}}` oder `<1>…</1>` bleiben unverändert; nur der Text drumherum wird übersetzt.
-
-### Texte im Code ändern
-
-- Alle Texte der App stehen in `client/src/locales/<sprache>.json` und werden mit
-  [i18next](https://www.i18next.com/) verwendet (`t("bereich.schluessel")`). Neue Texte zuerst in
-  `de.json` und `en.json` ergänzen, nie fest im Code schreiben.
-- Mehrzahlformen heissen `schluessel_one` / `schluessel_other` (weitere Formen je nach Sprache).
-- Servermeldungen (Fehler, Spielende) tragen einen Code (`code` bzw. `reasonCode`); die Texte dazu
-  stehen unter `errors.*` und `endReasons.*`. Der deutsche Klartext vom Server ist nur ein Rückfall.
-- `npm run check:locales` prüft Schlüssel und Platzhalter; die CI führt das ebenfalls aus.
-- Impressum, Datenschutzerklärung und Changelog bleiben bewusst auf Deutsch (rechtlich
-  verbindliche Fassung).
-
-### Eine neue Sprache hinzufügen
-
-1. **App:** In Weblate die Sprache hinzufügen. Weblate legt `client/src/locales/<code>.json` an;
-   Sprachwähler, Laden und `lang`-Attribut ergänzen sich automatisch. Von Hand: `de.json` kopieren,
-   übersetzen und als `<code>.json` ablegen.
-2. **Handbuch:** Pro Seite `docs/<Seite>.<code>.md` anlegen (z. B. `Spieldauer.fr.md`) und die
-   Sprache in `mkdocs.yml` unter `plugins → i18n → languages` eintragen (mit
-   `nav_translations`). Nicht übersetzte Seiten zeigen den deutschen Text. Danach `<code>` in
-   `DOCS_LANGUAGES` in `client/src/lib/docs.ts` ergänzen, damit die App auf die richtige
-   Handbuch-Fassung verlinkt.
-
-### Weblate einrichten (für Maintainer)
-
-Die Übersetzungen laufen über [Codeberg Translate](https://translate.codeberg.org/), die kostenlose
-Weblate-Instanz von Codeberg für freie Software. Dort ein Projekt „Fang X“ beantragen bzw. anlegen
-und eine Komponente für die App erstellen:
-
-| Feld | Wert |
-|---|---|
-| Repository | `https://github.com/flohulo/fang-x` (Branch `main`) |
-| Dateimaske | `client/src/locales/*.json` |
-| Basisdatei für einsprachige Dateien | `client/src/locales/de.json` |
-| Dateiformat | i18next JSON file (v4) |
-| Neue Übersetzungen | „Neue Sprachdatei anlegen“ |
-
-Damit die Änderungen ins Repository kommen, braucht Weblate Schreibrechte auf einen eigenen Branch
-(z. B. `weblate`), etwa über einen Deploy-Key mit Schreibzugriff, den Weblate in den
-Komponenteneinstellungen anzeigt. Dieser Branch wird dann per Pull Request nach `main` übernommen.
-Ein Webhook auf `https://translate.codeberg.org/hooks/github/` sorgt dafür, dass Weblate Änderungen
-am Repository sofort mitbekommt.
-
-Das Handbuch-Markdown wird per Pull Request übersetzt (siehe oben).
+- App-Texte stehen in `client/src/locales/<sprache>.json` und werden mit `t("bereich.schluessel")`
+  verwendet. Neue Texte zuerst in `de.json` und `en.json` ergänzen, nie fest im Code schreiben.
+- Servermeldungen tragen einen Code; die Texte dazu stehen unter `errors.*` und `endReasons.*`.
+- `npm run check:locales` prüft Schlüssel und Platzhalter (läuft auch in der CI).
+- Impressum, Datenschutz und Changelog bleiben auf Deutsch.
+- Handbuch: Übersetzungen heissen `docs/<Seite>.<sprache>.md`, z. B. `Spieldauer.en.md`.
 
 ## Pull Requests
 
 - Erkläre den Anwendungsfall und die Auswirkungen auf Spieler.
 - Halte Änderungen fokussiert und ergänze Tests für geändertes Verhalten.
-- Verwende für den PR-Titel Conventional Commits, z. B. `feat: Bonusmission ergänzen`, `fix: Fangradius korrigieren` oder `docs: Spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
+- Verwende für den PR-Titel Conventional Commits, z. B. `feat: bonusmission ergänzen`, `fix: fangradius korrigieren` oder `docs: spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Die Beschreibung nach dem Doppelpunkt beginnt mit einem Kleinbuchstaben. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
 - Teile keine echten GPS-Koordinaten, privaten Spielcodes, Zugangsdaten oder persönlichen Daten.
 - Vor einem Pull Request müssen Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
 

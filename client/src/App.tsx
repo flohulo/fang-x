@@ -97,6 +97,24 @@ function PwaUpdatePrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     immediate: true,
+    onRegisteredSW(_url, registration) {
+      if (!registration) return;
+      // Ein früher verschobenes Update wartet bereits: Dialog beim Öffnen erneut zeigen.
+      if (registration.waiting) setNeedRefresh(true);
+      const checkForUpdate = () => {
+        if (!navigator.onLine) return;
+        void registration.update().catch((error: unknown) => {
+          console.warn("PWA-Updateprüfung fehlgeschlagen:", error);
+        });
+      };
+      // Beim Öffnen sofort prüfen, danach bei Rückkehr in die App, bei Netz und regelmäßig.
+      checkForUpdate();
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") checkForUpdate();
+      });
+      window.addEventListener("online", checkForUpdate);
+      window.setInterval(checkForUpdate, 30 * 60 * 1000);
+    },
     onRegisterError(error) {
       console.warn("Service Worker konnte nicht registriert werden:", error);
     },

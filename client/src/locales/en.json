@@ -40,8 +40,8 @@
   },
   "pwa": {
     "updateTitle": "New version available",
-    "updateText": "A new version of Fang X is available. Reload the page to use it.",
-    "reload": "Reload now",
+    "updateText": "A new version of Fang X is available. Install it now; the page will reload in the process.",
+    "reload": "Install & reload",
     "later": "Later"
   },
   "app": {
