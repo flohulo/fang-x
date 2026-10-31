@@ -19,11 +19,11 @@
     "changelog": "Änderigsverlauf",
     "privacy": "Datäschutz",
     "imprint": "Imprässum",
-    "translate": ""
+    "translate": "Bi de Übersetzig hälfe"
   },
   "alerts": {
-    "title": "",
-    "description": "",
+    "title": "Alarm und Standortmäldig",
+    "description": "Wänn din Standort a Detektivä übermittlät oder live gestellt wärdet, alamiered mir dich mit Ton und Vibration. Git X uf, wärded Detektivä mit änere Systemnachrichten informiärt. Ä Systembenachrichtigung git's, wänn du sie im Browser erlaubst.",
     "denied": "",
     "unsupported": "",
     "granted": "",
