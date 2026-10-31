@@ -768,14 +768,32 @@
 
 
 <h1 id="catch-radius">Catch radius<a class="headerlink" href="#catch-radius" title="Permanent link">&para;</a></h1>
-<p><strong>Setting in Fang X:</strong> Catch radius (meters)
-<strong>Rule parameter:</strong> <code>catch.radiusMeters</code>
-<strong>Default value:</strong> 30 meters</p>
+<table>
+<thead>
+<tr>
+<th><strong>Setting</strong></th>
+<th>Catch radius (meters)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rule parameter</strong></td>
+<td><code>catch.radiusMeters</code></td>
+</tr>
+<tr>
+<td><strong>Default</strong></td>
+<td>30 meters</td>
+</tr>
+</tbody>
+</table>
 <p>The catch radius is the maximum GPS distance at which a catch attempt can succeed. For this the
 server compares the most recently reported locations of X and the detectives.</p>
 <h2 id="which-value-should-i-choose">Which value should I choose?<a class="headerlink" href="#which-value-should-i-choose" title="Permanent link">&para;</a></h2>
-<p>Smartphone GPS is not always exact. Buildings, trees and reception can affect the position
-measurement. A larger radius compensates for such fluctuations but makes catching easier.</p>
+<div class="admonition note">
+<p class="admonition-title"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m-8.95 5H1v-2h2.05C3.5 6.83 6.83 3.5 11 3.05V1h2v2.05c4.17.45 7.5 3.78 7.95 7.95H23v2h-2.05c-.45 4.17-3.78 7.5-7.95 7.95V23h-2v-2.05C6.83 20.5 3.5 17.17 3.05 13M12 5a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7"/></svg></span> GPS is not always exact</p>
+<p>Buildings, trees and reception can affect the position measurement. A larger radius
+compensates for such fluctuations but makes catching easier.</p>
+</div>
 <ul>
 <li><strong>30 meters</strong> is a practical starting value for most rounds.</li>
 <li>A smaller value demands more precise GPS measurements.</li>
