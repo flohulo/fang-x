@@ -2589,3 +2589,24 @@ label {
   stroke-width: 2;
   stroke-linecap: round;
 }
+
+.app-menu-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.app-menu-back:hover {
+  background: rgba(56, 189, 248, 0.24);
+}

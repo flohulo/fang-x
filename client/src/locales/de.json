@@ -19,7 +19,10 @@
     "changelog": "Changelog",
     "privacy": "Datenschutz",
     "imprint": "Impressum",
-    "translate": "Bei der Übersetzung helfen"
+    "translate": "Bei der Übersetzung helfen",
+    "help": "Hilfe",
+    "legal": "Rechtliches",
+    "back": "Zurück"
   },
   "alerts": {
     "title": "Alarm bei Standortmeldung",

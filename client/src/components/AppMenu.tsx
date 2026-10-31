@@ -26,6 +26,7 @@ export function AppMenu({
 }: AppMenuProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<"main" | "help" | "legal">("main");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const wasOpenRef = useRef(false);
@@ -37,6 +38,10 @@ export function AppMenu({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) setView("main");
   }, [open]);
 
   useEffect(() => {
@@ -94,50 +99,90 @@ export function AppMenu({
               </button>
             </div>
 
-            <section className="app-menu-section" aria-labelledby="app-menu-settings-title">
-              <h3 id="app-menu-settings-title">{t("menu.settings")}</h3>
-              <LanguageSwitcher />
-              <AlertSettings
-                enabled={alertsEnabled}
-                notificationPermission={notificationPermission}
-                onEnable={onEnableAlerts}
-                onDisable={onDisableAlerts}
-              />
-            </section>
+            {view === "main" && (
+              <section className="app-menu-section" aria-labelledby="app-menu-settings-title">
+                <h3 id="app-menu-settings-title">{t("menu.settings")}</h3>
+                <LanguageSwitcher />
+                <AlertSettings
+                  enabled={alertsEnabled}
+                  notificationPermission={notificationPermission}
+                  onEnable={onEnableAlerts}
+                  onDisable={onDisableAlerts}
+                />
+              </section>
+            )}
 
-            <nav className="app-menu-links" aria-label={t("menu.moreLinks")}>
-              <a
-                href={docsUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-              >
-                <span>{t("menu.docs")}</span>
-                <span aria-hidden="true">↗</span>
-              </a>
+            {view !== "main" && (
               <button
                 type="button"
-                className="app-menu-link-button"
-                onClick={() => {
-                  setOpen(false);
-                  onShowIntro();
-                }}
+                className="app-menu-link-button app-menu-back"
+                onClick={() => setView("main")}
               >
-                {t("onboarding.reopen")}
+                <span aria-hidden="true">‹</span> {t("menu.back")}
               </button>
-              <a href="/changelog" onClick={() => setOpen(false)}>
-                {t("menu.changelog")}
-              </a>
-              <a href="/datenschutz" onClick={() => setOpen(false)}>
-                {t("menu.privacy")}
-              </a>
-              <a href="/impressum" onClick={() => setOpen(false)}>
-                {t("menu.imprint")}
-              </a>
-              <a href={TRANSLATE_URL} target="_blank" rel="noopener noreferrer">
-                <span>{t("menu.translate")}</span>
-                <span aria-hidden="true">↗</span>
-              </a>
+            )}
+
+            <nav className="app-menu-links" aria-label={t("menu.moreLinks")}>
+              {view === "main" && (
+                <>
+                  <button
+                    type="button"
+                    className="app-menu-link-button"
+                    onClick={() => setView("help")}
+                  >
+                    <span>{t("menu.help")}</span>
+                    <span aria-hidden="true">›</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="app-menu-link-button"
+                    onClick={() => setView("legal")}
+                  >
+                    <span>{t("menu.legal")}</span>
+                    <span aria-hidden="true">›</span>
+                  </button>
+                  <a href={TRANSLATE_URL} target="_blank" rel="noopener noreferrer">
+                    <span>{t("menu.translate")}</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </>
+              )}
+              {view === "help" && (
+                <>
+                  <a
+                    href={docsUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span>{t("menu.docs")}</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                  <button
+                    type="button"
+                    className="app-menu-link-button"
+                    onClick={() => {
+                      setOpen(false);
+                      onShowIntro();
+                    }}
+                  >
+                    {t("onboarding.reopen")}
+                  </button>
+                </>
+              )}
+              {view === "legal" && (
+                <>
+                  <a href="/changelog" onClick={() => setOpen(false)}>
+                    {t("menu.changelog")}
+                  </a>
+                  <a href="/datenschutz" onClick={() => setOpen(false)}>
+                    {t("menu.privacy")}
+                  </a>
+                  <a href="/impressum" onClick={() => setOpen(false)}>
+                    {t("menu.imprint")}
+                  </a>
+                </>
+              )}
             </nav>
           </aside>
         </div>
