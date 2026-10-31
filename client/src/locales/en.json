@@ -19,10 +19,7 @@
     "changelog": "Changelog",
     "privacy": "Privacy",
     "imprint": "Legal notice",
-    "translate": "Help translate",
-    "help": "Help",
-    "legal": "Legal",
-    "back": "Back"
+    "translate": "Help translate"
   },
   "alerts": {
     "title": "Alert on location reports",
