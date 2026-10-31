@@ -45,7 +45,7 @@ jobs:
           gh pr create \
             --head weblate \
             --base main \
-            --title "chore(i18n): übersetzungen aktualisieren" \
+            --title "i18n: übersetzungen aktualisieren" \
             --body "## Änderungen
 
           Neue oder geänderte Übersetzungen aus Weblate (Codeberg Translate).

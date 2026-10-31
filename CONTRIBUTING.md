@@ -59,7 +59,7 @@ Wer im Code arbeitet:
 
 - Erkläre den Anwendungsfall und die Auswirkungen auf Spieler.
 - Halte Änderungen fokussiert und ergänze Tests für geändertes Verhalten.
-- Verwende für den PR-Titel Conventional Commits, z. B. `feat: bonusmission ergänzen`, `fix: fangradius korrigieren` oder `docs: spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Die Beschreibung nach dem Doppelpunkt beginnt mit einem Kleinbuchstaben. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
+- Verwende für den PR-Titel Conventional Commits, z. B. `feat: bonusmission ergänzen`, `fix: fangradius korrigieren` oder `docs: spielregeln erklären`. Für Sprach- und Übersetzungsupdates gibt es den Typ `i18n` (z. B. `i18n: übersetzungen aktualisieren`), der im Release unter „Sprachen“ erscheint. Daraus werden Release-Art und Changelog abgeleitet. Die Beschreibung nach dem Doppelpunkt beginnt mit einem Kleinbuchstaben. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
 - Teile keine echten GPS-Koordinaten, privaten Spielcodes, Zugangsdaten oder persönlichen Daten.
 - Vor einem Pull Request müssen Formatprüfung, Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
 
