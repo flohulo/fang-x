@@ -18,5 +18,6 @@ they catch X before time runs out.
 - Plan the duration so that everyone has enough time for the round and can safely return to the
   meeting point.
 
-The game duration only starts counting after the [head start for X](Vorsprung-fuer-X.md).
-Countdown and head start are therefore added on top of the configured round.
+!!! info ":material-timer-sand: Countdown and head start are added on top"
+    The game duration only starts counting after the [head start for X](Vorsprung-fuer-X.md).
+    Countdown and head start are therefore added on top of the configured round.

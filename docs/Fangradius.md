@@ -10,8 +10,9 @@ Server vergleicht dazu die zuletzt gemeldeten Standorte von X und den Detektiven
 
 ## Welchen Wert sollte ich wählen?
 
-Smartphone-GPS ist nicht immer exakt. Gebäude, Bäume und Empfang können die Positionsmessung
-beeinflussen. Ein größerer Radius gleicht solche Schwankungen aus, macht das Fangen aber leichter.
+!!! note ":material-crosshairs-gps: GPS ist nicht immer exakt"
+    Gebäude, Bäume und Empfang können die Positionsmessung beeinflussen. Ein größerer Radius
+    gleicht solche Schwankungen aus, macht das Fangen aber leichter.
 
 - **30 Meter** sind ein praktischer Startwert für die meisten Runden.
 - Ein kleinerer Wert verlangt genauere GPS-Messungen.

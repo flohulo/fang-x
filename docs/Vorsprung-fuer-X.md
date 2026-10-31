@@ -21,5 +21,6 @@ sie sich in dieser Zeit schon bewegen, nur X' Standort wird noch nicht gemeldet.
 Mit dieser Option senden die Detektive während des Vorsprungs noch keinen Standort. Ohne die
 Option können sie sich schon bewegen und ihre Position teilen, solange X noch Vorsprung hat.
 
-Der Vorsprung zählt vor der [Spieldauer](Spieldauer.md). Erst wenn er endet, beginnt die Zeit bis
-zur ersten [Standortmeldung](Reveal-Intervall.md#erste-standortmeldung).
+!!! info ":material-timer-sand: Reihenfolge"
+    Der Vorsprung zählt vor der [Spieldauer](Spieldauer.md). Erst wenn er endet, beginnt die Zeit
+    bis zur ersten [Standortmeldung](Reveal-Intervall.md#erste-standortmeldung).

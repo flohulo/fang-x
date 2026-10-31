@@ -18,7 +18,9 @@ verschoben.
 
 ## Tipps für eine sichere Runde
 
-- Wählt ein erreichbares Ziel an einem öffentlichen Ort.
-- Wählt keine privaten, abgesperrten oder gefährlichen Orte.
+!!! warning ":material-alert: Ziel mit Bedacht wählen"
+    Wählt ein erreichbares Ziel an einem öffentlichen Ort. Wählt keine privaten, abgesperrten
+    oder gefährlichen Orte.
+
 - Die Mission ist optional und ergänzt die normale Flucht- und Fangregel.
 - Die Bonusmission verhindert keine Live-Standortfreigabe, wenn X das Spielgebiet verlässt.

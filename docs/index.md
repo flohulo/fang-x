@@ -14,23 +14,23 @@ Freien achten solltet.
 3. Der Host legt Dauer, Vorsprung, Sichtungen und Fangregel fest.
 4. Spiel starten, Standort erlauben – X läuft los, die Detektive suchen.
 
-[Erste Schritte](Erste-Schritte.md){ .md-button .md-button--primary }
-[Alle Einstellungen](Spieleinstellungen.md){ .md-button }
+[:material-rocket-launch: Erste Schritte](Erste-Schritte.md){ .md-button .md-button--primary }
+[:material-tune: Alle Einstellungen](Spieleinstellungen.md){ .md-button }
 
 ## Was du hier findest
 
 | Seite | Inhalt |
 |---|---|
-| [Erste Schritte](Erste-Schritte.md) | Spiel erstellen, beitreten, Rollen und Spielablauf |
-| [Spieleinstellungen](Spieleinstellungen.md) | Übersicht aller Regeln und empfohlene Presets |
-| [Spieldauer](Spieldauer.md) | Wie lange eine Runde dauert |
-| [Vorsprung für X](Vorsprung-fuer-X.md) | Wie viel Vorsprung X bekommt |
-| [Reveal-Intervall](Reveal-Intervall.md) | Wann X' Standort gemeldet wird |
-| [Sichtradius](Sichtradius.md) | Wie genau eine Sichtung ist |
-| [Fangradius](Fangradius.md) | Wie nah ein Detektiv für den Fang herankommt |
-| [Spielgebiet](Spielgebiet.md) | Der erlaubte Aktionsradius |
-| [Bonusmission für X](Bonusmission-fuer-X.md) | Zusatzziel für X |
-| [Notfall-Knopf](Notfall-Knopf.md) | Runde abbrechen und Standort teilen |
+| :material-play-circle: [Erste Schritte](Erste-Schritte.md) | Spiel erstellen, beitreten, Rollen und Spielablauf |
+| :material-cog: [Spieleinstellungen](Spieleinstellungen.md) | Übersicht aller Regeln und empfohlene Presets |
+| :material-timer: [Spieldauer](Spieldauer.md) | Wie lange eine Runde dauert |
+| :material-run-fast: [Vorsprung für X](Vorsprung-fuer-X.md) | Wie viel Vorsprung X bekommt |
+| :material-bell-ring: [Reveal-Intervall](Reveal-Intervall.md) | Wann X' Standort gemeldet wird |
+| :material-eye: [Sichtradius](Sichtradius.md) | Wie genau eine Sichtung ist |
+| :material-target: [Fangradius](Fangradius.md) | Wie nah ein Detektiv für den Fang herankommt |
+| :material-map: [Spielgebiet](Spielgebiet.md) | Der erlaubte Aktionsradius |
+| :material-flag-checkered: [Bonusmission für X](Bonusmission-fuer-X.md) | Zusatzziel für X |
+| :material-alert-octagon: [Notfall-Knopf](Notfall-Knopf.md) | Runde abbrechen und Standort teilen |
 
 ## Sicher spielen
 

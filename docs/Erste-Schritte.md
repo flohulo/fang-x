@@ -42,6 +42,9 @@ App das Ergebnis und ihr könnt die Einstellungen der Runde als JSON-Datei expor
 
 ## Sicherheit und Notfall
 
-Bleibt an öffentlichen, sicheren Orten und meidet gefährliche Bereiche. Wenn X die Runde
-abbrechen muss, gibt es den [Notfall-Knopf](Notfall-Knopf.md): Nach einer Bestätigung endet das
-Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
+!!! warning ":material-alert: Bleibt an sicheren Orten"
+    Bleibt an öffentlichen, sicheren Orten und meidet gefährliche Bereiche.
+
+Wenn X die Runde abbrechen muss, gibt es den [Notfall-Knopf](Notfall-Knopf.md): Nach einer
+Bestätigung endet das Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt
+Benachrichtigung.

@@ -21,5 +21,6 @@ this time, only X's location is not reported yet.
 With this option the detectives do not send a location during the head start yet. Without the
 option they can already move and share their position while X still has a head start.
 
-The head start counts before the [game duration](Spieldauer.md). Only when it ends does the time
-until the first [location report](Reveal-Intervall.md#first-location-report) begin.
+!!! info ":material-timer-sand: Order"
+    The head start counts before the [game duration](Spieldauer.md). Only when it ends does the
+    time until the first [location report](Reveal-Intervall.md#first-location-report) begin.

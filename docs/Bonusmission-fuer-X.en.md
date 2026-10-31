@@ -17,7 +17,9 @@ minutes.
 
 ## Tips for a safe round
 
-- Choose an achievable target in a public place.
-- Do not choose private, closed-off or dangerous places.
+!!! warning ":material-alert: Choose the target carefully"
+    Choose an achievable target in a public place. Do not choose private, closed-off or
+    dangerous places.
+
 - The mission is optional and complements the normal escape and catch rules.
 - The bonus mission does not prevent the live location share if X leaves the play area.

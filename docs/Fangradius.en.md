@@ -10,8 +10,9 @@ server compares the most recently reported locations of X and the detectives.
 
 ## Which value should I choose?
 
-Smartphone GPS is not always exact. Buildings, trees and reception can affect the position
-measurement. A larger radius compensates for such fluctuations but makes catching easier.
+!!! note ":material-crosshairs-gps: GPS is not always exact"
+    Buildings, trees and reception can affect the position measurement. A larger radius
+    compensates for such fluctuations but makes catching easier.
 
 - **30 meters** is a practical starting value for most rounds.
 - A smaller value demands more precise GPS measurements.

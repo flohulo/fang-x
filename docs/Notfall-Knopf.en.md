@@ -37,5 +37,7 @@ location could be shared.
 ## Switching it off
 
 The host can switch off the emergency button in the [game settings](Spieleinstellungen.md). Then
-the server rejects giving up and the round continues. For rounds with children or in confusing
-terrain the button is recommended as a safety net.
+the server rejects giving up and the round continues.
+
+!!! tip ":material-shield-check: Recommended as a safety net"
+    For rounds with children or in confusing terrain you should leave the button switched on.
