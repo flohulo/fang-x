@@ -28,6 +28,7 @@
     "unsupported": "This browser does not support system notifications. Sound and vibration stay active.",
     "granted": "Alerts and browser notifications are active.",
     "disable": "Turn alert off",
+    "activeShort": "Alert on",
     "enable": "Turn alert on"
   },
   "notifications": {

@@ -28,6 +28,7 @@
     "unsupported": "Systembenachrichtigungen werden von diesem Browser nicht unterstützt. Ton und Vibration bleiben aktiv.",
     "granted": "Alarm und Browser-Benachrichtigungen sind aktiv.",
     "disable": "Alarm ausschalten",
+    "activeShort": "Alarm aktiv",
     "enable": "Alarm aktivieren"
   },
   "notifications": {
