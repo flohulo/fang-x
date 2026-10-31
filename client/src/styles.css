@@ -2589,3 +2589,8 @@ label {
   stroke-width: 2;
   stroke-linecap: round;
 }
+
+.app-menu-back {
+  margin-bottom: 8px;
+  color: var(--text-dim);
+}
