@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 const { version: appVersion } = JSON.parse(
-  readFileSync(new URL("../package.json", import.meta.url), "utf8")
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 ) as { version: string };
 
 export default defineConfig({

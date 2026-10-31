@@ -80,9 +80,7 @@ export function LobbyScreen({
       },
       (error) => {
         setStartLocationError(
-          error.code === error.PERMISSION_DENIED
-            ? t("lobby.geoDenied")
-            : t("lobby.geoFailed"),
+          error.code === error.PERMISSION_DENIED ? t("lobby.geoDenied") : t("lobby.geoFailed"),
         );
       },
       { enableHighAccuracy: true, maximumAge: 10_000, timeout: 15_000 },

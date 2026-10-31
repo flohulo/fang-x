@@ -151,7 +151,9 @@ export function ChangelogScreen() {
           <span className="changelog-topbar-label">Fang X · Versionsverlauf</span>
         </div>
 
-        {i18n.resolvedLanguage !== "de" && <p className="config-hint">{t("legal.changelogGermanOnly")}</p>}
+        {i18n.resolvedLanguage !== "de" && (
+          <p className="config-hint">{t("legal.changelogGermanOnly")}</p>
+        )}
 
         <header className="changelog-header">
           <span className="legal-badge">Das ist neu</span>
