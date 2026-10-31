@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.5.0...fang-x-v0.6.0) (2026-10-31)
+
+
+### Features
+
+* alarm-hinweis im menü bei aktivem alarm verkleinern ([#50](https://github.com/flohulo/fang-x/issues/50)) ([3a13000](https://github.com/flohulo/fang-x/commit/3a130004256714fb7e41d0e21b5f1d1c0c5a1c7a))
+* mehrsprachigkeit mit i18next und weblate (de/en) ([#33](https://github.com/flohulo/fang-x/issues/33)) ([3f57565](https://github.com/flohulo/fang-x/commit/3f57565d799aeefaa701a8715e88fcc370a960ab))
+* sprachupdates im release-changelog ausweisen ([#47](https://github.com/flohulo/fang-x/issues/47)) ([cdbedda](https://github.com/flohulo/fang-x/commit/cdbeddac8255718fb5e7eaf64631a77c220c6cee))
+* update-prüfung beim öffnen mit installieren-dialog ([#32](https://github.com/flohulo/fang-x/issues/32)) ([bbd12d3](https://github.com/flohulo/fang-x/commit/bbd12d320275cc91dd5967233c6b92779ffea56d))
+
+
+### Bug Fixes
+
+* reconnect-token, nachrichtenlimits, wirksame gebiets- und fangregeln; biome entfernt ([#30](https://github.com/flohulo/fang-x/issues/30)) ([9194c72](https://github.com/flohulo/fang-x/commit/9194c724d18fc25390aa03526b323f37c78abc17))
+
 ## [0.5.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.4.0...fang-x-v0.5.0) (2026-10-30)
 
 
