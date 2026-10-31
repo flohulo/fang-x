@@ -16,6 +16,17 @@ export function AlertSettings({
   onDisable,
 }: AlertSettingsProps) {
   const { t } = useTranslation();
+  if (enabled) {
+    return (
+      <div className="alert-settings-compact">
+        <span aria-hidden="true">🔔</span>
+        <span>{t("alerts.activeShort")}</span>
+        <button type="button" onClick={onDisable}>
+          {t("alerts.disable")}
+        </button>
+      </div>
+    );
+  }
   return (
     <section className="card alert-settings">
       <div className="alert-settings-icon" aria-hidden="true">

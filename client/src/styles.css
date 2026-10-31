@@ -1570,6 +1570,28 @@ label {
   font-size: 0.8rem;
 }
 
+.alert-settings-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+}
+
+.alert-settings-compact button {
+  width: auto;
+  min-height: 0;
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
 .permission-screen {
   gap: 0;
   background:
