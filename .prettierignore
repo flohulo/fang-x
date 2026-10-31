@@ -1,0 +1,9 @@
+node_modules/
+dist/
+site/
+.wrangler/
+package-lock.json
+CHANGELOG.md
+.release-please-manifest.json
+docs/
+CLAUDE.md
