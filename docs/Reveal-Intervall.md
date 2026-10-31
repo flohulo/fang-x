@@ -1,8 +1,9 @@
 # Reveal-Intervall
 
-**Einstellung in Fang X:** Reveal-Intervall (Minuten)
-**Regelparameter:** `reveal.intervalMinutes`
-**Standardwert:** 3 Minuten
+| **Einstellung** | Reveal-Intervall (Minuten) |
+|---|---|
+| **Regelparameter** | `reveal.intervalMinutes` |
+| **Standardwert** | 3 Minuten |
 
 Das Reveal-Intervall bestimmt, wie oft der Aufenthaltsort von X automatisch an die Detektive
 gemeldet wird. Eine solche Standortmeldung zeigt den Detektiven die letzte Sichtung auf der Karte.
@@ -18,9 +19,10 @@ auslösen.
 
 ## Erste Standortmeldung
 
-**Einstellung in Fang X:** Erste Standortmeldung (Minuten)
-**Regelparameter:** `reveal.firstRevealAfterMinutes`
-**Standardwert:** 3 Minuten
+| **Einstellung** | Erste Standortmeldung (Minuten) |
+|---|---|
+| **Regelparameter** | `reveal.firstRevealAfterMinutes` |
+| **Standardwert** | 3 Minuten |
 
 Die erste Standortmeldung folgt nach dem Ende des Vorsprungs. Mit einem Wert von **0** wird X
 sofort nach dem Vorsprung zum ersten Mal gemeldet; danach gilt das eingestellte Intervall.

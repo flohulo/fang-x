@@ -1,8 +1,9 @@
 # Spieldauer
 
-**Einstellung in Fang X:** Spieldauer (Minuten)
-**Regelparameter:** `game.durationMinutes`
-**Standardwert:** 30 Minuten
+| **Einstellung** | Spieldauer (Minuten) |
+|---|---|
+| **Regelparameter** | `game.durationMinutes` |
+| **Standardwert** | 30 Minuten |
 
 Die Spieldauer ist die Länge der eigentlichen Runde. Sie beginnt nach dem Countdown und dem
 Vorsprung für X und läuft während des Spiels ab.
@@ -17,5 +18,6 @@ Detektive gewinnen, wenn sie X vor Ablauf der Zeit fangen.
 - Plant die Dauer so, dass alle genug Zeit für die Runde haben und sicher zum Treffpunkt
   zurückkehren können.
 
-Die Spieldauer zählt erst nach dem [Vorsprung für X](Vorsprung-fuer-X.md). Countdown und
-Vorsprung kommen also zusätzlich zur eingestellten Runde dazu.
+!!! info ":material-timer-sand: Countdown und Vorsprung kommen dazu"
+    Die Spieldauer zählt erst nach dem [Vorsprung für X](Vorsprung-fuer-X.md). Countdown und
+    Vorsprung kommen also zusätzlich zur eingestellten Runde dazu.

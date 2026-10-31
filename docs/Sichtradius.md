@@ -1,8 +1,9 @@
 # Sichtradius
 
-**Einstellung in Fang X:** Sichtradius (Meter)
-**Regelparameter:** `reveal.revealRadiusMeters`
-**Standardwert:** 5 Meter
+| **Einstellung** | Sichtradius (Meter) |
+|---|---|
+| **Regelparameter** | `reveal.revealRadiusMeters` |
+| **Standardwert** | 5 Meter |
 
 Der Sichtradius legt fest, wie genau die Detektive eine reguläre Sichtung von X auf der Karte
 sehen. Bei einem größeren Radius zeigt der Kreis den Suchbereich statt eines nahezu exakten

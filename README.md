@@ -1,12 +1,26 @@
-# Fang X
+<h1 align="center">Fang X</h1>
 
-**Ein GPS-Fangspiel für draussen – kostenlos, werbefrei und Open Source.**
+<p align="center">
+  <strong>Ein GPS-Fangspiel für draussen – kostenlos, werbefrei und Open Source.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/flohulo/fang-x/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/flohulo/fang-x/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="Lizenz: AGPL-3.0-only" src="https://img.shields.io/badge/Lizenz-AGPL--3.0--only-blue.svg"></a>
+</p>
+
+<p align="center">
+  <a href="https://flohulo.github.io/fang-x/">Handbuch</a> ·
+  <a href="#so-funktionierts">So funktioniert's</a> ·
+  <a href="#datenschutz-und-sicher-spielen">Datenschutz</a> ·
+  <a href="#lokal-ausprobieren">Lokal ausprobieren</a> ·
+  <a href="#mitmachen">Mitmachen</a>
+</p>
+
+---
 
 Eine Person ist **X** und versucht zu entkommen. Die anderen spielen als **Detektive** und
 bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius erreicht, gewinnt.
-
-[![CI](https://github.com/flohulo/fang-x/actions/workflows/ci.yml/badge.svg)](https://github.com/flohulo/fang-x/actions/workflows/ci.yml)
-[![Lizenz: AGPL-3.0-only](https://img.shields.io/badge/Lizenz-AGPL--3.0--only-blue.svg)](LICENSE)
 
 ## So funktioniert's
 
@@ -15,25 +29,27 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
 3. Der Host legt die Regeln fest und startet das Spiel.
 4. X läuft voraus; die Detektive suchen X mithilfe der Karte und der Standort-Hinweise.
 
-Das Spiel kann optional eine Bonusmission enthalten. X versucht dabei, einen geheimen Zielpunkt
-zu erreichen, bevor die nächste Sichtung kommt.
+### Funktionen
 
-Der Host stellt die Regeln einzeln ein: zum Beispiel Dauer, Vorsprung, Zeitpunkt und Intervall der
-Standortmeldungen, Rollenanzahl, Live-Standorte der Detektive, ÖV-Budget, Startpunkt und Fangart.
-So kann jede Gruppe ihre eigene Runde zusammenstellen. Eine mögliche Kombination sind drei
-Spielende, zehn Minuten Vorsprung, 90 Minuten Spielzeit, Standortmeldungen alle fünf Minuten,
-Live-Standorte für die Detektive und ein begrenztes ÖV-Budget. Beim Foto-Fang bestätigen die
-Spielenden den Fang direkt in der App. Während der Runde können alle Spielenden im integrierten
-Chat schreiben; der Verlauf wird nach Spielende gelöscht.
-
-Muss X die Runde abbrechen, gibt es dafür den Notfall-Knopf: Nach einer Bestätigung endet das
-Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
+- **Eigene Regeln:** Der Host stellt die Regeln einzeln ein, zum Beispiel Dauer, Vorsprung,
+  Zeitpunkt und Intervall der Standortmeldungen, Rollenanzahl, Live-Standorte der Detektive,
+  ÖV-Budget, Startpunkt und Fangart. So kann jede Gruppe ihre eigene Runde zusammenstellen.
+  Eine mögliche Kombination sind drei Spielende, zehn Minuten Vorsprung, 90 Minuten Spielzeit,
+  Standortmeldungen alle fünf Minuten, Live-Standorte für die Detektive und ein begrenztes
+  ÖV-Budget.
+- **Bonusmission:** Optional versucht X, einen geheimen Zielpunkt zu erreichen, bevor die nächste
+  Sichtung kommt.
+- **Foto-Fang:** Die Spielenden bestätigen den Fang direkt in der App.
+- **Chat:** Während der Runde können alle im integrierten Chat schreiben; der Verlauf wird nach
+  Spielende gelöscht.
+- **Notfall-Knopf:** Muss X die Runde abbrechen, endet das Spiel nach einer Bestätigung. Die
+  Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
 
 ## Datenschutz und sicher spielen
 
 - Es gibt keine Benutzerkonten.
 - Live-Standorte werden nur während des Spiels übertragen; Routenverläufe werden nicht gespeichert.
-  Der einmalige Spielmittelpunkt wird für die laufende Runde gespeichert und danach gelöscht. Im
+  Der einmalige Spielmittelpunkt wird für die laufende Runde gespeichert und danach gelöscht.
   Wenn der Host einen Startpunkt festlegt, wird dieser für die laufende Runde gespeichert.
 - Fotos werden nicht in die App hochgeladen. Beim Foto-Fang bestätigen die Spieler den Fang
   gemeinsam in der App.
@@ -43,6 +59,8 @@ Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt Benac
   Geräteeinstellungen widerrufen.
 - Spielt rücksichtsvoll: Bleibt an sicheren, öffentlichen Orten, achtet auf den Verkehr und
   respektiert die Privatsphäre anderer.
+
+### Kartendaten
 
 Für Karten nutzt Fang X [OpenFreeMap](https://openfreemap.org/) auf Basis von
 [OpenStreetMap](https://www.openstreetmap.org/). Die Kartendaten sind © OpenStreetMap-Mitwirkende.
@@ -68,8 +86,9 @@ aus. Das Spiel benötigt eine Internetverbindung.
 
 ### Prüfen
 
-Für den Integrationstest muss der lokale Server in einem Terminal laufen. Starte dann in einem
-zweiten Terminal im Projektordner:
+> [!NOTE]
+> Für den Integrationstest muss der lokale Server in einem Terminal laufen. Starte dann in einem
+> zweiten Terminal im Projektordner:
 
 ```bash
 npm run typecheck

@@ -1,8 +1,9 @@
 # Notfall-Knopf
 
-**Einstellung in Fang X:** Notfall-Knopf für X: Spiel aufgeben und Standort teilen
-**Regelparameter:** `catch.xCanSurrender`
-**Standardwert:** An
+| **Einstellung** | Notfall-Knopf für X: Spiel aufgeben und Standort teilen |
+|---|---|
+| **Regelparameter** | `catch.xCanSurrender` |
+| **Standardwert** | An |
 
 Der Notfall-Knopf ist für X während des Vorsprungs und der laufenden Runde unten in der
 Kartensteuerung sichtbar. Er beendet die Runde sofort und teilt X' exakten Standort mit den
@@ -36,5 +37,8 @@ Standort geteilt werden konnte.
 ## Abschalten
 
 Der Host kann den Notfall-Knopf in den [Spieleinstellungen](Spieleinstellungen.md) ausschalten.
-Dann wird ein Aufgeben vom Server abgelehnt und die Runde läuft weiter. Für Runden mit Kindern
-oder unübersichtlichem Gelände ist der Knopf als Sicherheitsnetz empfehlenswert.
+Dann wird ein Aufgeben vom Server abgelehnt und die Runde läuft weiter.
+
+!!! tip ":material-shield-check: Als Sicherheitsnetz empfohlen"
+    Für Runden mit Kindern oder unübersichtlichem Gelände solltest du den Knopf eingeschaltet
+    lassen.

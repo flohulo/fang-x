@@ -1,8 +1,9 @@
 # Play area
 
-**Setting in Fang X:** Play area (radius, meters)
-**Rule parameter:** `map.playAreaRadiusMeters`
-**Default value:** 700 meters
+| **Setting** | Play area (radius, meters) |
+|---|---|
+| **Rule parameter** | `map.playAreaRadiusMeters` |
+| **Default** | 700 meters |
 
 The play area is a circle around the shared starting point. Its radius determines how far X may
 move away from this point.

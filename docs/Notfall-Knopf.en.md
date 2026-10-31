@@ -1,8 +1,9 @@
 # Emergency button
 
-**Setting in Fang X:** Emergency button for X: give up the game and share location
-**Rule parameter:** `catch.xCanSurrender`
-**Default value:** On
+| **Setting** | Emergency button for X: give up the game and share location |
+|---|---|
+| **Rule parameter** | `catch.xCanSurrender` |
+| **Default** | On |
 
 The emergency button is visible to X during the head start and the running round at the bottom of
 the map controls. It ends the round immediately and shares X's exact location with the
@@ -36,5 +37,7 @@ location could be shared.
 ## Switching it off
 
 The host can switch off the emergency button in the [game settings](Spieleinstellungen.md). Then
-the server rejects giving up and the round continues. For rounds with children or in confusing
-terrain the button is recommended as a safety net.
+the server rejects giving up and the round continues.
+
+!!! tip ":material-shield-check: Recommended as a safety net"
+    For rounds with children or in confusing terrain you should leave the button switched on.

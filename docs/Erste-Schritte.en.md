@@ -40,6 +40,9 @@ shows the result and you can export the round's settings as a JSON file.
 
 ## Safety and emergencies
 
-Stay in public, safe places and avoid dangerous areas. If X has to call off the round, there is
-the [emergency button](Notfall-Knopf.md): after a confirmation the game ends, the detectives win
-and receive X's exact location along with a notification.
+!!! warning ":material-alert: Stay in safe places"
+    Stay in public, safe places and avoid dangerous areas.
+
+If X has to call off the round, there is the [emergency button](Notfall-Knopf.md): after a
+confirmation the game ends, the detectives win and receive X's exact location along with a
+notification.

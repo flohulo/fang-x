@@ -14,23 +14,23 @@ playing outdoors.
 3. The host sets the duration, head start, reveals and catch rule.
 4. Start the game, allow location access – X runs off, the detectives search.
 
-[Getting started](Erste-Schritte.md){ .md-button .md-button--primary }
-[All settings](Spieleinstellungen.md){ .md-button }
+[:material-rocket-launch: Getting started](Erste-Schritte.md){ .md-button .md-button--primary }
+[:material-tune: All settings](Spieleinstellungen.md){ .md-button }
 
 ## What you will find here
 
 | Page | Contents |
 |---|---|
-| [Getting started](Erste-Schritte.md) | Creating and joining a game, roles and how a round works |
-| [Game settings](Spieleinstellungen.md) | Overview of all rules and recommended presets |
-| [Game duration](Spieldauer.md) | How long a round lasts |
-| [Head start for X](Vorsprung-fuer-X.md) | How much of a head start X gets |
-| [Reveal interval](Reveal-Intervall.md) | When X's location is reported |
-| [Reveal radius](Sichtradius.md) | How precise a reveal is |
-| [Catch radius](Fangradius.md) | How close a detective has to get to catch X |
-| [Play area](Spielgebiet.md) | The permitted radius of action |
-| [Bonus mission for X](Bonusmission-fuer-X.md) | An extra goal for X |
-| [Emergency button](Notfall-Knopf.md) | Ending the round and sharing the location |
+| :material-play-circle: [Getting started](Erste-Schritte.md) | Creating and joining a game, roles and how a round works |
+| :material-cog: [Game settings](Spieleinstellungen.md) | Overview of all rules and recommended presets |
+| :material-timer: [Game duration](Spieldauer.md) | How long a round lasts |
+| :material-run-fast: [Head start for X](Vorsprung-fuer-X.md) | How much of a head start X gets |
+| :material-bell-ring: [Reveal interval](Reveal-Intervall.md) | When X's location is reported |
+| :material-eye: [Reveal radius](Sichtradius.md) | How precise a reveal is |
+| :material-target: [Catch radius](Fangradius.md) | How close a detective has to get to catch X |
+| :material-map: [Play area](Spielgebiet.md) | The permitted radius of action |
+| :material-flag-checkered: [Bonus mission for X](Bonusmission-fuer-X.md) | An extra goal for X |
+| :material-alert-octagon: [Emergency button](Notfall-Knopf.md) | Ending the round and sharing the location |
 
 ## Playing safely
 

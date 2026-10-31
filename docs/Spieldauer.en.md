@@ -1,8 +1,9 @@
 # Game duration
 
-**Setting in Fang X:** Game duration (minutes)
-**Rule parameter:** `game.durationMinutes`
-**Default value:** 30 minutes
+| **Setting** | Game duration (minutes) |
+|---|---|
+| **Rule parameter** | `game.durationMinutes` |
+| **Default** | 30 minutes |
 
 The game duration is the length of the actual round. It begins after the countdown and X's head
 start and runs down during the game.
@@ -17,5 +18,6 @@ they catch X before time runs out.
 - Plan the duration so that everyone has enough time for the round and can safely return to the
   meeting point.
 
-The game duration only starts counting after the [head start for X](Vorsprung-fuer-X.md).
-Countdown and head start are therefore added on top of the configured round.
+!!! info ":material-timer-sand: Countdown and head start are added on top"
+    The game duration only starts counting after the [head start for X](Vorsprung-fuer-X.md).
+    Countdown and head start are therefore added on top of the configured round.

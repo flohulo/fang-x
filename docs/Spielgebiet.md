@@ -1,8 +1,9 @@
 # Spielgebiet
 
-**Einstellung in Fang X:** Spielgebiet (Radius, Meter)
-**Regelparameter:** `map.playAreaRadiusMeters`
-**Standardwert:** 700 Meter
+| **Einstellung** | Spielgebiet (Radius, Meter) |
+|---|---|
+| **Regelparameter** | `map.playAreaRadiusMeters` |
+| **Standardwert** | 700 Meter |
 
 Das Spielgebiet ist ein Kreis um den gemeinsamen Startpunkt. Sein Radius bestimmt, wie weit sich
 X von diesem Punkt entfernen darf.

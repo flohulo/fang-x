@@ -1,8 +1,9 @@
 # Reveal radius
 
-**Setting in Fang X:** Reveal radius (meters)
-**Rule parameter:** `reveal.revealRadiusMeters`
-**Default value:** 5 meters
+| **Setting** | Reveal radius (meters) |
+|---|---|
+| **Rule parameter** | `reveal.revealRadiusMeters` |
+| **Default** | 5 meters |
 
 The reveal radius determines how precisely the detectives see a regular reveal of X on the map.
 With a larger radius the circle shows a search area instead of an almost exact point.

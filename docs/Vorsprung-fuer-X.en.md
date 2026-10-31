@@ -1,8 +1,9 @@
 # Head start for X
 
-**Setting in Fang X:** Head start (minutes)
-**Rule parameter:** `game.headStartMinutes`
-**Default value:** 2 minutes
+| **Setting** | Head start (minutes) |
+|---|---|
+| **Rule parameter** | `game.headStartMinutes` |
+| **Default** | 2 minutes |
 
 The head start is the time X gets alone after the start. This lets X gain distance and think of a
 route. The detectives start at the agreed meeting point; by default they may already move during
@@ -20,5 +21,6 @@ this time, only X's location is not reported yet.
 With this option the detectives do not send a location during the head start yet. Without the
 option they can already move and share their position while X still has a head start.
 
-The head start counts before the [game duration](Spieldauer.md). Only when it ends does the time
-until the first [location report](Reveal-Intervall.md#first-location-report) begin.
+!!! info ":material-timer-sand: Order"
+    The head start counts before the [game duration](Spieldauer.md). Only when it ends does the
+    time until the first [location report](Reveal-Intervall.md#first-location-report) begin.
