@@ -4,8 +4,8 @@
 
 Beim ersten Öffnen führt dich die App in drei Schritten durch den Einstieg: eine kurze
 Spielübersicht, die Berechtigungen (Standort sowie Alarm und Benachrichtigungen) und die
-Installation als App auf dem Startbildschirm (PWA). Du kannst jeden Schritt überspringen und die
-Einführung später im Menü unter **Einführung erneut ansehen** wieder öffnen. Auf iPhone und iPad
+Installation als App auf dem Startbildschirm (PWA). Mit dem X oben rechts schliesst du die Einführung jederzeit; du kannst sie
+später im Menü unter **Einführung erneut ansehen** wieder öffnen. Auf iPhone und iPad
 installierst du die App über das Teilen-Symbol und **Zum Home-Bildschirm**.
 
 Solange die App nicht installiert ist, erinnert dich auf Start- und Lobby-Seite ein Hinweis

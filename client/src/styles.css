@@ -2449,6 +2449,7 @@ label {
 }
 
 .onboarding-dialog {
+  position: relative;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -2559,4 +2560,32 @@ label {
   font-size: 0.85rem;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.onboarding-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-dim);
+}
+
+.onboarding-close:hover {
+  color: var(--text);
+}
+
+.onboarding-close svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
 }

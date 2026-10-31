@@ -63,6 +63,16 @@ export function Onboarding({
         aria-modal="true"
         aria-labelledby="onboarding-title"
       >
+        <button
+          className="onboarding-close"
+          type="button"
+          aria-label={t("common.close")}
+          onClick={finish}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
         <p className="onboarding-progress">
           {t("onboarding.progress", { step: step + 1, total: STEP_COUNT })}
         </p>
@@ -161,11 +171,6 @@ export function Onboarding({
           {step > 0 && (
             <button className="secondary" type="button" onClick={() => setStep(step - 1)}>
               {t("onboarding.back")}
-            </button>
-          )}
-          {step < STEP_COUNT - 1 && (
-            <button className="secondary" type="button" onClick={finish}>
-              {t("onboarding.skip")}
             </button>
           )}
         </div>
