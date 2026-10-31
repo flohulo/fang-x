@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChangelogScreen } from "./changelog";
 import type { AlertNotificationPermission } from "./components/AlertSettings";
 import { AppMenu } from "./components/AppMenu";
+import { InstallBanner } from "./components/InstallBanner";
 import { isOnboardingDone, Onboarding } from "./components/Onboarding";
 import i18n from "./i18n";
 import { LegalScreen } from "./legal";
@@ -508,6 +509,9 @@ export default function App() {
         isGame={Boolean(game.myId && game.phase !== "LOBBY")}
       />
       {content}
+      {!showOnboarding && !(game.myId && game.phase !== "LOBBY" && screen !== "home") && (
+        <InstallBanner />
+      )}
       {showOnboarding && (
         <Onboarding
           alertsEnabled={alertsEnabled}

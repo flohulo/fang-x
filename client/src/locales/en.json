@@ -208,7 +208,10 @@
         "description": "During the round X picks a safe target in the play area. If X reaches it, the next reveal is postponed once by 2 minutes.",
         "recommendation": "Optional: tactical extra goal for X"
       }
-    }
+    },
+    "locationNeeded": "Without location access the map, sightings and catches do not work.",
+    "needLocation": "Allow location to start",
+    "skipLocation": "Continue without location (simulation mode)"
   },
   "game": {
     "phase": {
@@ -403,7 +406,6 @@
     "locationText": "Your location is needed for the map, sightings and catches. It is only used during the game.",
     "locationAllow": "Allow location",
     "locationGranted": "Location access is allowed.",
-    "locationDenied": "Location access is blocked. Allow it in your browser or site settings.",
     "locationUnsupported": "This device or connection does not support location sharing. You can still play in simulation mode.",
     "alertsTitle": "Alarm and notifications",
     "alertsText": "You get warned by sound, vibration and notification when your location is shared or X gives up.",
@@ -420,5 +422,20 @@
     "skip": "Skip",
     "finish": "Let's go",
     "reopen": "Show introduction again"
+  },
+  "locationGuide": {
+    "intro": "Location access is blocked. Here is how to allow it again:",
+    "android1": "Tap the icon next to the address in the address bar (lock) and open the site settings.",
+    "android2": "Set the \"Location\" permission to \"Allow\".",
+    "ios1": "Open Settings > Privacy & Security > Location Services and turn it on.",
+    "ios2": "Choose Safari Websites there (or Fang X if installed) and select \"While Using the App\".",
+    "reload": "Return to Fang X and tap \"Check again\".",
+    "retry": "Check again"
+  },
+  "installBanner": {
+    "label": "Install app",
+    "text": "Install Fang X as an app: faster start, full screen and reliable notifications.",
+    "textIos": "Install Fang X as an app: tap the share icon and choose \"Add to Home Screen\". Notifications only work on iPhone this way.",
+    "dismiss": "Not now"
   }
 }

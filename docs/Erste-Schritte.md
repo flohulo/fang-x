@@ -8,6 +8,11 @@ Installation als App auf dem Startbildschirm (PWA). Du kannst jeden Schritt übe
 Einführung später im Menü unter **Einführung erneut ansehen** wieder öffnen. Auf iPhone und iPad
 installierst du die App über das Teilen-Symbol und **Zum Home-Bildschirm**.
 
+Solange die App nicht installiert ist, erinnert dich auf Start- und Lobby-Seite ein Hinweis
+daran. Ist der Standortzugriff blockiert, zeigt die App eine Anleitung, wie du ihn in den
+Einstellungen wieder freigibst. In der Lobby kann der Host das Spiel erst starten, wenn der
+Standort erlaubt ist; zum Ausprobieren gibt es **Ohne Standort fortfahren (Simulationsmodus)**.
+
 ## Spiel erstellen
 
 Eine Person erstellt auf der Startseite ein neues Spiel. Sie wird Host und spielt standardmäßig

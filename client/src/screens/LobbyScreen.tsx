@@ -1,3 +1,5 @@
+import { LocationAccess } from "../components/LocationAccess";
+import { useLocationPermission } from "../lib/useLocationPermission";
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
 import { DEFAULT_RULESET } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
@@ -33,6 +35,8 @@ export function LobbyScreen({
   const [localRuleset, setLocalRuleset] = useState<Ruleset>(ruleset ?? DEFAULT_RULESET);
   const [copied, setCopied] = useState<null | "link" | "code">(null);
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
+  const location = useLocationPermission();
+  const [skipLocation, setSkipLocation] = useState(false);
   const [startLocationError, setStartLocationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -123,7 +127,8 @@ export function LobbyScreen({
   const hasX = players.some((p) => p.wantsX);
   const hasDetective = players.some((p) => !p.wantsX);
   const others = players.filter((p) => p.id !== myId);
-  const canStart = hasX;
+  const locationOk = location.state === "granted" || skipLocation;
+  const canStart = hasX && locationOk;
 
   return (
     <div className="screen">
@@ -187,6 +192,8 @@ export function LobbyScreen({
           </ul>
         )}
       </div>
+
+      <LocationAccess state={location.state} busy={location.busy} onRequest={location.request} />
 
       {youAreHost && (
         <div className="card">
@@ -707,8 +714,13 @@ export function LobbyScreen({
           </div>
 
           <button onClick={onStart} disabled={!canStart} style={{ marginTop: 16 }}>
-            {!hasX ? t("lobby.needX") : t("lobby.start")}
+            {!hasX ? t("lobby.needX") : !locationOk ? t("lobby.needLocation") : t("lobby.start")}
           </button>
+          {hasX && !locationOk && (
+            <button className="link-button" type="button" onClick={() => setSkipLocation(true)}>
+              {t("lobby.skipLocation")}
+            </button>
+          )}
 
           {hasX && !hasDetective && (
             <p className="config-hint">
