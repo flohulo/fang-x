@@ -1,0 +1,60 @@
+name: Übersetzungs-PR
+
+# Weblate (Codeberg Translate) pusht neue Übersetzungen auf den Branch `weblate`.
+# Dieser Workflow eröffnet daraus einen Pull Request nach `main`, falls noch keiner offen ist.
+# Weitere Weblate-Commits landen automatisch im bereits offenen PR.
+
+on:
+  push:
+    branches: [weblate]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: translations-pr
+  cancel-in-progress: false
+
+jobs:
+  open-pr:
+    name: Pull Request eröffnen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Request eröffnen, falls keiner offen ist
+        env:
+          # Mit dem Token aus den Secrets laufen CI und Titelprüfung im neuen PR; PRs, die mit dem
+          # Standard-GITHUB_TOKEN erstellt werden, lösen keine weiteren Workflows aus.
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          existing=$(gh pr list --head weblate --base main --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            echo "PR #$existing ist bereits offen, nichts zu tun."
+            exit 0
+          fi
+
+          # Nur eröffnen, wenn der Branch wirklich Änderungen gegenüber main enthält.
+          ahead=$(gh api "repos/$GH_REPO/compare/main...weblate" --jq '.ahead_by')
+          if [ "$ahead" = "0" ]; then
+            echo "weblate enthält nichts Neues gegenüber main."
+            exit 0
+          fi
+
+          gh pr create \
+            --head weblate \
+            --base main \
+            --title "chore(i18n): übersetzungen aktualisieren" \
+            --body "## Änderungen
+
+          Neue oder geänderte Übersetzungen aus Weblate (Codeberg Translate).
+
+          ## Prüfung
+
+          - [x] \`npm run check:locales\` läuft in der CI
+          - [ ] Typecheck und Build laufen in der CI
+
+          ## Hinweise für Reviewer
+
+          Dieser Pull Request wurde automatisch erstellt. Weitere Übersetzungen kommen in denselben PR, solange er offen ist."
