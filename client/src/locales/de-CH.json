@@ -1,388 +1,388 @@
 {
-    "language": {
-        "label": "Sprach"
+  "language": {
+    "label": "Sprach"
+  },
+  "common": {
+    "close": "Schlüse",
+    "cancel": "abbräche",
+    "unnamed": "unbenänt",
+    "roleX": "X",
+    "roleDetective": "Detektiv"
+  },
+  "menu": {
+    "open": "Menü öffnä",
+    "close": "Menü schlüssä",
+    "title": "Menü",
+    "settings": "Istelige",
+    "moreLinks": "witeri site",
+    "docs": "spielräglä im Handbuech",
+    "changelog": "Änderigsverlauf",
+    "privacy": "Datäschutz",
+    "imprint": "Imprässum",
+    "translate": ""
+  },
+  "alerts": {
+    "title": "",
+    "description": "",
+    "denied": "",
+    "unsupported": "",
+    "granted": "",
+    "disable": "",
+    "enable": ""
+  },
+  "notifications": {
+    "surrenderTitle": "",
+    "surrenderBody": "",
+    "positionLiveTitle": "",
+    "positionLiveBody": "",
+    "positionSharedTitle": "",
+    "positionSharedBody": ""
+  },
+  "pwa": {
+    "updateTitle": "",
+    "updateText": "",
+    "reload": "",
+    "later": ""
+  },
+  "app": {
+    "reconnecting": "",
+    "tooManyGames": "",
+    "createFailed": "",
+    "unknownError": "",
+    "hostName": "",
+    "playerName": "",
+    "tooManyAttempts": "",
+    "serverUnreachable": "",
+    "noSuchGame": ""
+  },
+  "home": {
+    "subtitle": "",
+    "nameLabel": "",
+    "namePlaceholder": "",
+    "newGame": {
+      "title": "",
+      "text": "",
+      "button": ""
     },
-    "common": {
-        "close": "Schlüse",
-        "cancel": "abbräche",
-        "unnamed": "unbenänt",
-        "roleX": "X",
-        "roleDetective": "Detektiv"
+    "join": {
+      "title": "",
+      "codeLabel": "",
+      "codePlaceholder": "",
+      "playAs": "",
+      "roleTitle": "",
+      "playAsXLabel": "",
+      "button": "",
+      "checking": "",
+      "invite": ""
     },
-    "menu": {
-        "open": "Menü öffnä",
-        "close": "Menü schlüssä",
-        "title": "Menü",
-        "settings": "Istelige",
-        "moreLinks": "witeri site",
-        "docs": "spielräglä im Handbuech",
-        "changelog": "Änderigsverlauf",
-        "privacy": "Datäschutz",
-        "imprint": "Imprässum",
-        "translate": ""
+    "privacyNote": "",
+    "version": ""
+  },
+  "chat": {
+    "title": "",
+    "open": "",
+    "close": "",
+    "onlyDuringGame": "",
+    "messages": "",
+    "empty": "",
+    "placeholder": "",
+    "inputLabel": "",
+    "send": "",
+    "hint": ""
+  },
+  "lobby": {
+    "title": "",
+    "waiting": {
+      "title": "",
+      "text": "",
+      "docsLink": ""
     },
-    "alerts": {
+    "geoUnsupported": "",
+    "geoDenied": "",
+    "geoFailed": "",
+    "shareText": "",
+    "codeLabel": "",
+    "shareInvite": "",
+    "linkCopied": "",
+    "copyCode": "",
+    "codeCopied": "",
+    "myPlayer": "",
+    "otherPlayers": "",
+    "nobodyYet": "",
+    "shareCodeHint": "",
+    "settings": "",
+    "rulesetName": "",
+    "rulesetNamePlaceholder": "",
+    "rulesetNameHint": "",
+    "rolesFromLobby": "",
+    "detectivesWait": "",
+    "detectivesShareLive": "",
+    "xSeesDetectives": "",
+    "xSees": {
+      "ALWAYS": "",
+      "ON_REVEAL": "",
+      "NEVER": ""
+    },
+    "catchRule": "",
+    "catchMethod": {
+      "PHOTO_CONFIRMATION": "",
+      "RADIUS": ""
+    },
+    "xCanSurrender": "",
+    "transitBudget": "",
+    "transitForX": "",
+    "transitForDetectives": "",
+    "outOfBounds": "",
+    "busStopsForX": "",
+    "trainStopsForX": "",
+    "startPoint": "",
+    "startPointUpdate": "",
+    "startPointSet": "",
+    "startPointRemove": "",
+    "startPointDone": "",
+    "startPointHint": "",
+    "duration": "",
+    "headStart": "",
+    "countdown": "",
+    "firstReveal": "",
+    "interval": "",
+    "revealRadius": "",
+    "catchRadius": "",
+    "playArea": "",
+    "objective": "",
+    "wikiFooter": "",
+    "wikiFooterLink": "",
+    "start": "",
+    "needX": "",
+    "dryRun": "",
+    "leave": "",
+    "you": "",
+    "disconnected": "",
+    "disconnectedTitle": "",
+    "toggleRole": "",
+    "playerRole": "",
+    "wikiLinkLabel": "",
+    "wikiLinkTitle": "",
+    "params": {
+      "explain": "",
+      "infoTitle": "",
+      "readMore": "",
+      "duration": {
         "title": "",
         "description": "",
-        "denied": "",
-        "unsupported": "",
-        "granted": "",
-        "disable": "",
-        "enable": ""
-    },
-    "notifications": {
-        "surrenderTitle": "",
-        "surrenderBody": "",
-        "positionLiveTitle": "",
-        "positionLiveBody": "",
-        "positionSharedTitle": "",
-        "positionSharedBody": ""
-    },
-    "pwa": {
-        "updateTitle": "",
-        "updateText": "",
-        "reload": "",
-        "later": ""
-    },
-    "app": {
-        "reconnecting": "",
-        "tooManyGames": "",
-        "createFailed": "",
-        "unknownError": "",
-        "hostName": "",
-        "playerName": "",
-        "tooManyAttempts": "",
-        "serverUnreachable": "",
-        "noSuchGame": ""
-    },
-    "home": {
-        "subtitle": "",
-        "nameLabel": "",
-        "namePlaceholder": "",
-        "newGame": {
-            "title": "",
-            "text": "",
-            "button": ""
-        },
-        "join": {
-            "title": "",
-            "codeLabel": "",
-            "codePlaceholder": "",
-            "playAs": "",
-            "roleTitle": "",
-            "playAsXLabel": "",
-            "button": "",
-            "checking": "",
-            "invite": ""
-        },
-        "privacyNote": "",
-        "version": ""
-    },
-    "chat": {
+        "recommendation": ""
+      },
+      "headStart": {
         "title": "",
-        "open": "",
-        "close": "",
-        "onlyDuringGame": "",
-        "messages": "",
-        "empty": "",
-        "placeholder": "",
-        "inputLabel": "",
-        "send": "",
-        "hint": ""
-    },
-    "lobby": {
+        "description": "",
+        "recommendation": ""
+      },
+      "interval": {
         "title": "",
-        "waiting": {
-            "title": "",
-            "text": "",
-            "docsLink": ""
-        },
-        "geoUnsupported": "",
-        "geoDenied": "",
-        "geoFailed": "",
-        "shareText": "",
-        "codeLabel": "",
-        "shareInvite": "",
-        "linkCopied": "",
-        "copyCode": "",
-        "codeCopied": "",
-        "myPlayer": "",
-        "otherPlayers": "",
-        "nobodyYet": "",
-        "shareCodeHint": "",
-        "settings": "",
-        "rulesetName": "",
-        "rulesetNamePlaceholder": "",
-        "rulesetNameHint": "",
-        "rolesFromLobby": "",
-        "detectivesWait": "",
-        "detectivesShareLive": "",
-        "xSeesDetectives": "",
-        "xSees": {
-            "ALWAYS": "",
-            "ON_REVEAL": "",
-            "NEVER": ""
-        },
-        "catchRule": "",
-        "catchMethod": {
-            "PHOTO_CONFIRMATION": "",
-            "RADIUS": ""
-        },
-        "xCanSurrender": "",
-        "transitBudget": "",
-        "transitForX": "",
-        "transitForDetectives": "",
-        "outOfBounds": "",
-        "busStopsForX": "",
-        "trainStopsForX": "",
-        "startPoint": "",
-        "startPointUpdate": "",
-        "startPointSet": "",
-        "startPointRemove": "",
-        "startPointDone": "",
-        "startPointHint": "",
-        "duration": "",
-        "headStart": "",
-        "countdown": "",
-        "firstReveal": "",
-        "interval": "",
-        "revealRadius": "",
-        "catchRadius": "",
-        "playArea": "",
-        "objective": "",
-        "wikiFooter": "",
-        "wikiFooterLink": "",
-        "start": "",
-        "needX": "",
-        "dryRun": "",
-        "leave": "",
-        "you": "",
-        "disconnected": "",
-        "disconnectedTitle": "",
-        "toggleRole": "",
-        "playerRole": "",
-        "wikiLinkLabel": "",
-        "wikiLinkTitle": "",
-        "params": {
-            "explain": "",
-            "infoTitle": "",
-            "readMore": "",
-            "duration": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "headStart": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "interval": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "firstReveal": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "revealRadius": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "catchRadius": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "playArea": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            },
-            "objective": {
-                "title": "",
-                "description": "",
-                "recommendation": ""
-            }
-        }
-    },
-    "game": {
-        "phase": {
-            "COUNTDOWN": "",
-            "HEADSTART": "",
-            "RUNNING": "",
-            "ENDED": ""
-        },
-        "phaseTitle": {
-            "COUNTDOWN": "",
-            "HEADSTART": "",
-            "RUNNING": "",
-            "ENDED": ""
-        },
-        "winnerX": "",
-        "winnerDetectives": "",
-        "surrendered": "",
-        "surrenderLive": "",
-        "surrenderNoPosition": "",
-        "openInOsm": "",
-        "backToStart": "",
-        "exportSettings": "",
-        "settingsExported": "",
-        "exportHint": "",
-        "unnamedRuleset": "",
-        "youAreX": "",
-        "youAreDetective": "",
-        "nextReveal": "",
-        "soon": "",
-        "timeUndetermined": "",
-        "timeRemaining": "",
-        "leftArea": "",
-        "transitNotice": {
-            "label": "",
-            "bus": "",
-            "train": "",
-            "dismiss": ""
-        },
-        "gpsError": "",
-        "geoUnsupported": "",
-        "area": {
-            "unknown": "",
-            "outside": "",
-            "toEdge": "",
-            "none": ""
-        },
-        "gps": {
-            "simulation": "",
-            "active": "",
-            "off": ""
-        },
-        "solo": "",
-        "transitBudget": {
-            "summary": "",
-            "report": "",
-            "exhausted": "",
-            "reportEveryStop": ""
-        },
-        "photoCatch": {
-            "reported": "",
-            "confirmPrompt": "",
-            "confirm": "",
-            "reject": "",
-            "waiting": "",
-            "report": "",
-            "rule": "",
-            "noUpload": ""
-        },
-        "mapCredit": {
-            "satellite": "",
-            "street": ""
-        },
-        "chooseObjective": "",
-        "cancelChoosing": "",
-        "simulationMode": "",
-        "enableGps": "",
-        "emergency": "",
-        "emergencyLabel": "",
-        "leave": "",
-        "surrenderDialog": {
-            "title": "",
-            "text": "",
-            "keepPlaying": "",
-            "confirm": ""
-        },
-        "transitDialog": {
-            "title": "",
-            "text": "",
-            "mode": "",
-            "bus": "",
-            "train": "",
-            "count": "",
-            "confirm": ""
-        },
-        "hint": {
-            "noPosition": {
-                "title": "",
-                "simulated": "",
-                "real": ""
-            },
-            "countdownX": "",
-            "countdownDetective": "",
-            "headstartSolo": "",
-            "headstartX": "",
-            "headstartDetective": "",
-            "objectivePendingTitle": "",
-            "objectivePendingText": "",
-            "objectiveActiveTitle": "",
-            "objectiveActiveText": "",
-            "objectiveDoneTitle": "",
-            "objectiveDoneText": "",
-            "huntedSoloTitle": "",
-            "huntedTitle": "",
-            "huntedSoloText": "",
-            "huntedText": "",
-            "lastRevealTitle": "",
-            "lastRevealText": "",
-            "noRevealTitle": "",
-            "noRevealText": "",
-            "defaultTitle": "",
-            "defaultText": ""
-        }
-    },
-    "map": {
-        "satellite": "",
-        "streetMap": "",
-        "showSatellite": "",
-        "showStreetMap": "",
-        "objective": "",
-        "start": "",
-        "startPoint": "",
-        "startPopup": "",
-        "objectiveReached": "",
-        "objectiveRadius": ""
-    },
-    "errors": {
-        "MESSAGE_TOO_LARGE": "",
-        "INVALID_JSON": "",
-        "NO_GAME": "",
-        "ROOM_FULL": "",
-        "HOST_ONLY": "",
-        "LOBBY_ONLY": "",
-        "INVALID_START_POINT": "",
-        "CHAT_RATE_LIMIT": "",
-        "NEED_X": "",
-        "REVEAL_DEFERRED": "",
-        "OUT_OF_BOUNDS_WARNING": "",
-        "OBJECTIVE_X_ONLY": "",
-        "OBJECTIVE_UNAVAILABLE": "",
-        "OBJECTIVE_ALREADY_SET": "",
-        "OBJECTIVE_INVALID": "",
-        "POSITION_STALE": "",
-        "OBJECTIVE_OUTSIDE_AREA": "",
-        "OBJECTIVE_TOO_CLOSE": "",
-        "SURRENDER_X_ONLY": "",
-        "SURRENDER_DISABLED": "",
-        "TRANSIT_EXHAUSTED_bus": "",
-        "TRANSIT_EXHAUSTED_train": "",
-        "TRANSIT_MIN_ONE": "",
-        "TRANSIT_REMAINING_bus": "",
-        "TRANSIT_REMAINING_train": ""
-    },
-    "endReasons": {
-        "TIME_UP": "",
-        "X_LEFT": "",
-        "X_OUT_OF_BOUNDS": "",
-        "CAUGHT": "",
-        "CAUGHT_CONFIRMED": "",
-        "CAUGHT_PHOTO": "",
-        "SURRENDER_LIVE": "",
-        "SURRENDER_NO_POSITION": ""
-    },
-    "legal": {
-        "germanOnly": "",
-        "back": "",
-        "changelogGermanOnly": ""
+        "description": "",
+        "recommendation": ""
+      },
+      "firstReveal": {
+        "title": "",
+        "description": "",
+        "recommendation": ""
+      },
+      "revealRadius": {
+        "title": "",
+        "description": "",
+        "recommendation": ""
+      },
+      "catchRadius": {
+        "title": "",
+        "description": "",
+        "recommendation": ""
+      },
+      "playArea": {
+        "title": "",
+        "description": "",
+        "recommendation": ""
+      },
+      "objective": {
+        "title": "",
+        "description": "",
+        "recommendation": ""
+      }
     }
+  },
+  "game": {
+    "phase": {
+      "COUNTDOWN": "",
+      "HEADSTART": "",
+      "RUNNING": "",
+      "ENDED": ""
+    },
+    "phaseTitle": {
+      "COUNTDOWN": "",
+      "HEADSTART": "",
+      "RUNNING": "",
+      "ENDED": ""
+    },
+    "winnerX": "",
+    "winnerDetectives": "",
+    "surrendered": "",
+    "surrenderLive": "",
+    "surrenderNoPosition": "",
+    "openInOsm": "",
+    "backToStart": "",
+    "exportSettings": "",
+    "settingsExported": "",
+    "exportHint": "",
+    "unnamedRuleset": "",
+    "youAreX": "",
+    "youAreDetective": "",
+    "nextReveal": "",
+    "soon": "",
+    "timeUndetermined": "",
+    "timeRemaining": "",
+    "leftArea": "",
+    "transitNotice": {
+      "label": "",
+      "bus": "",
+      "train": "",
+      "dismiss": ""
+    },
+    "gpsError": "",
+    "geoUnsupported": "",
+    "area": {
+      "unknown": "",
+      "outside": "",
+      "toEdge": "",
+      "none": ""
+    },
+    "gps": {
+      "simulation": "",
+      "active": "",
+      "off": ""
+    },
+    "solo": "",
+    "transitBudget": {
+      "summary": "",
+      "report": "",
+      "exhausted": "",
+      "reportEveryStop": ""
+    },
+    "photoCatch": {
+      "reported": "",
+      "confirmPrompt": "",
+      "confirm": "",
+      "reject": "",
+      "waiting": "",
+      "report": "",
+      "rule": "",
+      "noUpload": ""
+    },
+    "mapCredit": {
+      "satellite": "",
+      "street": ""
+    },
+    "chooseObjective": "",
+    "cancelChoosing": "",
+    "simulationMode": "",
+    "enableGps": "",
+    "emergency": "",
+    "emergencyLabel": "",
+    "leave": "",
+    "surrenderDialog": {
+      "title": "",
+      "text": "",
+      "keepPlaying": "",
+      "confirm": ""
+    },
+    "transitDialog": {
+      "title": "",
+      "text": "",
+      "mode": "",
+      "bus": "",
+      "train": "",
+      "count": "",
+      "confirm": ""
+    },
+    "hint": {
+      "noPosition": {
+        "title": "",
+        "simulated": "",
+        "real": ""
+      },
+      "countdownX": "",
+      "countdownDetective": "",
+      "headstartSolo": "",
+      "headstartX": "",
+      "headstartDetective": "",
+      "objectivePendingTitle": "",
+      "objectivePendingText": "",
+      "objectiveActiveTitle": "",
+      "objectiveActiveText": "",
+      "objectiveDoneTitle": "",
+      "objectiveDoneText": "",
+      "huntedSoloTitle": "",
+      "huntedTitle": "",
+      "huntedSoloText": "",
+      "huntedText": "",
+      "lastRevealTitle": "",
+      "lastRevealText": "",
+      "noRevealTitle": "",
+      "noRevealText": "",
+      "defaultTitle": "",
+      "defaultText": ""
+    }
+  },
+  "map": {
+    "satellite": "",
+    "streetMap": "",
+    "showSatellite": "",
+    "showStreetMap": "",
+    "objective": "",
+    "start": "",
+    "startPoint": "",
+    "startPopup": "",
+    "objectiveReached": "",
+    "objectiveRadius": ""
+  },
+  "errors": {
+    "MESSAGE_TOO_LARGE": "",
+    "INVALID_JSON": "",
+    "NO_GAME": "",
+    "ROOM_FULL": "",
+    "HOST_ONLY": "",
+    "LOBBY_ONLY": "",
+    "INVALID_START_POINT": "",
+    "CHAT_RATE_LIMIT": "",
+    "NEED_X": "",
+    "REVEAL_DEFERRED": "",
+    "OUT_OF_BOUNDS_WARNING": "",
+    "OBJECTIVE_X_ONLY": "",
+    "OBJECTIVE_UNAVAILABLE": "",
+    "OBJECTIVE_ALREADY_SET": "",
+    "OBJECTIVE_INVALID": "",
+    "POSITION_STALE": "",
+    "OBJECTIVE_OUTSIDE_AREA": "",
+    "OBJECTIVE_TOO_CLOSE": "",
+    "SURRENDER_X_ONLY": "",
+    "SURRENDER_DISABLED": "",
+    "TRANSIT_EXHAUSTED_bus": "",
+    "TRANSIT_EXHAUSTED_train": "",
+    "TRANSIT_MIN_ONE": "",
+    "TRANSIT_REMAINING_bus": "",
+    "TRANSIT_REMAINING_train": ""
+  },
+  "endReasons": {
+    "TIME_UP": "",
+    "X_LEFT": "",
+    "X_OUT_OF_BOUNDS": "",
+    "CAUGHT": "",
+    "CAUGHT_CONFIRMED": "",
+    "CAUGHT_PHOTO": "",
+    "SURRENDER_LIVE": "",
+    "SURRENDER_NO_POSITION": ""
+  },
+  "legal": {
+    "germanOnly": "",
+    "back": "",
+    "changelogGermanOnly": ""
+  }
 }
