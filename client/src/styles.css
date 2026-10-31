@@ -149,7 +149,8 @@ body,
   border-top: 1px solid rgba(148, 163, 184, 0.14);
 }
 
-.app-menu-links a {
+.app-menu-links a,
+.app-menu-links .app-menu-link-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -164,7 +165,17 @@ body,
     color 0.15s ease;
 }
 
-.app-menu-links a:hover {
+.app-menu-links .app-menu-link-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-menu-links a:hover,
+.app-menu-links .app-menu-link-button:hover {
   background: rgba(56, 189, 248, 0.09);
   color: var(--accent);
 }
@@ -2435,4 +2446,63 @@ label {
     width: 100%;
     justify-content: space-between;
   }
+}
+
+.onboarding-dialog {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.onboarding-dialog h2:focus {
+  outline: none;
+}
+
+.onboarding-dialog h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.onboarding-dialog p {
+  margin: 0 0 12px;
+}
+
+.onboarding-progress {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+.onboarding-list {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.onboarding-item {
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.onboarding-ok {
+  color: #4ade80;
+}
+
+.onboarding-hint {
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.onboarding-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.onboarding-actions button + button {
+  margin-top: 0;
 }

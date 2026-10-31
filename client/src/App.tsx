@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChangelogScreen } from "./changelog";
 import type { AlertNotificationPermission } from "./components/AlertSettings";
 import { AppMenu } from "./components/AppMenu";
+import { isOnboardingDone, Onboarding } from "./components/Onboarding";
 import i18n from "./i18n";
 import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
@@ -157,6 +158,7 @@ export default function App() {
   const [notificationPermission, setNotificationPermission] = useState<AlertNotificationPermission>(
     () => (typeof Notification === "undefined" ? "unsupported" : Notification.permission),
   );
+  const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone() && !loadSession());
   const legalPage = useMemo(readLegalPage, []);
   const changelogPage = useMemo(isChangelogPage, []);
   const resumedRef = useRef(false);
@@ -502,9 +504,18 @@ export default function App() {
         notificationPermission={notificationPermission}
         onEnableAlerts={enableAlerts}
         onDisableAlerts={disableAlerts}
+        onShowIntro={() => setShowOnboarding(true)}
         isGame={Boolean(game.myId && game.phase !== "LOBBY")}
       />
       {content}
+      {showOnboarding && (
+        <Onboarding
+          alertsEnabled={alertsEnabled}
+          notificationPermission={notificationPermission}
+          onEnableAlerts={enableAlerts}
+          onFinish={() => setShowOnboarding(false)}
+        />
+      )}
       <PwaUpdatePrompt />
     </>
   );
