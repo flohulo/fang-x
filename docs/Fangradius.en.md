@@ -1,8 +1,9 @@
 # Catch radius
 
-**Setting in Fang X:** Catch radius (meters)
-**Rule parameter:** `catch.radiusMeters`
-**Default value:** 30 meters
+| **Setting** | Catch radius (meters) |
+|---|---|
+| **Rule parameter** | `catch.radiusMeters` |
+| **Default** | 30 meters |
 
 The catch radius is the maximum GPS distance at which a catch attempt can succeed. For this the
 server compares the most recently reported locations of X and the detectives.

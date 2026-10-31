@@ -1,8 +1,9 @@
 # Head start for X
 
-**Setting in Fang X:** Head start (minutes)
-**Rule parameter:** `game.headStartMinutes`
-**Default value:** 2 minutes
+| **Setting** | Head start (minutes) |
+|---|---|
+| **Rule parameter** | `game.headStartMinutes` |
+| **Default** | 2 minutes |
 
 The head start is the time X gets alone after the start. This lets X gain distance and think of a
 route. The detectives start at the agreed meeting point; by default they may already move during

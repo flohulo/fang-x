@@ -1,8 +1,9 @@
 # Emergency button
 
-**Setting in Fang X:** Emergency button for X: give up the game and share location
-**Rule parameter:** `catch.xCanSurrender`
-**Default value:** On
+| **Setting** | Emergency button for X: give up the game and share location |
+|---|---|
+| **Rule parameter** | `catch.xCanSurrender` |
+| **Default** | On |
 
 The emergency button is visible to X during the head start and the running round at the bottom of
 the map controls. It ends the round immediately and shares X's exact location with the

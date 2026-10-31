@@ -1,8 +1,9 @@
 # Spieldauer
 
-**Einstellung in Fang X:** Spieldauer (Minuten)
-**Regelparameter:** `game.durationMinutes`
-**Standardwert:** 30 Minuten
+| **Einstellung** | Spieldauer (Minuten) |
+|---|---|
+| **Regelparameter** | `game.durationMinutes` |
+| **Standardwert** | 30 Minuten |
 
 Die Spieldauer ist die Länge der eigentlichen Runde. Sie beginnt nach dem Countdown und dem
 Vorsprung für X und läuft während des Spiels ab.

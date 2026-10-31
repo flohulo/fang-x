@@ -1,8 +1,9 @@
 # Game duration
 
-**Setting in Fang X:** Game duration (minutes)
-**Rule parameter:** `game.durationMinutes`
-**Default value:** 30 minutes
+| **Setting** | Game duration (minutes) |
+|---|---|
+| **Rule parameter** | `game.durationMinutes` |
+| **Default** | 30 minutes |
 
 The game duration is the length of the actual round. It begins after the countdown and X's head
 start and runs down during the game.

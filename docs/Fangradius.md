@@ -1,8 +1,9 @@
 # Fangradius
 
-**Einstellung in Fang X:** Fangradius (Meter)
-**Regelparameter:** `catch.radiusMeters`
-**Standardwert:** 30 Meter
+| **Einstellung** | Fangradius (Meter) |
+|---|---|
+| **Regelparameter** | `catch.radiusMeters` |
+| **Standardwert** | 30 Meter |
 
 Der Fangradius ist der maximale GPS-Abstand, bei dem ein Fangversuch erfolgreich sein kann. Der
 Server vergleicht dazu die zuletzt gemeldeten Standorte von X und den Detektiven.

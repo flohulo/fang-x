@@ -1,8 +1,9 @@
 # Reveal interval
 
-**Setting in Fang X:** Reveal interval (minutes)
-**Rule parameter:** `reveal.intervalMinutes`
-**Default value:** 3 minutes
+| **Setting** | Reveal interval (minutes) |
+|---|---|
+| **Rule parameter** | `reveal.intervalMinutes` |
+| **Default** | 3 minutes |
 
 The reveal interval determines how often X's whereabouts are automatically reported to the
 detectives. Such a location report shows the detectives the last reveal on the map.
@@ -17,9 +18,10 @@ Regardless of the interval, leaving the play area can trigger a separate live lo
 
 ## First location report
 
-**Setting in Fang X:** First location report (minutes)
-**Rule parameter:** `reveal.firstRevealAfterMinutes`
-**Default value:** 3 minutes
+| **Setting** | First location report (minutes) |
+|---|---|
+| **Rule parameter** | `reveal.firstRevealAfterMinutes` |
+| **Default** | 3 minutes |
 
 The first location report follows after the head start ends. With a value of **0**, X is
 reported for the first time immediately after the head start; after that the configured interval

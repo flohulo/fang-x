@@ -1,8 +1,9 @@
 # Bonus mission for X
 
-**Setting in Fang X:** Enable bonus mission for X
-**Rule parameter:** `objective.enabled`
-**Default value:** Off
+| **Setting** | Enable bonus mission for X |
+|---|---|
+| **Rule parameter** | `objective.enabled` |
+| **Default** | Off |
 
 With the bonus mission, X can pick a secret intermediate goal in the play area during the round.
 If X gets within 50 meters of the goal, the next location report is postponed once by two

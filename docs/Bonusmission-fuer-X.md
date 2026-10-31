@@ -1,8 +1,9 @@
 # Bonusmission für X
 
-**Einstellung in Fang X:** Bonusmission für X aktivieren
-**Regelparameter:** `objective.enabled`
-**Standardwert:** Aus
+| **Einstellung** | Bonusmission für X aktivieren |
+|---|---|
+| **Regelparameter** | `objective.enabled` |
+| **Standardwert** | Aus |
 
 Mit der Bonusmission kann X während der Runde ein geheimes Zwischenziel im Spielgebiet wählen.
 Erreicht X das Ziel bis auf 50 Meter, wird die nächste Standortmeldung einmalig um zwei Minuten

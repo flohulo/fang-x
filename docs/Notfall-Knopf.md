@@ -1,8 +1,9 @@
 # Notfall-Knopf
 
-**Einstellung in Fang X:** Notfall-Knopf für X: Spiel aufgeben und Standort teilen
-**Regelparameter:** `catch.xCanSurrender`
-**Standardwert:** An
+| **Einstellung** | Notfall-Knopf für X: Spiel aufgeben und Standort teilen |
+|---|---|
+| **Regelparameter** | `catch.xCanSurrender` |
+| **Standardwert** | An |
 
 Der Notfall-Knopf ist für X während des Vorsprungs und der laufenden Runde unten in der
 Kartensteuerung sichtbar. Er beendet die Runde sofort und teilt X' exakten Standort mit den

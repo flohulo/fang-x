@@ -1,8 +1,9 @@
 # Vorsprung für X
 
-**Einstellung in Fang X:** Vorsprung (Minuten)
-**Regelparameter:** `game.headStartMinutes`
-**Standardwert:** 2 Minuten
+| **Einstellung** | Vorsprung (Minuten) |
+|---|---|
+| **Regelparameter** | `game.headStartMinutes` |
+| **Standardwert** | 2 Minuten |
 
 Der Vorsprung ist die Zeit, die X nach dem Start allein erhält. So kann X Abstand gewinnen und
 sich eine Route überlegen. Die Detektive starten am vereinbarten Treffpunkt; standardmäßig dürfen
