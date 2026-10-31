@@ -21,6 +21,6 @@
   },
   "devDependencies": {
     "prettier": "^3.9.10",
-    "ws": "^8.22.0"
+    "ws": "^8.22.1"
   }
 }
