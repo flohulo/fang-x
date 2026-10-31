@@ -331,9 +331,7 @@ export function GameScreen({
           {surrender && (
             <div className="surrender-result" role="status">
               <strong>{t("game.surrendered", { name: surrender.name })}</strong>
-              <span>
-                {surrender.pos ? t("game.surrenderLive") : t("game.surrenderNoPosition")}
-              </span>
+              <span>{surrender.pos ? t("game.surrenderLive") : t("game.surrenderNoPosition")}</span>
               {surrender.pos && (
                 <a
                   href={`https://www.openstreetmap.org/?mlat=${surrender.pos.lat}&mlon=${surrender.pos.lng}#map=17/${surrender.pos.lat}/${surrender.pos.lng}`}
@@ -391,7 +389,9 @@ export function GameScreen({
 
         <div className="map-overlay">
           <div className="map-overlay-row">
-            <span className={`phase-badge phase-${phase}`}>{t(`game.phase.${phase}`, { defaultValue: phase })}</span>
+            <span className={`phase-badge phase-${phase}`}>
+              {t(`game.phase.${phase}`, { defaultValue: phase })}
+            </span>
             {timeLeft !== null && <span className="map-timer">{formatDuration(timeLeft)}</span>}
             <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
               {isX ? t("game.youAreX") : t("game.youAreDetective")}
@@ -410,7 +410,9 @@ export function GameScreen({
             <div className="reveal-progress-head">
               <span>{t("game.nextReveal")}</span>
               <span>
-                {revealTimer.indeterminate ? t("game.soon") : formatDuration(revealRemainingMs ?? 0)}
+                {revealTimer.indeterminate
+                  ? t("game.soon")
+                  : formatDuration(revealRemainingMs ?? 0)}
               </span>
             </div>
             <div
@@ -489,7 +491,11 @@ export function GameScreen({
                 : t("game.area.none")}
             </span>
             <span className={`gps-chip${position === null ? " is-off" : ""}`}>
-              {simulated ? t("game.gps.simulation") : position ? t("game.gps.active") : t("game.gps.off")}
+              {simulated
+                ? t("game.gps.simulation")
+                : position
+                  ? t("game.gps.active")
+                  : t("game.gps.off")}
             </span>
             {isSolo && <span className="solo-chip">{t("game.solo", { code })}</span>}
           </div>
@@ -657,7 +663,11 @@ export function GameScreen({
               <h2 id="transit-dialog-title">{t("game.transitDialog.title")}</h2>
               <p>{t("game.transitDialog.text")}</p>
 
-              <div className="transit-mode-toggle" role="group" aria-label={t("game.transitDialog.mode")}>
+              <div
+                className="transit-mode-toggle"
+                role="group"
+                aria-label={t("game.transitDialog.mode")}
+              >
                 <button
                   type="button"
                   className={transitMode === "bus" ? undefined : "secondary"}

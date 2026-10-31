@@ -103,7 +103,9 @@ export function HomeScreen({
               onChange={(e) => setWantsX(e.target.checked)}
               aria-label={t("home.join.playAsXLabel")}
             />
-            <span className="role-label">{wantsX ? t("common.roleX") : t("common.roleDetective")}</span>
+            <span className="role-label">
+              {wantsX ? t("common.roleX") : t("common.roleDetective")}
+            </span>
             <span className="role-track" aria-hidden="true">
               <span className="role-knob" />
             </span>

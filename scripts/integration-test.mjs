@@ -249,7 +249,10 @@ async function run() {
   console.log("\nWarte auf Spielende...");
   const end = await det.waitFor((m) => m.t === "end", 10000);
   assert(end.winner === "DETECTIVES", `Spielende: ${end.winner} gewinnt (${end.reason})`);
-  assert(typeof end.reasonCode === "string", `Spielende trägt einen Grund-Code (${end.reasonCode})`);
+  assert(
+    typeof end.reasonCode === "string",
+    `Spielende trägt einen Grund-Code (${end.reasonCode})`,
+  );
 
   // Chat ist nach dem Spielende gesperrt
   host.ws.send(JSON.stringify({ t: "chat", text: "Nach dem Spiel" }));
@@ -319,7 +322,13 @@ async function run() {
   // Fremde Spieler-ID ohne Token darf den Platz nicht übernehmen
   const thief = await connect(code2);
   thief.ws.send(
-    JSON.stringify({ t: "join", code: code2, name: "Dieb", wantsX: false, playerId: bJoined.playerId }),
+    JSON.stringify({
+      t: "join",
+      code: code2,
+      name: "Dieb",
+      wantsX: false,
+      playerId: bJoined.playerId,
+    }),
   );
   const thiefJoined = await thief.waitFor((m) => m.t === "joined");
   assert(thiefJoined.playerId !== bJoined.playerId, "Platz lässt sich ohne Token nicht übernehmen");
@@ -447,7 +456,9 @@ async function run() {
   );
   assert(overBudget.t === "error", "Mehr Haltestellen als das Restbudget werden abgelehnt");
   assert(
-    overBudget.code === "TRANSIT_REMAINING" && overBudget.params?.mode === "bus" && overBudget.params?.count === 1,
+    overBudget.code === "TRANSIT_REMAINING" &&
+      overBudget.params?.mode === "bus" &&
+      overBudget.params?.count === 1,
     "ÖV-Restbudget-Fehler trägt Code und Parameter",
   );
   mrX.ws.send(JSON.stringify({ t: "useTransitStop", mode: "bus", count: 1 }));

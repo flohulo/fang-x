@@ -26,10 +26,13 @@ function translate(
   if (!code) return fallback;
   // Manche Meldungen hängen vom Verkehrsmittel ab (z. B. TRANSIT_EXHAUSTED_bus).
   const keys = [params?.mode ? `${prefix}.${code}_${params.mode}` : null, `${prefix}.${code}`];
-  return t(keys.filter((key): key is string => key !== null), {
-    ...params,
-    defaultValue: fallback,
-  });
+  return t(
+    keys.filter((key): key is string => key !== null),
+    {
+      ...params,
+      defaultValue: fallback,
+    },
+  );
 }
 
 export function formatServerError(t: TFunction, error: ServerError): string {

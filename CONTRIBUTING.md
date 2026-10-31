@@ -8,10 +8,13 @@ Voraussetzungen: Node.js 22 und npm.
 
 ```bash
 npm ci
+npm run format:check
 npm run typecheck
 npm run build
 npm run check:locales
 ```
+
+Der Code wird mit [Prettier](https://prettier.io/) formatiert. `npm run format` formatiert alle Dateien, `npm run format:check` prüft nur (läuft auch in der CI). Die Regeln stehen in `.prettierrc.json`, ausgenommen sind die Dateien in `.prettierignore`.
 
 Für den Integrationstest den Worker in einem Terminal starten:
 
@@ -58,7 +61,7 @@ Wer im Code arbeitet:
 - Halte Änderungen fokussiert und ergänze Tests für geändertes Verhalten.
 - Verwende für den PR-Titel Conventional Commits, z. B. `feat: bonusmission ergänzen`, `fix: fangradius korrigieren` oder `docs: spielregeln erklären`. Daraus werden Release-Art und Changelog abgeleitet. Die Beschreibung nach dem Doppelpunkt beginnt mit einem Kleinbuchstaben. Ein eigener Workflow prüft den Titel und schlägt bei ungültigem Format fehl.
 - Teile keine echten GPS-Koordinaten, privaten Spielcodes, Zugangsdaten oder persönlichen Daten.
-- Vor einem Pull Request müssen Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
+- Vor einem Pull Request müssen Formatprüfung, Typecheck und Build erfolgreich sein; bei Änderungen an Spielablauf, Server oder Protokoll soll auch der Integrationstest erfolgreich sein.
 
 ## Sicherheit und Standortdaten
 

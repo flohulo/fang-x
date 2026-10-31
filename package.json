@@ -15,9 +15,12 @@
     "build": "npm run build --workspace @fang-x/client",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:integration": "node scripts/integration-test.mjs",
-    "check:locales": "node scripts/check-locales.mjs"
+    "check:locales": "node scripts/check-locales.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "prettier": "^3.9.10",
     "ws": "^8.22.0"
   }
 }
