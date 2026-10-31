@@ -242,8 +242,10 @@
     "leftArea": "",
     "transitNotice": {
       "label": "",
-      "bus": "",
-      "train": "",
+      "bus_one": "",
+      "bus_other": "",
+      "train_one": "",
+      "train_other": "",
       "dismiss": ""
     },
     "gpsError": "",
@@ -367,8 +369,10 @@
     "TRANSIT_EXHAUSTED_bus": "",
     "TRANSIT_EXHAUSTED_train": "",
     "TRANSIT_MIN_ONE": "",
-    "TRANSIT_REMAINING_bus": "",
-    "TRANSIT_REMAINING_train": ""
+    "TRANSIT_REMAINING_bus_one": "",
+    "TRANSIT_REMAINING_bus_other": "",
+    "TRANSIT_REMAINING_train_one": "",
+    "TRANSIT_REMAINING_train_other": ""
   },
   "endReasons": {
     "TIME_UP": "",
