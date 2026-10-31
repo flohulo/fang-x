@@ -12,6 +12,7 @@ interface AppMenuProps {
   notificationPermission: AlertNotificationPermission;
   onEnableAlerts: () => void;
   onDisableAlerts: () => void;
+  onShowIntro: () => void;
   isGame: boolean;
 }
 
@@ -20,6 +21,7 @@ export function AppMenu({
   notificationPermission,
   onEnableAlerts,
   onDisableAlerts,
+  onShowIntro,
   isGame,
 }: AppMenuProps) {
   const { t } = useTranslation();
@@ -113,6 +115,16 @@ export function AppMenu({
                 <span>{t("menu.docs")}</span>
                 <span aria-hidden="true">↗</span>
               </a>
+              <button
+                type="button"
+                className="app-menu-link-button"
+                onClick={() => {
+                  setOpen(false);
+                  onShowIntro();
+                }}
+              >
+                {t("onboarding.reopen")}
+              </button>
               <a href="/changelog" onClick={() => setOpen(false)}>
                 {t("menu.changelog")}
               </a>

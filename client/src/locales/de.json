@@ -208,7 +208,10 @@
         "description": "X wählt während der Runde ein sicheres Ziel im Spielgebiet. Erreicht X es, wird die nächste Sichtung einmalig um 2 Minuten verschoben.",
         "recommendation": "Optional: Taktisches Zusatzziel für X"
       }
-    }
+    },
+    "locationNeeded": "Ohne Standortfreigabe funktionieren Karte, Sichtungen und Fang nicht.",
+    "needLocation": "Standort erlauben, um zu starten",
+    "skipLocation": "Ohne Standort fortfahren (Simulationsmodus)"
   },
   "game": {
     "phase": {
@@ -389,5 +392,49 @@
     "germanOnly": "Dieser Text ist nur auf Deutsch verfügbar und in dieser Fassung verbindlich.",
     "back": "Zurück zum Spiel",
     "changelogGermanOnly": "Der Versionsverlauf ist nur auf Deutsch verfügbar."
+  },
+  "onboarding": {
+    "progress": "Schritt {{step}} von {{total}}",
+    "welcomeTitle": "Willkommen bei Fang X",
+    "welcomeText": "Fang X ist ein GPS-Fangspiel für draussen. So läuft es ab:",
+    "welcomeCreate": "Eine Person erstellt ein Spiel und teilt den Code oder den Einladungslink.",
+    "welcomeRoles": "Alle wählen eine Rolle: X versucht zu entkommen, Detektive versuchen X zu fangen.",
+    "welcomePlay": "Auf der Karte siehst du Sichtungen und Standorte. Bleibt dabei an sicheren, öffentlichen Orten.",
+    "permissionsTitle": "Berechtigungen",
+    "permissionsText": "Damit das Spiel funktioniert, braucht Fang X zwei Freigaben. Dein Browser fragt dich jeweils kurz.",
+    "locationTitle": "Standort",
+    "locationText": "Für die Karte, die Sichtungen und den Fang wird dein Standort benötigt. Er wird nur während des Spiels verwendet.",
+    "locationAllow": "Standort erlauben",
+    "locationGranted": "Standortzugriff ist erlaubt.",
+    "locationUnsupported": "Dieses Gerät oder diese Verbindung unterstützt keine Standortfreigabe. Im Simulationsmodus kannst du trotzdem spielen.",
+    "alertsTitle": "Alarm und Benachrichtigungen",
+    "alertsText": "Du wirst per Ton, Vibration und Benachrichtigung gewarnt, wenn dein Standort geteilt wird oder X aufgibt.",
+    "alertsAllow": "Alarm und Benachrichtigungen erlauben",
+    "alertsGranted": "Alarm und Benachrichtigungen sind aktiv.",
+    "installTitle": "Als App installieren",
+    "installText": "Fang X lässt sich wie eine App auf dem Startbildschirm installieren. Das startet schneller und nutzt den ganzen Bildschirm.",
+    "installButton": "App installieren",
+    "installDone": "Fang X ist bereits als App installiert.",
+    "installIos": "Tippe im Browser auf das Teilen-Symbol und wähle \"Zum Home-Bildschirm\".",
+    "installOther": "Öffne das Browser-Menü und wähle \"App installieren\" oder \"Zum Startbildschirm hinzufügen\".",
+    "next": "Weiter",
+    "back": "Zurück",
+    "finish": "Los geht's",
+    "reopen": "Einführung erneut ansehen"
+  },
+  "locationGuide": {
+    "intro": "Der Standortzugriff ist blockiert. So gibst du ihn wieder frei:",
+    "android1": "Tippe in der Adressleiste auf das Symbol neben der Adresse (Schloss) und öffne die Website-Einstellungen.",
+    "android2": "Setze die Berechtigung \"Standort\" auf \"Zulassen\".",
+    "ios1": "Öffne Einstellungen > Datenschutz & Sicherheit > Ortungsdienste und schalte sie ein.",
+    "ios2": "Wähle dort Safari-Websites (oder Fang X, falls installiert) und stelle \"Beim Verwenden der App\" ein.",
+    "reload": "Kehre zu Fang X zurück und tippe auf \"Erneut prüfen\".",
+    "retry": "Erneut prüfen"
+  },
+  "installBanner": {
+    "label": "App installieren",
+    "text": "Installiere Fang X als App: schnellerer Start, Vollbild und zuverlässige Benachrichtigungen.",
+    "textIos": "Installiere Fang X als App: Tippe auf das Teilen-Symbol und wähle \"Zum Home-Bildschirm\". Nur so funktionieren Benachrichtigungen auf dem iPhone.",
+    "dismiss": "Nicht jetzt"
   }
 }
