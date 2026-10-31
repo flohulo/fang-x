@@ -27,6 +27,7 @@ jobs:
             build
             ci
             chore
+            i18n
             revert
           subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: Die Beschreibung nach dem Doppelpunkt soll klein beginnen.
