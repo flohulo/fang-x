@@ -67,7 +67,9 @@ export const i18nReady = i18n
   .init({
     supportedLngs: SUPPORTED_LANGUAGES,
     nonExplicitSupportedLngs: true,
-    load: "languageOnly",
+    // "all": Regionssprachen wie de-CH werden selbst geladen und fallen auf de zurück
+    // (bei "languageOnly" würde de-CH zu de gekürzt und wäre nicht auswählbar).
+    load: "all",
     // Fehlende Texte erscheinen auf Deutsch.
     fallbackLng: SOURCE_LANGUAGE,
     ns: ["translation"],
