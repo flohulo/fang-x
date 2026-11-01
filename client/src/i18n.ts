@@ -8,7 +8,7 @@ import { initReactI18next } from "react-i18next";
 
 /** Quellsprache der Texte; hier werden neue Schlüssel zuerst ergänzt. */
 export const SOURCE_LANGUAGE = "de";
-/** Rückfall für Schlüssel, die in einer Sprache noch fehlen. */
+/** Rückfall für Dokumentation und Sprachattribut; für fehlende Texte gilt die Quellsprache. */
 export const FALLBACK_LANGUAGE = "en";
 export const LANGUAGE_STORAGE_KEY = "fangx:lang";
 
@@ -70,7 +70,8 @@ export const i18nReady = i18n
     // "all": Regionssprachen wie de-CH werden selbst geladen und fallen auf de zurück
     // (bei "languageOnly" würde de-CH zu de gekürzt und wäre nicht auswählbar).
     load: "all",
-    fallbackLng: [FALLBACK_LANGUAGE, SOURCE_LANGUAGE],
+    // Fehlende Texte erscheinen auf Deutsch.
+    fallbackLng: SOURCE_LANGUAGE,
     ns: ["translation"],
     defaultNS: "translation",
     interpolation: { escapeValue: false },
