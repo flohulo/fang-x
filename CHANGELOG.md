@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.6.0...fang-x-v0.7.0) (2026-11-01)
+
+
+### Features
+
+* einführung beim ersten start mit berechtigungen und pwa-installation ([#51](https://github.com/flohulo/fang-x/issues/51)) ([a2c5de4](https://github.com/flohulo/fang-x/commit/a2c5de4037f3645f6d939e8ce74fac198989a5d4))
+* menülinks auf unterseiten verteilen ([#52](https://github.com/flohulo/fang-x/issues/52)) ([8e8cdcd](https://github.com/flohulo/fang-x/commit/8e8cdcd6173607bcdfea589f717b4b1dcfe3105b))
+
+
+### Bug Fixes
+
+* fehlende übersetzungen auf deutsch zurückfallen lassen ([#55](https://github.com/flohulo/fang-x/issues/55)) ([57b7173](https://github.com/flohulo/fang-x/commit/57b7173d146e71b3480671cf4fa9e4a0a194fe61))
+* schweizerdeutsch im sprachwähler auswählbar machen ([#54](https://github.com/flohulo/fang-x/issues/54)) ([15024ea](https://github.com/flohulo/fang-x/commit/15024ea3373dd80fef7c56cbc299b0446cdcb5d5))
+
 ## [0.6.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.5.0...fang-x-v0.6.0) (2026-10-31)
 
 
