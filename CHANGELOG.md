@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/flohulo/fang-x/compare/fang-x-v0.7.1...fang-x-v0.7.2) (2026-11-04)
+
+
+### Languages
+
+* schweizerdeutsche übersetzung vervollständigen ([#58](https://github.com/flohulo/fang-x/issues/58)) ([46ec9f5](https://github.com/flohulo/fang-x/commit/46ec9f590e3cb2c1ac963537e5e402dde6da460a))
+
 ## [0.7.1](https://github.com/flohulo/fang-x/compare/fang-x-v0.7.0...fang-x-v0.7.1) (2026-11-04)
 
 
