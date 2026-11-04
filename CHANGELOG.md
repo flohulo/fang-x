@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/flohulo/fang-x/compare/fang-x-v0.7.0...fang-x-v0.7.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* leere schweizerdeutsch-texte auf deutsch zurückfallen lassen ([#56](https://github.com/flohulo/fang-x/issues/56)) ([ab82cfd](https://github.com/flohulo/fang-x/commit/ab82cfd4296f4ab9dc4ee406c9be5937181785ab))
+
 ## [0.7.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.6.0...fang-x-v0.7.0) (2026-11-01)
 
 
