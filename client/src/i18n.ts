@@ -30,6 +30,8 @@ export const SUPPORTED_LANGUAGES: string[] = Object.keys(loaders)
 
 /** Name der Sprache in dieser Sprache selbst (z. B. "Deutsch", "English", "Français"). */
 export function languageName(code: string): string {
+  // Intl nennt de-CH "Schweizer Hochdeutsch"; gemeint ist hier Schweizerdeutsch.
+  if (code === "de-CH") return "Schweizerdeutsch";
   try {
     const name = new Intl.DisplayNames([code], { type: "language" }).of(code);
     if (name) return name.charAt(0).toLocaleUpperCase(code) + name.slice(1);
@@ -72,6 +74,8 @@ export const i18nReady = i18n
     load: "all",
     // Fehlende Texte erscheinen auf Deutsch.
     fallbackLng: SOURCE_LANGUAGE,
+    // Noch nicht übersetzte Texte (leere Strings, z. B. aus Weblate) ebenfalls auf Deutsch zeigen.
+    returnEmptyString: false,
     ns: ["translation"],
     defaultNS: "translation",
     interpolation: { escapeValue: false },
