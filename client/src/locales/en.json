@@ -347,6 +347,8 @@
     "showStreetMap": "Show street map",
     "objective": "Mission target",
     "start": "Start",
+    "pingLabel": "Ping {{index}}",
+    "pingPopup": "Ping {{index}} at {{time}}",
     "startPoint": "Starting point",
     "startPopup": "Starting point · where the round began",
     "objectiveReached": "Mission target reached",

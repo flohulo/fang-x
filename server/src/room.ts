@@ -1018,6 +1018,8 @@ export class GameRoom {
           at: now,
           index: revealIndex,
           live: false,
+          pos: reportedPos,
+          radiusMeters: radius,
         });
       }
     }

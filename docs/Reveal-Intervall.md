@@ -29,3 +29,9 @@ sofort nach dem Vorsprung zum ersten Mal gemeldet; danach gilt das eingestellte 
 
 Ein späterer erster Ping gibt X Zeit, sich zu lösen, ohne dass die Detektive sofort einen
 Anhaltspunkt haben. Ein früher erster Ping bringt die Jagd schneller in Gang.
+
+## Ping-Verlauf für X
+
+X sieht auf der eigenen Karte alle bisherigen Standortmeldungen als nummerierte Marker. Angezeigt
+wird die Position, die die Detektive erhalten haben (inklusive Versatz). Antippen eines Markers
+zeigt die Uhrzeit der Meldung.

@@ -61,3 +61,8 @@ App das Ergebnis und ihr könnt die Einstellungen der Runde als JSON-Datei expor
 Wenn X die Runde abbrechen muss, gibt es den [Notfall-Knopf](Notfall-Knopf.md): Nach einer
 Bestätigung endet das Spiel, die Detektive gewinnen und erhalten den exakten Standort von X samt
 Benachrichtigung.
+
+## Standort vor dem Start
+
+Schon während des Countdowns ("Start in …") siehst du deinen eigenen Standort auf der Karte. Dein
+Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet.
