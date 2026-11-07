@@ -12,12 +12,14 @@ concurrency:
   group: preview-pr-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+# Dependabot-PRs erhalten keine Repository- oder Environment-Secrets, daher keine Vorschau.
 jobs:
   preview:
     name: Deploy PR preview
     if: >-
       github.event.action != 'closed' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: preview
@@ -92,7 +94,8 @@ jobs:
     name: Remove closed PR preview
     if: >-
       github.event.action == 'closed' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: preview
