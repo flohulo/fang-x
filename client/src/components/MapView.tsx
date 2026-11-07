@@ -212,6 +212,8 @@ interface MapViewProps {
   playAreaRadiusMeters: number;
   players: PlayerMarker[];
   lastReveal: RevealEvent | null;
+  /** Bisherige Pings von X (nur für X selbst) — nummerierte Marker mit Radius. */
+  pingHistory?: RevealEvent[];
   objective: ObjectiveState | null;
   /** Treffpunkt/Startpunkt des Spiels — bleibt dauerhaft sichtbar. */
   startPoint: LatLng | null;
@@ -224,6 +226,7 @@ export function MapView({
   playAreaRadiusMeters,
   players,
   lastReveal,
+  pingHistory = [],
   objective,
   startPoint,
   onMapClick,
@@ -234,6 +237,7 @@ export function MapView({
   const markersRef = useRef<Map<string, Marker>>(new Map());
   const objectiveMarkerRef = useRef<Marker | null>(null);
   const startMarkerRef = useRef<Marker | null>(null);
+  const pingMarkersRef = useRef<Marker[]>([]);
   const onMapClickRef = useRef(onMapClick);
   onMapClickRef.current = onMapClick;
   const onSatelliteChangeRef = useRef(onSatelliteChange);
@@ -405,6 +409,37 @@ export function MapView({
     if (map.isStyleLoaded()) updateReveal();
     else map.on("load", updateReveal);
   }, [lastReveal]);
+
+  // Eigener Ping-Verlauf von X
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    for (const marker of pingMarkersRef.current) marker.remove();
+    pingMarkersRef.current = pingHistory.map((ping) => {
+      const el = document.createElement("div");
+      el.textContent = String(ping.index);
+      el.setAttribute("aria-label", i18n.t("map.pingLabel", { index: ping.index }));
+      el.style.width = "22px";
+      el.style.height = "22px";
+      el.style.display = "grid";
+      el.style.placeItems = "center";
+      el.style.borderRadius = "50%";
+      el.style.border = "2px solid white";
+      el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
+      el.style.background = "#ef4444";
+      el.style.color = "white";
+      el.style.fontSize = "12px";
+      el.style.fontWeight = "700";
+      const time = new Date(ping.at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return new Marker({ element: el })
+        .setLngLat([ping.pos.lng, ping.pos.lat])
+        .setPopup(new Popup().setText(i18n.t("map.pingPopup", { index: ping.index, time })))
+        .addTo(map);
+    });
+  }, [pingHistory]);
 
   // Spieler-Marker aktualisieren
   useEffect(() => {

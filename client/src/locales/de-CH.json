@@ -347,6 +347,8 @@
     "showStreetMap": "Strassecharte aazeige",
     "objective": "Missionsziel",
     "start": "Start",
+    "pingLabel": "Ping {{index}}",
+    "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",
     "startPopup": "Startpunkt · da hät d Rundi aagfange",
     "objectiveReached": "Missionsziel erreicht",

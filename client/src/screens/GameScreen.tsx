@@ -17,6 +17,7 @@ import type { GameResult, PlayerView } from "../lib/useGame";
 interface GameScreenProps {
   code: string;
   phase: string;
+  pingHistory: RevealEvent[];
   phaseEndsAt: number | null;
   playAreaCenter: LatLng | null;
   players: PlayerView[];
@@ -79,6 +80,7 @@ function formatDuration(ms: number): string {
 export function GameScreen({
   code,
   phase,
+  pingHistory,
   phaseEndsAt,
   playAreaCenter,
   players,
@@ -120,7 +122,9 @@ export function GameScreen({
 
   const me = players.find((p) => p.id === myId);
   const isX = me?.role === "X";
+  // Im Countdown läuft GPS nur lokal, damit du deinen Standort schon siehst (nichts wird gesendet).
   const trackingActive =
+    phase === "COUNTDOWN" ||
     phase === "RUNNING" ||
     (phase === "HEADSTART" && (!ruleset?.game.detectivesWaitDuringHeadStart || isX));
 
@@ -128,15 +132,17 @@ export function GameScreen({
 
   const handlePosition = useCallback(
     (pos: LatLng) => {
-      const now = Date.now();
-      const minInterval = (ruleset?.movement?.minUpdateSeconds ?? 15) * 1000;
-      if (now - lastSentRef.current >= minInterval) {
-        lastSentRef.current = now;
-        onPosition(pos);
+      if (phase !== "COUNTDOWN") {
+        const now = Date.now();
+        const minInterval = (ruleset?.movement?.minUpdateSeconds ?? 15) * 1000;
+        if (now - lastSentRef.current >= minInterval) {
+          lastSentRef.current = now;
+          onPosition(pos);
+        }
       }
       if (!mapCenter) setMapCenter(pos);
     },
-    [onPosition, mapCenter, ruleset],
+    [onPosition, mapCenter, ruleset, phase],
   );
 
   const { position, error, simulated, setSimulatedPosition, enableRealGps } = useGeolocation(
@@ -255,7 +261,7 @@ export function GameScreen({
     simulated,
     lastReveal,
     objective,
-    phaseActive: phase === "HEADSTART" || phase === "RUNNING",
+    phaseActive: phase === "COUNTDOWN" || phase === "HEADSTART" || phase === "RUNNING",
   });
   const canChooseObjective =
     phase === "RUNNING" && isX && ruleset?.objective?.enabled && objective?.status === "PENDING";
@@ -381,6 +387,7 @@ export function GameScreen({
           playAreaRadiusMeters={playAreaRadius}
           players={playerMarkers}
           lastReveal={lastReveal}
+          pingHistory={isX ? pingHistory : []}
           objective={isX ? objective : null}
           startPoint={playAreaCenter ?? ruleset?.map?.startLocation ?? null}
           onMapClick={handleMapClick}

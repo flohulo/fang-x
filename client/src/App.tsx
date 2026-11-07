@@ -473,6 +473,7 @@ export default function App() {
         myId={game.myId}
         ruleset={game.ruleset}
         lastReveal={game.lastReveal}
+        pingHistory={game.pingHistory}
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}

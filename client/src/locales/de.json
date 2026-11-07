@@ -347,6 +347,8 @@
     "showStreetMap": "Strassenkarte anzeigen",
     "objective": "Missionsziel",
     "start": "Start",
+    "pingLabel": "Ping {{index}}",
+    "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",
     "startPopup": "Startpunkt · hier begann die Runde",
     "objectiveReached": "Missionsziel erreicht",

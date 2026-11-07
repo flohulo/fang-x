@@ -64,6 +64,7 @@ export function useGame() {
     index: number;
     live: boolean;
   } | null>(null);
+  const [pingHistory, setPingHistory] = useState<RevealEvent[]>([]);
   const [objective, setObjective] = useState<ObjectiveState | null>(null);
   const [yourPositionIsShared, setYourPositionIsShared] = useState(false);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
@@ -171,6 +172,7 @@ export function useGame() {
           if (msg.phase === "LOBBY") {
             setLastReveal(null);
             setLastPositionShared(null);
+            setPingHistory([]);
             setGameResult(null);
             setYourPositionIsShared(false);
             setObjective(null);
@@ -181,6 +183,7 @@ export function useGame() {
           } else if (msg.reveals && msg.reveals.length > 0) {
             // Nach Reload/Reconnect: letzte Sichtung nachziehen.
             setLastReveal(msg.reveals[msg.reveals.length - 1]);
+            setPingHistory(msg.reveals.filter((r) => !r.isLive));
           }
           break;
         case "config":
@@ -226,6 +229,18 @@ export function useGame() {
           break;
         case "positionShared":
           setLastPositionShared({ at: msg.at, index: msg.index, live: msg.live });
+          if (!msg.live && msg.pos) {
+            const ping: RevealEvent = {
+              pos: msg.pos,
+              radiusMeters: msg.radiusMeters ?? 0,
+              at: msg.at,
+              index: msg.index,
+              isLive: false,
+            };
+            setPingHistory((current) =>
+              [...current.filter((r) => r.index !== ping.index), ping].slice(-50),
+            );
+          }
           break;
         case "objective":
           setObjective(msg.objective);
@@ -382,6 +397,7 @@ export function useGame() {
     catchPending,
     lastReveal,
     lastPositionShared,
+    pingHistory,
     objective,
     yourPositionIsShared,
     gameResult,
