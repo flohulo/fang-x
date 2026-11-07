@@ -171,6 +171,7 @@ export default function App() {
   const resumedRef = useRef(false);
   const lastAlertedPositionRef = useRef<string | null>(null);
   const surrenderNotifiedRef = useRef<string | null>(null);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const game = useGame();
@@ -395,6 +396,24 @@ export default function App() {
     setJoinError(null);
   }, [game]);
 
+  // Mitten in Lobby oder Runde nachfragen; nach Spielende direkt zurück zum Start.
+  const requestLeave = useCallback(() => {
+    if (game.gameResult) {
+      handleLeave();
+      return;
+    }
+    setLeaveDialogOpen(true);
+  }, [game.gameResult, handleLeave]);
+
+  useEffect(() => {
+    if (!leaveDialogOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setLeaveDialogOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [leaveDialogOpen]);
+
   // Nach einem Reload wieder in das laufende Spiel zurückkehren.
   useEffect(() => {
     if (!locationReady || resumedRef.current) return;
@@ -476,7 +495,7 @@ export default function App() {
         onConfigure={game.configure}
         onSetRole={game.setRole}
         onStart={game.start}
-        onLeave={handleLeave}
+        onLeave={requestLeave}
       />
     ) : (
       <GameScreen
@@ -505,7 +524,7 @@ export default function App() {
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}
-        onLeave={handleLeave}
+        onLeave={requestLeave}
       />
     );
 
@@ -525,6 +544,44 @@ export default function App() {
         isGame={Boolean(game.myId && game.phase !== "LOBBY")}
       />
       {content}
+      {leaveDialogOpen && (
+        <div
+          className="transit-dialog-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setLeaveDialogOpen(false);
+          }}
+        >
+          <section
+            className="transit-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="leave-dialog-title"
+            aria-describedby="leave-dialog-description"
+          >
+            <h2 id="leave-dialog-title">{t("app.leaveDialog.title")}</h2>
+            <p id="leave-dialog-description">
+              {game.phase === "LOBBY"
+                ? t("app.leaveDialog.textLobby")
+                : t("app.leaveDialog.textGame")}
+            </p>
+            <div className="transit-dialog-actions">
+              <button type="button" className="secondary" onClick={() => setLeaveDialogOpen(false)}>
+                {t("app.leaveDialog.stay")}
+              </button>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => {
+                  setLeaveDialogOpen(false);
+                  handleLeave();
+                }}
+              >
+                {t("app.leaveDialog.confirm")}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
       {!showOnboarding && !(game.myId && game.phase !== "LOBBY" && screen !== "home") && (
         <InstallBanner />
       )}

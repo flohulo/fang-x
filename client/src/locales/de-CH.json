@@ -58,7 +58,14 @@
     "playerName": "Spieler",
     "tooManyAttempts": "Zviel Versuech. Bitte e Minute warte.",
     "serverUnreachable": "Server nöd erreichbar.",
-    "noSuchGame": "Kei Spiel mit em Code {{code}}. Prüef de Code oder starte es neus Spiel."
+    "noSuchGame": "Kei Spiel mit em Code {{code}}. Prüef de Code oder starte es neus Spiel.",
+    "leaveDialog": {
+      "title": "Spiel verlah?",
+      "textLobby": "Du verlasch d Lobby. Mit em Code chasch wieder bitrette.",
+      "textGame": "Du verlasch di laufend Rundi. S Spiel gaht ohni dich wiiter und d Rolle oder dä Platz chönnt verlore gah.",
+      "stay": "Blibe",
+      "confirm": "Verlah"
+    }
   },
   "home": {
     "subtitle": "S GPS-Fangspiel für dusse",
