@@ -2,6 +2,7 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChangelogScreen } from "./changelog";
+import { ContributorsScreen } from "./contributors";
 import type { AlertNotificationPermission } from "./components/AlertSettings";
 import { AppMenu } from "./components/AppMenu";
 import { InstallBanner } from "./components/InstallBanner";
@@ -92,6 +93,10 @@ function isChangelogPage(): boolean {
   return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/changelog";
 }
 
+function isContributorsPage(): boolean {
+  return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/mitarbeiter";
+}
+
 function PwaUpdatePrompt() {
   const { t } = useTranslation();
   const {
@@ -162,6 +167,7 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone() && !loadSession());
   const legalPage = useMemo(readLegalPage, []);
   const changelogPage = useMemo(isChangelogPage, []);
+  const contributorsPage = useMemo(isContributorsPage, []);
   const resumedRef = useRef(false);
   const lastAlertedPositionRef = useRef<string | null>(null);
   const surrenderNotifiedRef = useRef<string | null>(null);
@@ -275,7 +281,7 @@ export default function App() {
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);
 
   useEffect(() => {
-    if (legalPage || changelogPage || !navigator.permissions) return;
+    if (legalPage || changelogPage || contributorsPage || !navigator.permissions) return;
 
     void navigator.permissions
       .query({ name: "geolocation" })
@@ -291,7 +297,7 @@ export default function App() {
       .catch((error: unknown) => {
         console.warn("Standortberechtigung konnte nicht geprüft werden:", error);
       });
-  }, [legalPage, changelogPage]);
+  }, [legalPage, changelogPage, contributorsPage]);
 
   const _requestLocationAccess = useCallback(() => {
     if (!navigator.geolocation) {
@@ -426,6 +432,15 @@ export default function App() {
     return (
       <>
         <LegalScreen page={legalPage} />
+        <PwaUpdatePrompt />
+      </>
+    );
+  }
+
+  if (contributorsPage) {
+    return (
+      <>
+        <ContributorsScreen />
         <PwaUpdatePrompt />
       </>
     );

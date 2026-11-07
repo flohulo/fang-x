@@ -2610,3 +2610,11 @@ label {
 .app-menu-back:hover {
   background: rgba(56, 189, 248, 0.24);
 }
+
+.contributors-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

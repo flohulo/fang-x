@@ -175,6 +175,9 @@ export function AppMenu({
                   <a href="/changelog" onClick={() => setOpen(false)}>
                     {t("menu.changelog")}
                   </a>
+                  <a href="/mitarbeiter" onClick={() => setOpen(false)}>
+                    {t("menu.contributors")}
+                  </a>
                   <a href="/datenschutz" onClick={() => setOpen(false)}>
                     {t("menu.privacy")}
                   </a>
