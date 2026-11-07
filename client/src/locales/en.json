@@ -15,8 +15,9 @@
     "title": "Menu",
     "settings": "Settings",
     "moreLinks": "More pages",
-    "docs": "Game rules in the manual",
+    "docs": "Manual",
     "changelog": "Changelog",
+    "contributors": "Contributors",
     "privacy": "Privacy",
     "imprint": "Legal notice",
     "translate": "Help translate",
@@ -82,6 +83,13 @@
     "privacyNote": "Your location is only sent to other players during an active game. No accounts, emails or location histories are stored.",
     "version": "Version {{version}}"
   },
+  "contributors": {
+    "title": "Contributors",
+    "intro": "People who have contributed to Fang X. The list comes from GitHub and ships with the app.",
+    "empty": "No entries yet.",
+    "count": "{{count}} contributions",
+    "github": "View on GitHub"
+  },
   "chat": {
     "title": "Chat",
     "open": "Open chat",
@@ -99,7 +107,7 @@
     "waiting": {
       "title": "Waiting for the admin",
       "text": "The admin sets the game rules and starts the round. Stay in the lobby until the game starts.",
-      "docsLink": "View game rules in the manual ↗"
+      "docsLink": "View manual ↗"
     },
     "geoUnsupported": "This browser does not support location sharing.",
     "geoDenied": "Location access denied. Allow it in the website settings.",

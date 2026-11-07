@@ -15,8 +15,9 @@
     "title": "Menü",
     "settings": "Einstellungen",
     "moreLinks": "Weitere Seiten",
-    "docs": "Spielregeln im Handbuch",
+    "docs": "Handbuch",
     "changelog": "Changelog",
+    "contributors": "Mitarbeiter",
     "privacy": "Datenschutz",
     "imprint": "Impressum",
     "translate": "Bei der Übersetzung helfen",
@@ -82,6 +83,13 @@
     "privacyNote": "Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen. Es werden keine Konten, E-Mails oder Standortverläufe gespeichert.",
     "version": "Version {{version}}"
   },
+  "contributors": {
+    "title": "Mitarbeiter",
+    "intro": "Menschen, die an Fang X mitgearbeitet haben. Die Liste stammt von GitHub und wird mit der App ausgeliefert.",
+    "empty": "Noch keine Einträge vorhanden.",
+    "count": "{{count}} Beiträge",
+    "github": "Auf GitHub ansehen"
+  },
   "chat": {
     "title": "Chat",
     "open": "Chat öffnen",
@@ -99,7 +107,7 @@
     "waiting": {
       "title": "Warte auf den Admin",
       "text": "Der Admin legt die Spielregeln fest und startet die Runde. Bleib in der Lobby, bis das Spiel gestartet wird.",
-      "docsLink": "Spielregeln im Handbuch ansehen ↗"
+      "docsLink": "Handbuch ansehen ↗"
     },
     "geoUnsupported": "Standortfreigabe wird von diesem Browser nicht unterstützt.",
     "geoDenied": "Standortzugriff abgelehnt. Erlaube ihn in den Website-Einstellungen.",
