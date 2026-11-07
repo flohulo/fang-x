@@ -57,7 +57,14 @@
     "playerName": "Player",
     "tooManyAttempts": "Too many attempts. Please wait a minute.",
     "serverUnreachable": "Server unreachable.",
-    "noSuchGame": "No game with code {{code}}. Check the code or start a new game."
+    "noSuchGame": "No game with code {{code}}. Check the code or start a new game.",
+    "leaveDialog": {
+      "title": "Leave game?",
+      "textLobby": "You are leaving the lobby. You can rejoin with the code.",
+      "textGame": "You are leaving the running round. The game continues without you and your role or spot may be lost.",
+      "stay": "Stay",
+      "confirm": "Leave"
+    }
   },
   "home": {
     "subtitle": "The GPS chase game for the outdoors",

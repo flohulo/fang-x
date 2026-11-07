@@ -57,7 +57,14 @@
     "playerName": "Spieler",
     "tooManyAttempts": "Zu viele Versuche. Bitte eine Minute warten.",
     "serverUnreachable": "Server nicht erreichbar.",
-    "noSuchGame": "Kein Spiel mit dem Code {{code}}. Prüfe den Code oder starte ein neues Spiel."
+    "noSuchGame": "Kein Spiel mit dem Code {{code}}. Prüfe den Code oder starte ein neues Spiel.",
+    "leaveDialog": {
+      "title": "Spiel verlassen?",
+      "textLobby": "Du verlässt die Lobby. Mit dem Code kannst du wieder beitreten.",
+      "textGame": "Du verlässt die laufende Runde. Das Spiel geht ohne dich weiter und X-Rolle oder Platz können verloren gehen.",
+      "stay": "Bleiben",
+      "confirm": "Verlassen"
+    }
   },
   "home": {
     "subtitle": "Das GPS-Fangspiel für draussen",
