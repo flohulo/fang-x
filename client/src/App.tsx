@@ -545,7 +545,9 @@ export default function App() {
           >
             <h2 id="leave-dialog-title">{t("app.leaveDialog.title")}</h2>
             <p id="leave-dialog-description">
-              {game.phase === "LOBBY" ? t("app.leaveDialog.textLobby") : t("app.leaveDialog.textGame")}
+              {game.phase === "LOBBY"
+                ? t("app.leaveDialog.textLobby")
+                : t("app.leaveDialog.textGame")}
             </p>
             <div className="transit-dialog-actions">
               <button type="button" className="secondary" onClick={() => setLeaveDialogOpen(false)}>
