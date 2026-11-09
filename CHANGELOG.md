@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.7.2...fang-x-v0.8.0) (2026-11-09)
+
+
+### Features
+
+* handbuch umbenennen und mitarbeiter-seite aus github ergänzen ([#64](https://github.com/flohulo/fang-x/issues/64)) ([ef16c98](https://github.com/flohulo/fang-x/commit/ef16c986abb5cd74bf9055e8a23998e63ee98910))
+* standort im countdown und ping-verlauf für x anzeigen ([#61](https://github.com/flohulo/fang-x/issues/61)) ([8148b3c](https://github.com/flohulo/fang-x/commit/8148b3c5ffeac3a5603055f6af2c8d41fb6d3c75))
+* verlassen von lobby und laufender runde bestätigen lassen ([#63](https://github.com/flohulo/fang-x/issues/63)) ([94151c5](https://github.com/flohulo/fang-x/commit/94151c5b761cbba3a2407ae29dc13e3ac0bd32f7))
+
 ## [0.7.2](https://github.com/flohulo/fang-x/compare/fang-x-v0.7.1...fang-x-v0.7.2) (2026-11-04)
 
 
