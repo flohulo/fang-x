@@ -15,8 +15,9 @@
     "title": "Menü",
     "settings": "Istelige",
     "moreLinks": "witeri site",
-    "docs": "spielräglä im Handbuech",
+    "docs": "Handbuech",
     "changelog": "Änderigsverlauf",
+    "contributors": "Mitarbeiter",
     "privacy": "Datäschutz",
     "imprint": "Imprässum",
     "translate": "Bi de Übersetzig hälfe",
@@ -57,7 +58,14 @@
     "playerName": "Spieler",
     "tooManyAttempts": "Zviel Versuech. Bitte e Minute warte.",
     "serverUnreachable": "Server nöd erreichbar.",
-    "noSuchGame": "Kei Spiel mit em Code {{code}}. Prüef de Code oder starte es neus Spiel."
+    "noSuchGame": "Kei Spiel mit em Code {{code}}. Prüef de Code oder starte es neus Spiel.",
+    "leaveDialog": {
+      "title": "Spiel verlah?",
+      "textLobby": "Du verlasch d Lobby. Mit em Code chasch wieder bitrette.",
+      "textGame": "Du verlasch di laufend Rundi. S Spiel gaht ohni dich wiiter und d Rolle oder dä Platz chönnt verlore gah.",
+      "stay": "Blibe",
+      "confirm": "Verlah"
+    }
   },
   "home": {
     "subtitle": "S GPS-Fangspiel für dusse",
@@ -82,6 +90,13 @@
     "privacyNote": "Din Standort wird nur während eme aktive Spiel a d Mitspieler übertreit. Es werded kei Konte, E-Mails oder Standortverläuf gspeicheret.",
     "version": "Version {{version}}"
   },
+  "contributors": {
+    "title": "Mitarbeiter",
+    "intro": "Lüt, wo a Fang X mitgholfe händ. D Liste chunt vo GitHub und wird mit de App uusgliferet.",
+    "empty": "Na kei Iiträg vorhande.",
+    "count": "{{count}} Biiträg",
+    "github": "Uf GitHub aaluege"
+  },
   "chat": {
     "title": "Chat",
     "open": "Chat öffnä",
@@ -99,7 +114,7 @@
     "waiting": {
       "title": "Warte uf de Admin",
       "text": "De Admin legt d Spielregle fescht und startet d Rundi. Bliib i de Lobby, bis s Spiel gstartet wird.",
-      "docsLink": "Spielregle im Handbuech aaluege ↗"
+      "docsLink": "Handbuech aaluege ↗"
     },
     "geoUnsupported": "Dä Browser unterstützt d Standortfrigab nöd.",
     "geoDenied": "Standortzuegriff abglehnt. Erlaub en i de Site-Istelige.",
@@ -347,6 +362,8 @@
     "showStreetMap": "Strassecharte aazeige",
     "objective": "Missionsziel",
     "start": "Start",
+    "pingLabel": "Ping {{index}}",
+    "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",
     "startPopup": "Startpunkt · da hät d Rundi aagfange",
     "objectiveReached": "Missionsziel erreicht",

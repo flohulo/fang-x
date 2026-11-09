@@ -15,8 +15,9 @@
     "title": "Menü",
     "settings": "Einstellungen",
     "moreLinks": "Weitere Seiten",
-    "docs": "Spielregeln im Handbuch",
+    "docs": "Handbuch",
     "changelog": "Changelog",
+    "contributors": "Mitarbeiter",
     "privacy": "Datenschutz",
     "imprint": "Impressum",
     "translate": "Bei der Übersetzung helfen",
@@ -57,7 +58,14 @@
     "playerName": "Spieler",
     "tooManyAttempts": "Zu viele Versuche. Bitte eine Minute warten.",
     "serverUnreachable": "Server nicht erreichbar.",
-    "noSuchGame": "Kein Spiel mit dem Code {{code}}. Prüfe den Code oder starte ein neues Spiel."
+    "noSuchGame": "Kein Spiel mit dem Code {{code}}. Prüfe den Code oder starte ein neues Spiel.",
+    "leaveDialog": {
+      "title": "Spiel verlassen?",
+      "textLobby": "Du verlässt die Lobby. Mit dem Code kannst du wieder beitreten.",
+      "textGame": "Du verlässt die laufende Runde. Das Spiel geht ohne dich weiter und X-Rolle oder Platz können verloren gehen.",
+      "stay": "Bleiben",
+      "confirm": "Verlassen"
+    }
   },
   "home": {
     "subtitle": "Das GPS-Fangspiel für draussen",
@@ -82,6 +90,13 @@
     "privacyNote": "Dein Standort wird nur während eines aktiven Spiels an Mitspieler übertragen. Es werden keine Konten, E-Mails oder Standortverläufe gespeichert.",
     "version": "Version {{version}}"
   },
+  "contributors": {
+    "title": "Mitarbeiter",
+    "intro": "Menschen, die an Fang X mitgearbeitet haben. Die Liste stammt von GitHub und wird mit der App ausgeliefert.",
+    "empty": "Noch keine Einträge vorhanden.",
+    "count": "{{count}} Beiträge",
+    "github": "Auf GitHub ansehen"
+  },
   "chat": {
     "title": "Chat",
     "open": "Chat öffnen",
@@ -99,7 +114,7 @@
     "waiting": {
       "title": "Warte auf den Admin",
       "text": "Der Admin legt die Spielregeln fest und startet die Runde. Bleib in der Lobby, bis das Spiel gestartet wird.",
-      "docsLink": "Spielregeln im Handbuch ansehen ↗"
+      "docsLink": "Handbuch ansehen ↗"
     },
     "geoUnsupported": "Standortfreigabe wird von diesem Browser nicht unterstützt.",
     "geoDenied": "Standortzugriff abgelehnt. Erlaube ihn in den Website-Einstellungen.",
@@ -347,6 +362,8 @@
     "showStreetMap": "Strassenkarte anzeigen",
     "objective": "Missionsziel",
     "start": "Start",
+    "pingLabel": "Ping {{index}}",
+    "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",
     "startPopup": "Startpunkt · hier begann die Runde",
     "objectiveReached": "Missionsziel erreicht",

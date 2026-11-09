@@ -132,7 +132,15 @@ export type ServerMessage =
   | { t: "catchPending"; pending: boolean }
   | { t: "playerPosition"; playerId: string; pos: LatLng | null }
   | { t: "reveal"; reveal: RevealEvent }
-  | { t: "positionShared"; at: number; index: number; live: boolean }
+  | {
+      t: "positionShared";
+      at: number;
+      index: number;
+      live: boolean;
+      /** Gemeldete Position der Sichtung (nur an X) — für den eigenen Ping-Verlauf. */
+      pos?: LatLng;
+      radiusMeters?: number;
+    }
   | {
       t: "objective";
       objective: ObjectiveState | null;

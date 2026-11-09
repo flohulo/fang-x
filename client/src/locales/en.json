@@ -15,8 +15,9 @@
     "title": "Menu",
     "settings": "Settings",
     "moreLinks": "More pages",
-    "docs": "Game rules in the manual",
+    "docs": "Manual",
     "changelog": "Changelog",
+    "contributors": "Contributors",
     "privacy": "Privacy",
     "imprint": "Legal notice",
     "translate": "Help translate",
@@ -57,7 +58,14 @@
     "playerName": "Player",
     "tooManyAttempts": "Too many attempts. Please wait a minute.",
     "serverUnreachable": "Server unreachable.",
-    "noSuchGame": "No game with code {{code}}. Check the code or start a new game."
+    "noSuchGame": "No game with code {{code}}. Check the code or start a new game.",
+    "leaveDialog": {
+      "title": "Leave game?",
+      "textLobby": "You are leaving the lobby. You can rejoin with the code.",
+      "textGame": "You are leaving the running round. The game continues without you and your role or spot may be lost.",
+      "stay": "Stay",
+      "confirm": "Leave"
+    }
   },
   "home": {
     "subtitle": "The GPS chase game for the outdoors",
@@ -82,6 +90,13 @@
     "privacyNote": "Your location is only sent to other players during an active game. No accounts, emails or location histories are stored.",
     "version": "Version {{version}}"
   },
+  "contributors": {
+    "title": "Contributors",
+    "intro": "People who have contributed to Fang X. The list comes from GitHub and ships with the app.",
+    "empty": "No entries yet.",
+    "count": "{{count}} contributions",
+    "github": "View on GitHub"
+  },
   "chat": {
     "title": "Chat",
     "open": "Open chat",
@@ -99,7 +114,7 @@
     "waiting": {
       "title": "Waiting for the admin",
       "text": "The admin sets the game rules and starts the round. Stay in the lobby until the game starts.",
-      "docsLink": "View game rules in the manual ↗"
+      "docsLink": "View manual ↗"
     },
     "geoUnsupported": "This browser does not support location sharing.",
     "geoDenied": "Location access denied. Allow it in the website settings.",
@@ -347,6 +362,8 @@
     "showStreetMap": "Show street map",
     "objective": "Mission target",
     "start": "Start",
+    "pingLabel": "Ping {{index}}",
+    "pingPopup": "Ping {{index}} at {{time}}",
     "startPoint": "Starting point",
     "startPopup": "Starting point · where the round began",
     "objectiveReached": "Mission target reached",

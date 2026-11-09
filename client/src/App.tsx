@@ -2,6 +2,7 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChangelogScreen } from "./changelog";
+import { ContributorsScreen } from "./contributors";
 import type { AlertNotificationPermission } from "./components/AlertSettings";
 import { AppMenu } from "./components/AppMenu";
 import { InstallBanner } from "./components/InstallBanner";
@@ -92,6 +93,10 @@ function isChangelogPage(): boolean {
   return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/changelog";
 }
 
+function isContributorsPage(): boolean {
+  return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/mitarbeiter";
+}
+
 function PwaUpdatePrompt() {
   const { t } = useTranslation();
   const {
@@ -162,9 +167,11 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone() && !loadSession());
   const legalPage = useMemo(readLegalPage, []);
   const changelogPage = useMemo(isChangelogPage, []);
+  const contributorsPage = useMemo(isContributorsPage, []);
   const resumedRef = useRef(false);
   const lastAlertedPositionRef = useRef<string | null>(null);
   const surrenderNotifiedRef = useRef<string | null>(null);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const game = useGame();
@@ -275,7 +282,7 @@ export default function App() {
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);
 
   useEffect(() => {
-    if (legalPage || changelogPage || !navigator.permissions) return;
+    if (legalPage || changelogPage || contributorsPage || !navigator.permissions) return;
 
     void navigator.permissions
       .query({ name: "geolocation" })
@@ -291,7 +298,7 @@ export default function App() {
       .catch((error: unknown) => {
         console.warn("Standortberechtigung konnte nicht geprüft werden:", error);
       });
-  }, [legalPage, changelogPage]);
+  }, [legalPage, changelogPage, contributorsPage]);
 
   const _requestLocationAccess = useCallback(() => {
     if (!navigator.geolocation) {
@@ -389,6 +396,24 @@ export default function App() {
     setJoinError(null);
   }, [game]);
 
+  // Mitten in Lobby oder Runde nachfragen; nach Spielende direkt zurück zum Start.
+  const requestLeave = useCallback(() => {
+    if (game.gameResult) {
+      handleLeave();
+      return;
+    }
+    setLeaveDialogOpen(true);
+  }, [game.gameResult, handleLeave]);
+
+  useEffect(() => {
+    if (!leaveDialogOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setLeaveDialogOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [leaveDialogOpen]);
+
   // Nach einem Reload wieder in das laufende Spiel zurückkehren.
   useEffect(() => {
     if (!locationReady || resumedRef.current) return;
@@ -431,6 +456,15 @@ export default function App() {
     );
   }
 
+  if (contributorsPage) {
+    return (
+      <>
+        <ContributorsScreen />
+        <PwaUpdatePrompt />
+      </>
+    );
+  }
+
   if (changelogPage) {
     return (
       <>
@@ -461,7 +495,7 @@ export default function App() {
         onConfigure={game.configure}
         onSetRole={game.setRole}
         onStart={game.start}
-        onLeave={handleLeave}
+        onLeave={requestLeave}
       />
     ) : (
       <GameScreen
@@ -473,6 +507,7 @@ export default function App() {
         myId={game.myId}
         ruleset={game.ruleset}
         lastReveal={game.lastReveal}
+        pingHistory={game.pingHistory}
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
@@ -489,7 +524,7 @@ export default function App() {
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}
-        onLeave={handleLeave}
+        onLeave={requestLeave}
       />
     );
 
@@ -509,6 +544,44 @@ export default function App() {
         isGame={Boolean(game.myId && game.phase !== "LOBBY")}
       />
       {content}
+      {leaveDialogOpen && (
+        <div
+          className="transit-dialog-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setLeaveDialogOpen(false);
+          }}
+        >
+          <section
+            className="transit-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="leave-dialog-title"
+            aria-describedby="leave-dialog-description"
+          >
+            <h2 id="leave-dialog-title">{t("app.leaveDialog.title")}</h2>
+            <p id="leave-dialog-description">
+              {game.phase === "LOBBY"
+                ? t("app.leaveDialog.textLobby")
+                : t("app.leaveDialog.textGame")}
+            </p>
+            <div className="transit-dialog-actions">
+              <button type="button" className="secondary" onClick={() => setLeaveDialogOpen(false)}>
+                {t("app.leaveDialog.stay")}
+              </button>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => {
+                  setLeaveDialogOpen(false);
+                  handleLeave();
+                }}
+              >
+                {t("app.leaveDialog.confirm")}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
       {!showOnboarding && !(game.myId && game.phase !== "LOBBY" && screen !== "home") && (
         <InstallBanner />
       )}

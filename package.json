@@ -15,6 +15,7 @@
     "build": "npm run build --workspace @fang-x/client",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:integration": "node scripts/integration-test.mjs",
+    "update:contributors": "node scripts/update-contributors.mjs",
     "check:locales": "node scripts/check-locales.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
