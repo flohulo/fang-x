@@ -19,6 +19,7 @@ import {
   type ClientMessage,
   DEFAULT_RULESET,
   distanceMeters,
+  type GameStats,
   isInsidePlayArea,
   jitterPoint,
   type LatLng,
@@ -75,6 +76,10 @@ const CHAT_WINDOW_MS = 5_000;
 const TICK_FAST_MS = 1_000;
 const TICK_IDLE_MS = 5_000;
 
+/** Auswertung: GPS-Rauschen unter 5 m zählt nicht, Sprünge über 400 m werden ignoriert. */
+const STAT_MIN_STEP_METERS = 5;
+const STAT_MAX_STEP_METERS = 400;
+
 const STATE_KEY = "room";
 
 interface Player {
@@ -92,6 +97,10 @@ interface Player {
   disconnectedAt: number | null;
   position: LatLng | null;
   lastPositionAt: number;
+  /** Summe der zurückgelegten Strecke für die Auswertung (kein Verlauf). */
+  distanceMeters: number;
+  /** Zuletzt für die Strecke gewertete Position; nur im Arbeitsspeicher. */
+  statPos: LatLng | null;
 }
 
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
@@ -123,6 +132,7 @@ interface RoomSnapshot {
     wantsX: boolean;
     color: string;
     token?: string | null;
+    distanceMeters?: number;
   }>;
   ruleset: Ruleset;
   phaseEndsAt: number | null;
@@ -138,6 +148,8 @@ interface RoomSnapshot {
   endDetail?: EndDetail | null;
   surrender?: SurrenderInfo | null;
   transitStops?: { bus: number; train: number };
+  closestApproachMeters?: number | null;
+  stats?: GameStats | null;
   catchPending?: boolean;
   nextPlayerId: number;
   updatedAt: number;
@@ -169,6 +181,8 @@ export class GameRoom {
   private endDetail: EndDetail | null = null;
   private surrenderInfo: SurrenderInfo | null = null;
   private transitStops = { bus: 0, train: 0 };
+  private closestApproachMeters: number | null = null;
+  private endStats: GameStats | null = null;
   private chatMessages: ChatMessage[] = [];
   private nextChatMessageId = 1;
   private catchPending = false;
@@ -229,6 +243,7 @@ export class GameRoom {
         wantsX: p.wantsX,
         color: p.color,
         token: p.token,
+        distanceMeters: Math.round(p.distanceMeters),
       })),
       ruleset: this.ruleset,
       phaseEndsAt: this.phaseEndsAt,
@@ -250,6 +265,8 @@ export class GameRoom {
       endDetail: this.endDetail,
       surrender: this.surrenderInfo,
       transitStops: this.transitStops,
+      closestApproachMeters: this.closestApproachMeters,
+      stats: this.endStats,
       catchPending: this.catchPending,
       nextPlayerId: this.nextPlayerId,
       updatedAt: Date.now(),
@@ -295,6 +312,8 @@ export class GameRoom {
     this.endDetail = snap.endDetail ?? null;
     this.surrenderInfo = snap.surrender ?? null;
     this.transitStops = snap.transitStops ?? { bus: 0, train: 0 };
+    this.closestApproachMeters = snap.closestApproachMeters ?? null;
+    this.endStats = snap.stats ?? null;
     this.catchPending = snap.catchPending ?? false;
     this.nextPlayerId = Math.max(1, snap.nextPlayerId);
     this.lastActiveAt = snap.updatedAt;
@@ -310,6 +329,8 @@ export class GameRoom {
         disconnectedAt: now,
         position: null,
         lastPositionAt: 0,
+        distanceMeters: p.distanceMeters ?? 0,
+        statPos: null,
       });
     }
 
@@ -579,6 +600,7 @@ export class GameRoom {
                 ? { reasonCode: this.endDetail.code, reasonParams: this.endDetail.params }
                 : {}),
               players: this.getPlayerInfos(),
+              ...(this.endStats ? { stats: this.endStats } : {}),
               ...(this.surrenderInfo ? { surrender: this.surrenderInfo } : {}),
             });
           }
@@ -699,6 +721,7 @@ export class GameRoom {
           if (!isValidPosition(msg.pos)) return;
           player.position = msg.pos;
           player.lastPositionAt = Date.now();
+          this.trackStats(player, msg.pos);
           this.lastActiveAt = player.lastPositionAt;
           // Spielgebiet einmalig auf die Startposition von X festlegen, damit der
           // Kreis nicht mit X mitwandert.
@@ -761,6 +784,8 @@ export class GameRoom {
       disconnectedAt: null,
       position: null,
       lastPositionAt: 0,
+      distanceMeters: 0,
+      statPos: null,
     };
     this.players.set(id, player);
     return player;
@@ -872,6 +897,12 @@ export class GameRoom {
     this.nextRevealAt = null;
     this.xPositions.length = 0;
     this.transitStops = { bus: 0, train: 0 };
+    this.closestApproachMeters = null;
+    this.endStats = null;
+    for (const p of this.players.values()) {
+      p.distanceMeters = 0;
+      p.statPos = null;
+    }
     this.catchPending = false;
     this.broadcast({ t: "transitStops", ...this.transitStops });
     this.broadcast({ t: "catchPending", pending: false });
@@ -1325,6 +1356,50 @@ export class GameRoom {
     );
   }
 
+  /** Zählt Strecke und geringsten Abstand mit — als reine Summen, ohne Verlauf. */
+  private trackStats(player: Player, pos: LatLng) {
+    if (this.phase !== "RUNNING") return;
+    if (player.statPos === null) {
+      player.statPos = pos;
+    } else {
+      const step = distanceMeters(player.statPos, pos);
+      if (step >= STAT_MIN_STEP_METERS) {
+        if (step <= STAT_MAX_STEP_METERS) player.distanceMeters += step;
+        player.statPos = pos;
+      }
+    }
+    const others = [...this.players.values()].filter(
+      (o) => o.position && (player.role === "X" ? o.role !== "X" : o.role === "X"),
+    );
+    for (const other of others) {
+      if (!other.position) continue;
+      const gap = Math.round(distanceMeters(pos, other.position));
+      if (this.closestApproachMeters === null || gap < this.closestApproachMeters) {
+        this.closestApproachMeters = gap;
+      }
+    }
+  }
+
+  private buildStats(): GameStats {
+    const now = Date.now();
+    const end = this.phaseEndsAt === null ? now : Math.min(now, this.phaseEndsAt);
+    const running = this.phase === "RUNNING" && this.gameStartedAt !== null;
+    return {
+      durationSeconds: running
+        ? Math.max(0, Math.round((end - (this.gameStartedAt ?? end)) / 1000))
+        : 0,
+      revealCount: this.lastRevealIndex,
+      closestApproachMeters: this.closestApproachMeters,
+      players: [...this.players.values()].map((p) => ({
+        playerId: p.id,
+        name: p.name,
+        color: p.color,
+        role: p.role,
+        distanceMeters: Math.round(p.distanceMeters),
+      })),
+    };
+  }
+
   private endGame(
     winner: "X" | "DETECTIVES",
     reason: string,
@@ -1332,6 +1407,7 @@ export class GameRoom {
     detail?: EndDetail,
   ) {
     this.surrenderInfo = surrender ?? null;
+    this.endStats = this.buildStats();
     this.phase = "ENDED";
     this.objective = null;
     this.winner = winner;
@@ -1350,6 +1426,7 @@ export class GameRoom {
       reason,
       ...(detail ? { reasonCode: detail.code, reasonParams: detail.params } : {}),
       players: this.getPlayerInfos(),
+      ...(this.endStats ? { stats: this.endStats } : {}),
       ...(surrender ? { surrender } : {}),
     });
     this.playAreaCenter = null;
@@ -1359,6 +1436,7 @@ export class GameRoom {
     };
     for (const player of this.players.values()) {
       player.position = null;
+      player.statPos = null;
     }
     this.xPositions.length = 0;
     this.broadcastPhase();

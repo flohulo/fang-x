@@ -259,6 +259,14 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "stats": {
+      "title": "Round summary",
+      "duration": "Play time",
+      "reveals": "Reveals",
+      "closest": "Closest approach",
+      "farthest": "Walked the farthest",
+      "roleX": "X"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",

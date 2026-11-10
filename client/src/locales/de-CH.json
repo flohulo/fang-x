@@ -255,6 +255,14 @@
     "surrenderLive": "De exakt Live-Standort isch a d Detektivä übertreit worde.",
     "surrenderNoPosition": "Es Standort isch nöd verfüegbar gsi.",
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
+    "stats": {
+      "title": "Uswärtig",
+      "duration": "Spielziit",
+      "reveals": "Sichtige",
+      "closest": "Chnappste Abstand",
+      "farthest": "Am wiitischte glaufe",
+      "roleX": "X"
+    },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
     "settingsExported": "Istelige exportiert ✓",
