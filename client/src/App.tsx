@@ -11,6 +11,7 @@ import i18n from "./i18n";
 import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
 import { formatServerError } from "./lib/serverMessages";
+import { ensureHumanTicket, fetchWithTicket } from "./lib/humanCheck";
 import { clearSession, loadSession, saveSession } from "./lib/session";
 import { useGame } from "./lib/useGame";
 import { GameScreen } from "./screens/GameScreen";
@@ -212,6 +213,11 @@ export default function App() {
     }
   }, []);
 
+  // Menschen-Prüfung beim Öffnen der Seite unsichtbar im Hintergrund erledigen.
+  useEffect(() => {
+    void ensureHumanTicket();
+  }, []);
+
   useEffect(() => {
     if (!alertsEnabled) return;
     const unlockAudio = () => {
@@ -336,7 +342,7 @@ export default function App() {
       setJoinError(null);
       setCheckingCode(true);
       try {
-        const res = await fetch("/api/games", { method: "POST" });
+        const res = await fetchWithTicket("/api/games", { method: "POST" });
         if (res.status === 429) {
           throw new Error(t("app.tooManyGames"));
         }
@@ -363,7 +369,7 @@ export default function App() {
       try {
         // Vor dem Beitritt prüfen, ob es den Code gibt – sonst würde ein
         // Tippfehler still einen neuen, leeren Raum erzeugen.
-        const res = await fetch(`/api/games/${encodeURIComponent(code)}`);
+        const res = await fetchWithTicket(`/api/games/${encodeURIComponent(code)}`);
         if (res.status === 429) {
           throw new Error(t("app.tooManyAttempts"));
         }
@@ -424,7 +430,7 @@ export default function App() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/games/${encodeURIComponent(saved.code)}`);
+        const res = await fetchWithTicket(`/api/games/${encodeURIComponent(saved.code)}`);
         if (!res.ok) return;
         const { exists } = (await res.json()) as { exists: boolean };
         if (!exists) {

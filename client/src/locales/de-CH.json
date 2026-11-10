@@ -378,6 +378,8 @@
     "LOBBY_ONLY": "Konfiguration nur i de Lobby.",
     "INVALID_START_POINT": "De Startpunkt isch ungültig.",
     "CHAT_RATE_LIMIT": "Bitte langsamer schribe.",
+    "HUMAN_CHECK_REQUIRED": "Bitte bestätig zuerst, dass du en Mönsch bisch. Lad d Site neu und probier's nomal.",
+    "ABUSE_DISCONNECT": "D Verbindig isch wäg zvil fählerhafte Aafrage trennt worde. Lad d Site neu, zum wieder biträte.",
     "NEED_X": "Für de Start bruucht es mindestens es X.",
     "REVEAL_DEFERRED": "Standort-Ping verschobe: s X-GPS isch grad nöd verfüegbar.",
     "OUT_OF_BOUNDS_WARNING": "Du bisch usserhalb vom Spielgebiet – chum sofort zrugg.",

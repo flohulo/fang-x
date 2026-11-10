@@ -2,13 +2,23 @@
 // Statische Assets (Client-PWA) + HTTP-Routen fürs Spielraum-Matchmaking.
 // Die eigentliche Spiellogik lebt in der GameRoom-Durable-Object.
 
+import {
+  createChallenge,
+  humanCheckEnabled,
+  redeemChallenge,
+  requireTicket,
+  TICKET_TTL_MS,
+} from "./human-check";
 import { RateLimiter } from "./rate-limit";
 import { GameRoom } from "./room";
+import { HUMAN_CHECK_DIFFICULTY_BITS } from "@fang-x/shared";
 
 export interface Env {
   GAME_ROOM: DurableObjectNamespace;
   RATE_LIMIT: DurableObjectNamespace;
   ASSETS: Fetcher;
+  /** Signaturschlüssel der Menschen-Prüfung (wrangler secret). Ohne ihn ist sie aus. */
+  HUMAN_CHECK_SECRET?: string;
 }
 
 // 6-Buchstaben-Code ohne mehrdeutige Zeichen (kein I, O, 0, 1)
@@ -20,6 +30,10 @@ const CREATE_LIMIT = 10;
 const CREATE_WINDOW_MS = 10 * 60_000;
 const LOOKUP_LIMIT = 60;
 const LOOKUP_WINDOW_MS = 60_000;
+const VERIFY_LIMIT = 30;
+const VERIFY_WINDOW_MS = 10 * 60_000;
+const JOIN_LIMIT = 100;
+const JOIN_WINDOW_MS = 10 * 60_000;
 
 function generateCode(): string {
   const bytes = new Uint8Array(CODE_LENGTH);
@@ -74,8 +88,50 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // Menschen-Prüfung: Aufgabe holen und Lösung gegen ein Ticket tauschen.
+    if (url.pathname === "/api/challenge" && request.method === "GET") {
+      if (!humanCheckEnabled(env)) {
+        return Response.json({ enabled: false }, { headers: NO_STORE });
+      }
+      const limited = await checkRateLimit(env, request, "verify", VERIFY_LIMIT, VERIFY_WINDOW_MS);
+      if (limited) return limited;
+      return Response.json(
+        {
+          enabled: true,
+          challenge: await createChallenge(env),
+          difficulty: HUMAN_CHECK_DIFFICULTY_BITS,
+        },
+        { headers: NO_STORE },
+      );
+    }
+
+    if (url.pathname === "/api/verify" && request.method === "POST") {
+      if (!humanCheckEnabled(env)) {
+        return Response.json({ enabled: false }, { headers: NO_STORE });
+      }
+      const limited = await checkRateLimit(env, request, "verify", VERIFY_LIMIT, VERIFY_WINDOW_MS);
+      if (limited) return limited;
+      const body = (await request.json().catch(() => null)) as {
+        challenge?: unknown;
+        solution?: unknown;
+      } | null;
+      const ticket = await redeemChallenge(env, body?.challenge, body?.solution);
+      if (!ticket) {
+        return Response.json(
+          { error: "Die Prüfung ist fehlgeschlagen. Bitte versuche es erneut." },
+          { status: 400, headers: NO_STORE },
+        );
+      }
+      return Response.json(
+        { enabled: true, ticket, expiresInMs: TICKET_TTL_MS },
+        { headers: NO_STORE },
+      );
+    }
+
     // Neues Spiel anlegen → liefert Spiel-Code
     if (url.pathname === "/api/games" && request.method === "POST") {
+      const unverified = await requireTicket(env, request);
+      if (unverified) return unverified;
       const limited = await checkRateLimit(env, request, "create", CREATE_LIMIT, CREATE_WINDOW_MS);
       if (limited) return limited;
 
@@ -104,6 +160,8 @@ export default {
     // damit ein Tippfehler eine klare Meldung gibt statt einen leeren Raum.
     const codeCheck = url.pathname.match(/^\/api\/games\/([A-Z0-9]{6})$/);
     if (codeCheck && request.method === "GET") {
+      const unverified = await requireTicket(env, request);
+      if (unverified) return unverified;
       const limited = await checkRateLimit(env, request, "lookup", LOOKUP_LIMIT, LOOKUP_WINDOW_MS);
       if (limited) return limited;
 
@@ -123,6 +181,10 @@ export default {
     const roomMatch = url.pathname.match(/^\/room\/([A-Z0-9]{6})$/);
     if (roomMatch && request.headers.get("Upgrade") === "websocket") {
       // WebSocket-Upgrade für den Spiel-Raum
+      const unverified = await requireTicket(env, request);
+      if (unverified) return unverified;
+      const limited = await checkRateLimit(env, request, "join", JOIN_LIMIT, JOIN_WINDOW_MS);
+      if (limited) return limited;
       const code = roomMatch[1];
       const id = env.GAME_ROOM.idFromName(code);
       const stub = env.GAME_ROOM.get(id);

@@ -382,6 +382,8 @@
     "LOBBY_ONLY": "Konfiguration nur in der Lobby.",
     "INVALID_START_POINT": "Der Startpunkt ist ungültig.",
     "CHAT_RATE_LIMIT": "Bitte langsamer schreiben.",
+    "HUMAN_CHECK_REQUIRED": "Bitte bestätige zuerst, dass du ein Mensch bist. Lade die Seite neu und versuche es erneut.",
+    "ABUSE_DISCONNECT": "Die Verbindung wurde wegen zu vieler fehlerhafter Anfragen getrennt. Lade die Seite neu, um wieder beizutreten.",
     "NEED_X": "Für den Start braucht es mindestens ein X.",
     "REVEAL_DEFERRED": "Standort-Ping verschoben: X-GPS ist gerade nicht verfügbar.",
     "OUT_OF_BOUNDS_WARNING": "Du bist ausserhalb des Spielgebiets – kehre sofort zurück.",

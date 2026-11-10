@@ -60,6 +60,24 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
 - Spielt rücksichtsvoll: Bleibt an sicheren, öffentlichen Orten, achtet auf den Verkehr und
   respektiert die Privatsphäre anderer.
 
+### Spam-Schutz
+
+Beim Öffnen der Seite löst der Browser unsichtbar eine kleine Rechenaufgabe (Proof-of-Work).
+Der Server stellt dafür ein signiertes Ticket aus, das für das Erstellen, Abfragen und Beitreten
+von Räumen nötig ist. Es gibt keine Cookies, keine Konten und keinen externen Dienst. Zusätzlich
+gelten Limits pro IP-Adresse (Raum erstellen, Raum abfragen, Beitritt). Wer eine Verbindung mit
+fehlerhaften Nachrichten oder Chat-Spam flutet, wird getrennt.
+
+Für den Betrieb den Signaturschlüssel einmalig setzen:
+
+```bash
+cd server
+npx wrangler secret put HUMAN_CHECK_SECRET
+```
+
+Ohne diesen Schlüssel ist die Prüfung ausgeschaltet. Das ist für die lokale Entwicklung gedacht.
+Lokal einschalten geht mit `npx wrangler dev --var HUMAN_CHECK_SECRET:irgendein-text`.
+
 ### Kartendaten
 
 Für Karten nutzt Fang X [OpenFreeMap](https://openfreemap.org/) auf Basis von

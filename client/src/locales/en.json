@@ -382,6 +382,8 @@
     "LOBBY_ONLY": "Settings can only be changed in the lobby.",
     "INVALID_START_POINT": "The starting point is invalid.",
     "CHAT_RATE_LIMIT": "Please write more slowly.",
+    "HUMAN_CHECK_REQUIRED": "Please confirm that you are human first. Reload the page and try again.",
+    "ABUSE_DISCONNECT": "The connection was closed because of too many invalid requests. Reload the page to rejoin.",
     "NEED_X": "At least one X is needed to start.",
     "REVEAL_DEFERRED": "Location ping postponed: X's GPS is currently unavailable.",
     "OUT_OF_BOUNDS_WARNING": "You are outside the play area – return immediately.",

@@ -9,7 +9,9 @@ import type {
   Ruleset,
   ServerMessage,
 } from "@fang-x/shared";
+import { HUMAN_TICKET_PARAM, WS_CLOSE_ABUSE } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
+import { cachedHumanTicket, ensureHumanTicket } from "./humanCheck";
 import type { ServerError } from "./serverMessages";
 import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
 
@@ -103,7 +105,11 @@ export function useGame() {
     retryTimerRef.current = window.setTimeout(() => {
       retryTimerRef.current = null;
       if (intentionalRef.current) return;
-      connectRef.current(session);
+      // Ticket vorab erneuern, falls es inzwischen abgelaufen ist.
+      void ensureHumanTicket().then(() => {
+        if (intentionalRef.current || sessionRef.current !== session) return;
+        connectRef.current(session);
+      });
     }, delay);
   };
 
@@ -111,7 +117,9 @@ export function useGame() {
     clearRetryTimer();
 
     const proto = location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}`);
+    const ticket = cachedHumanTicket();
+    const query = ticket ? `?${HUMAN_TICKET_PARAM}=${encodeURIComponent(ticket)}` : "";
+    const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}${query}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -274,13 +282,19 @@ export function useGame() {
       }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       // Ein bereits ersetzter Socket (z. B. durch einen neuen Beitritt) darf
       // keinen Reconnect für die aktuelle Verbindung auslösen.
       if (wsRef.current !== ws) return;
       wsRef.current = null;
       setConnected(false);
       if (intentionalRef.current) return;
+      // Der Server hat wegen Missbrauchs getrennt: nicht sofort wieder verbinden.
+      if (event.code === WS_CLOSE_ABUSE) {
+        intentionalRef.current = true;
+        setReconnecting(false);
+        return;
+      }
       // Ungeplant getrennt — Platz bleibt serverseitig frei, wir versuchen es erneut.
       scheduleReconnect();
     };
