@@ -123,6 +123,11 @@
     "codeLabel": "Game code",
     "shareInvite": "Share invitation",
     "linkCopied": "Link copied ✓",
+    "showQr": "Show QR code",
+    "hideQr": "Hide QR code",
+    "qrAlt": "QR code to join game {{code}}",
+    "qrHint": "Others scan the code with their camera and join right away.",
+    "qrFailed": "The QR code could not be created. Share the link or the code.",
     "copyCode": "Copy code only",
     "codeCopied": "Code copied ✓",
     "myPlayer": "My player",
@@ -258,6 +263,14 @@
       "suspect": "Mark suspect",
       "clear": "Mark not here",
       "cancel": "Cancel marking"
+    },
+    "stats": {
+      "title": "Round summary",
+      "duration": "Play time",
+      "reveals": "Reveals",
+      "closest": "Closest approach",
+      "farthest": "Walked the farthest",
+      "roleX": "X"
     },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",

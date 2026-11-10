@@ -123,6 +123,11 @@
     "codeLabel": "Spiel-Code",
     "shareInvite": "Einladung teilen",
     "linkCopied": "Link kopiert ✓",
+    "showQr": "QR-Code anzeigen",
+    "hideQr": "QR-Code ausblenden",
+    "qrAlt": "QR-Code für den Beitritt zum Spiel {{code}}",
+    "qrHint": "Andere scannen den Code mit der Kamera und treten direkt bei.",
+    "qrFailed": "Der QR-Code konnte nicht erzeugt werden. Teile den Link oder den Code.",
     "copyCode": "Nur Code kopieren",
     "codeCopied": "Code kopiert ✓",
     "myPlayer": "Mein Spieler",
@@ -258,6 +263,14 @@
       "suspect": "Verdacht markieren",
       "clear": "Hier nicht markieren",
       "cancel": "Markieren abbrechen"
+    },
+    "stats": {
+      "title": "Auswertung",
+      "duration": "Spielzeit",
+      "reveals": "Sichtungen",
+      "closest": "Knappster Abstand",
+      "farthest": "Am weitesten gelaufen",
+      "roleX": "X"
     },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",

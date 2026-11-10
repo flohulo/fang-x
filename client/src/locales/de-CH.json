@@ -123,6 +123,11 @@
     "codeLabel": "Spiel-Code",
     "shareInvite": "Iladig teile",
     "linkCopied": "Link kopiert ✓",
+    "showQr": "QR-Code aazeige",
+    "hideQr": "QR-Code usblände",
+    "qrAlt": "QR-Code zum Biitritt is Spiel {{code}}",
+    "qrHint": "Anderi scanned de Code mit de Kamera und träted direkt bi.",
+    "qrFailed": "De QR-Code het nöd chöne erzügt werde. Teil de Link oder de Code.",
     "copyCode": "Nur Code kopiere",
     "codeCopied": "Code kopiert ✓",
     "myPlayer": "Min Spieler",
@@ -254,6 +259,14 @@
       "suspect": "Verdacht markiere",
       "clear": "Da nöd markiere",
       "cancel": "Markiere abbräche"
+    },
+    "stats": {
+      "title": "Uswärtig",
+      "duration": "Spielziit",
+      "reveals": "Sichtige",
+      "closest": "Chnappste Abstand",
+      "farthest": "Am wiitischte glaufe",
+      "roleX": "X"
     },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
