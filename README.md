@@ -46,6 +46,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
 - **Akku-Warnung:** Wird bei jemandem der Akku knapp, erfahren es alle (nur in Chromium-basierten
   Browsern).
+- **Auswertung:** Am Ende zeigt die App Spielzeit, Sichtungen, knappsten Abstand und die
+  gelaufene Strecke pro Person. Gespeichert werden nur Summen, kein Routenverlauf.
 
 ## Datenschutz und sicher spielen
 

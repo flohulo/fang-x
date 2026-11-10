@@ -261,6 +261,14 @@
       "self": "Din Akku isch bi {{level}} %. Lad s Gerät uf, damit di Position nöd usfallt.",
       "dismiss": "Hiwis zuemache"
     },
+    "stats": {
+      "title": "Uswärtig",
+      "duration": "Spielziit",
+      "reveals": "Sichtige",
+      "closest": "Chnappste Abstand",
+      "farthest": "Am wiitischte glaufe",
+      "roleX": "X"
+    },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
     "settingsExported": "Istelige exportiert ✓",

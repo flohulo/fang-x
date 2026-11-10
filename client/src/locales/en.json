@@ -265,6 +265,14 @@
       "self": "Your battery is at {{level}}%. Charge your device so your position does not drop out.",
       "dismiss": "Dismiss notice"
     },
+    "stats": {
+      "title": "Round summary",
+      "duration": "Play time",
+      "reveals": "Reveals",
+      "closest": "Closest approach",
+      "farthest": "Walked the farthest",
+      "roleX": "X"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",

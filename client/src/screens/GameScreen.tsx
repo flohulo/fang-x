@@ -1,4 +1,11 @@
-import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
+import type {
+  ChatMessage,
+  GameStats,
+  LatLng,
+  ObjectiveState,
+  RevealEvent,
+  Ruleset,
+} from "@fang-x/shared";
 import { metersToPlayAreaEdge } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
@@ -78,6 +85,55 @@ function formatDuration(ms: number): string {
   const s = total % 60;
   if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function formatDistance(meters: number): string {
+  if (meters < 1000) return `${Math.round(meters)} m`;
+  return `${(meters / 1000).toFixed(1)} km`;
+}
+
+function ResultStats({ stats, t }: { stats: GameStats; t: TFunction }) {
+  const walked = [...stats.players].sort((a, b) => b.distanceMeters - a.distanceMeters);
+  const farthest = walked[0]?.distanceMeters ? walked[0] : null;
+  return (
+    <section className="result-stats" aria-label={t("game.stats.title")}>
+      <h3>{t("game.stats.title")}</h3>
+      <dl>
+        <div>
+          <dt>{t("game.stats.duration")}</dt>
+          <dd>{formatDuration(stats.durationSeconds * 1000)}</dd>
+        </div>
+        <div>
+          <dt>{t("game.stats.reveals")}</dt>
+          <dd>{stats.revealCount}</dd>
+        </div>
+        {stats.closestApproachMeters !== null && (
+          <div>
+            <dt>{t("game.stats.closest")}</dt>
+            <dd>{formatDistance(stats.closestApproachMeters)}</dd>
+          </div>
+        )}
+        {farthest && (
+          <div>
+            <dt>{t("game.stats.farthest")}</dt>
+            <dd>{farthest.name}</dd>
+          </div>
+        )}
+      </dl>
+      <ul className="result-stats-players">
+        {walked.map((p) => (
+          <li key={p.playerId}>
+            <span className="result-stats-dot" style={{ background: p.color }} aria-hidden="true" />
+            <span className="result-stats-name">
+              {p.name}
+              {p.role === "X" ? ` (${t("game.stats.roleX")})` : ""}
+            </span>
+            <span>{formatDistance(p.distanceMeters)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 export function GameScreen({
@@ -379,6 +435,7 @@ export function GameScreen({
               params: gameResult.reasonParams,
             })}
           </p>
+          {gameResult.stats && <ResultStats stats={gameResult.stats} t={t} />}
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             {t("game.backToStart")}
           </button>

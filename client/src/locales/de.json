@@ -265,6 +265,14 @@
       "self": "Dein Akku ist bei {{level}} %. Lade das Gerät, damit deine Position nicht ausfällt.",
       "dismiss": "Hinweis schliessen"
     },
+    "stats": {
+      "title": "Auswertung",
+      "duration": "Spielzeit",
+      "reveals": "Sichtungen",
+      "closest": "Knappster Abstand",
+      "farthest": "Am weitesten gelaufen",
+      "roleX": "X"
+    },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",
     "settingsExported": "Einstellungen exportiert ✓",
