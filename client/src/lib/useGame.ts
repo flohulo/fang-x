@@ -64,6 +64,12 @@ export function useGame() {
     armed: PingTrickMode | null;
     used: PingTrickMode | null;
   }>({ armed: null, used: null });
+  const [batteryWarning, setBatteryWarning] = useState<{
+    playerId: string;
+    name: string;
+    level: number;
+    at: number;
+  } | null>(null);
   const [catchPending, setCatchPending] = useState(false);
   const [lastReveal, setLastReveal] = useState<RevealEvent | null>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -186,6 +192,7 @@ export function useGame() {
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
             setPingTrick({ armed: null, used: null });
+            setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -227,6 +234,14 @@ export function useGame() {
           break;
         case "pingTrick":
           setPingTrick({ armed: msg.armed, used: msg.used });
+          break;
+        case "batteryLow":
+          setBatteryWarning({
+            playerId: msg.playerId,
+            name: msg.name,
+            level: msg.level,
+            at: msg.at,
+          });
           break;
         case "playerPosition":
           setPlayers((current) =>
@@ -363,6 +378,10 @@ export function useGame() {
     send({ t: "setPingTrick", mode });
   };
 
+  const sendBatteryLow = (level: number) => {
+    send({ t: "batteryLow", level });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -409,6 +428,7 @@ export function useGame() {
     transitStops,
     transitNotice,
     pingTrick,
+    batteryWarning,
     revealTimer,
     chatMessages,
     catchPending,
@@ -423,6 +443,7 @@ export function useGame() {
     reconnecting,
     join,
     requestPingTrick,
+    sendBatteryLow,
     configure,
     setRole,
     start,

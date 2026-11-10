@@ -16,6 +16,7 @@
     "settings": "Settings",
     "moreLinks": "More pages",
     "docs": "Manual",
+    "website": "Website",
     "changelog": "Changelog",
     "contributors": "Contributors",
     "privacy": "Privacy",
@@ -275,6 +276,12 @@
         "FAKE": "Fake ping",
         "SKIP": "Skip"
       }
+    },
+    "battery": {
+      "label": "Battery:",
+      "other": "{{name}}'s battery is at {{level}}%. Their position may drop out soon.",
+      "self": "Your battery is at {{level}}%. Charge your device so your position does not drop out.",
+      "dismiss": "Dismiss notice"
     },
     "stats": {
       "title": "Round summary",

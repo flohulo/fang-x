@@ -19,12 +19,15 @@ import {
   settingsExportFileName,
 } from "../lib/settingsExport";
 import { formatEndReason } from "../lib/serverMessages";
+import { useBatteryWarning } from "../lib/useBatteryWarning";
 import { useGeolocation } from "../lib/useGeolocation";
 import type { GameResult, PlayerView } from "../lib/useGame";
 
 interface GameScreenProps {
   pingTrick: { armed: PingTrickMode | null; used: PingTrickMode | null };
   onPingTrick: (mode: PingTrickMode | "CANCEL") => void;
+  batteryWarning: { playerId: string; name: string; level: number; at: number } | null;
+  onBatteryLow: (level: number) => void;
   code: string;
   phase: string;
   pingHistory: RevealEvent[];
@@ -151,6 +154,8 @@ export function GameScreen({
   transitNotice,
   pingTrick,
   onPingTrick,
+  batteryWarning,
+  onBatteryLow,
   revealTimer,
   chatMessages,
   catchPending,
@@ -177,6 +182,7 @@ export function GameScreen({
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
+  const [dismissedBatteryAt, setDismissedBatteryAt] = useState<number | null>(null);
   const [clockNow, setClockNow] = useState(() => Date.now());
   const [satelliteOn, setSatelliteOn] = useState(false);
   const [settingsExported, setSettingsExported] = useState(false);
@@ -232,6 +238,17 @@ export function GameScreen({
   const transitRemaining = transitMode === "bus" ? busRemaining : trainRemaining;
   const visibleTransitNotice =
     transitNotice && transitNotice.at !== dismissedTransitNoticeAt ? transitNotice : null;
+
+  useBatteryWarning(phase === "HEADSTART" || phase === "RUNNING", onBatteryLow);
+
+  const visibleBattery =
+    batteryWarning && batteryWarning.at !== dismissedBatteryAt ? batteryWarning : null;
+
+  useEffect(() => {
+    if (!batteryWarning) return;
+    const timer = window.setTimeout(() => setDismissedBatteryAt(batteryWarning.at), 30_000);
+    return () => window.clearTimeout(timer);
+  }, [batteryWarning]);
 
   useEffect(() => {
     if (!transitNotice) return;
@@ -545,6 +562,28 @@ export function GameScreen({
               className="transit-notice-close"
               aria-label={t("game.transitNotice.dismiss")}
               onClick={() => setDismissedTransitNoticeAt(visibleTransitNotice.at)}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {visibleBattery && (
+          <div className="transit-notice battery-notice" role="alert">
+            <span>
+              <strong>{t("game.battery.label")}</strong>{" "}
+              {visibleBattery.playerId === myId
+                ? t("game.battery.self", { level: visibleBattery.level })
+                : t("game.battery.other", {
+                    name: visibleBattery.name,
+                    level: visibleBattery.level,
+                  })}
+            </span>
+            <button
+              type="button"
+              className="transit-notice-close"
+              aria-label={t("game.battery.dismiss")}
+              onClick={() => setDismissedBatteryAt(visibleBattery.at)}
             >
               ×
             </button>

@@ -512,6 +512,7 @@ export default function App() {
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
         pingTrick={game.pingTrick}
+        batteryWarning={game.batteryWarning}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
         catchPending={game.catchPending}
@@ -523,6 +524,7 @@ export default function App() {
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
         onPingTrick={game.requestPingTrick}
+        onBatteryLow={game.sendBatteryLow}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}

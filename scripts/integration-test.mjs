@@ -281,6 +281,26 @@ async function run() {
   host.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
   await host.waitFor((m) => m.t === "yourPositionIsShared" && !m.shared);
 
+  // Akku-Warnung geht an alle und wird gedrosselt
+  host.ws.send(JSON.stringify({ t: "batteryLow", level: 12 }));
+  host.ws.send(JSON.stringify({ t: "batteryLow", level: 11 }));
+  const batteryNotice = await det.waitFor((m) => m.t === "batteryLow", 5000);
+  assert(
+    batteryNotice.level === 12 && batteryNotice.playerId === hostJoined.playerId,
+    "Akku-Warnung erreicht die anderen Spielenden",
+  );
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    det.messages.filter((m) => m.t === "batteryLow").length === 1,
+    "Akku-Warnung wird je Person gedrosselt",
+  );
+  det.ws.send(JSON.stringify({ t: "batteryLow", level: 90 }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    det.messages.filter((m) => m.t === "batteryLow").length === 1,
+    "Unplausibler Akkustand löst keine Warnung aus",
+  );
+
   // 9. Detektiv bewegt sich zu X → Fang
   console.log("\nDetektiv bewegt sich zu X...");
   det.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));

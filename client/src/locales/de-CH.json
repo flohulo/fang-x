@@ -272,6 +272,12 @@
         "SKIP": "Überspringe"
       }
     },
+    "battery": {
+      "label": "Akku:",
+      "other": "De Akku vo {{name}} isch bi {{level}} %. Gli chönnt d Position usfalle.",
+      "self": "Din Akku isch bi {{level}} %. Lad s Gerät uf, damit di Position nöd usfallt.",
+      "dismiss": "Hiwis zuemache"
+    },
     "stats": {
       "title": "Uswärtig",
       "duration": "Spielziit",
