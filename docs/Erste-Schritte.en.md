@@ -50,3 +50,10 @@ shows the result and you can export the round's settings as a JSON file.
 If X has to call off the round, there is the [emergency button](Notfall-Knopf.md): after a
 confirmation the game ends, the detectives win and receive X's exact location along with a
 notification.
+
+## App updates
+
+When a new version is available, the app asks whether to reload. After **Reload** the version
+history (changelog) opens automatically so you can see what is new. The back link takes you to
+the home screen at any time, where a running game is resumed. You can also find the changelog in
+the menu and via the version number on the home screen.

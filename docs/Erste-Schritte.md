@@ -70,3 +70,11 @@ Benachrichtigung.
 
 Schon während des Countdowns ("Start in …") siehst du deinen eigenen Standort auf der Karte. Dein
 Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet.
+
+## App-Updates
+
+Steht eine neue Version bereit, fragt dich die App, ob sie neu geladen werden soll. Nach **Neu
+laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerungen. Du kommst
+über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
+aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
+Startseite.
