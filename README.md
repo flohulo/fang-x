@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://flohulo.github.io/fang-x/">Handbuch</a> ·
+  <a href="https://flohulo.github.io/fang-x/handbuch/">Handbuch</a> ·
   <a href="#so-funktionierts">So funktioniert's</a> ·
   <a href="#datenschutz-und-sicher-spielen">Datenschutz</a> ·
   <a href="#lokal-ausprobieren">Lokal ausprobieren</a> ·
@@ -103,8 +103,9 @@ Weitere Hinweise zum Entwickeln und Mitwirken stehen in
 
 ## Handbuch
 
-Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
-<https://flohulo.github.io/fang-x/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
+Die Webseite zum Spiel (Quelle: [`website/`](website/)) liegt unter
+<https://flohulo.github.io/fang-x/>. Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
+<https://flohulo.github.io/fang-x/handbuch/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
 aus den Seiten in [`docs/`](docs/) gebaut:
 
 ```bash
@@ -112,7 +113,7 @@ pip install -r requirements-docs.txt
 mkdocs serve
 ```
 
-Die Seite wird bei Änderungen an `docs/` oder `mkdocs.yml` automatisch über den Workflow
+Webseite und Handbuch werden bei Änderungen an `website/`, `docs/` oder `mkdocs.yml` automatisch über den Workflow
 `.github/workflows/deploy-docs.yml` auf GitHub Pages veröffentlicht.
 
 ## Übersetzen
