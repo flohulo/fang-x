@@ -62,6 +62,12 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
 - Spielt rücksichtsvoll: Bleibt an sicheren, öffentlichen Orten, achtet auf den Verkehr und
   respektiert die Privatsphäre anderer.
 
+### Fehlerberichte (optional)
+
+Wenn der Betreiber ein [GlitchTip](https://glitchtip.com/)-Projekt eingerichtet hat, werden
+Programmfehler dorthin gemeldet. Vor dem Senden werden Standortdaten, Nutzerdaten, Header,
+Cookies, Breadcrumbs und Spielcodes entfernt. Ohne eingerichtetes Projekt wird nichts gesendet.
+
 ### Kartendaten
 
 Für Karten nutzt Fang X [OpenFreeMap](https://openfreemap.org/) auf Basis von
@@ -85,6 +91,17 @@ npx wrangler dev --ip 127.0.0.1 --port 8787
 
 Öffne anschliessend <http://localhost:8787>. Der lokale Server liefert Spiel und API gemeinsam
 aus. Das Spiel benötigt eine Internetverbindung.
+
+### Fehlerberichte einrichten (optional)
+
+Fang X kann Fehler an ein gehostetes GlitchTip-Projekt melden. Lege dafür in GlitchTip ein
+Projekt an und hinterlege dessen DSN:
+
+- **Server:** als Secret mit `npx wrangler secret put GLITCHTIP_DSN` im Ordner `server`.
+- **Client:** als Umgebungsvariable `VITE_GLITCHTIP_DSN` beim Bauen (`npm run build`).
+
+Ohne DSN ist die Fehlerberichterstattung ausgeschaltet. Die Bereinigung der Berichte steht in
+[`shared/src/error-report.ts`](shared/src/error-report.ts).
 
 ### Prüfen
 
