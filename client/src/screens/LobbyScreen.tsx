@@ -1,4 +1,5 @@
 import { LocationAccess } from "../components/LocationAccess";
+import { PlayAreaEditor } from "../components/PlayAreaEditor";
 import { useLocationPermission } from "../lib/useLocationPermission";
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
 import { DEFAULT_RULESET } from "@fang-x/shared";
@@ -38,6 +39,7 @@ export function LobbyScreen({
   const location = useLocationPermission();
   const [skipLocation, setSkipLocation] = useState(false);
   const [startLocationError, setStartLocationError] = useState<string | null>(null);
+  const [drawingArea, setDrawingArea] = useState(false);
 
   useEffect(() => {
     if (!activeInfoKey) return;
@@ -652,17 +654,41 @@ export function LobbyScreen({
                   }
                 />
               </div>
-              <input
-                id="cfg-playarea"
-                type="text"
-                inputMode="numeric"
-                value={localRuleset.map.playAreaRadiusMeters}
-                onChange={(e) =>
-                  updateNested("map", {
-                    playAreaRadiusMeters: parseInt(e.target.value, 10) || 700,
-                  })
-                }
-              />
+              {localRuleset.map.playAreaPolygon ? (
+                <p className="config-hint">
+                  {t("lobby.playAreaDrawn", { count: localRuleset.map.playAreaPolygon.length })}
+                </p>
+              ) : (
+                <input
+                  id="cfg-playarea"
+                  type="text"
+                  inputMode="numeric"
+                  value={localRuleset.map.playAreaRadiusMeters}
+                  onChange={(e) =>
+                    updateNested("map", {
+                      playAreaRadiusMeters: parseInt(e.target.value, 10) || 700,
+                    })
+                  }
+                />
+              )}
+              {youAreHost && (
+                <div className="area-editor-actions" style={{ marginTop: 8 }}>
+                  <button className="secondary" type="button" onClick={() => setDrawingArea(true)}>
+                    {localRuleset.map.playAreaPolygon
+                      ? t("lobby.playAreaEdit")
+                      : t("lobby.playAreaDraw")}
+                  </button>
+                  {localRuleset.map.playAreaPolygon && (
+                    <button
+                      className="secondary"
+                      type="button"
+                      onClick={() => updateNested("map", { playAreaPolygon: null })}
+                    >
+                      {t("lobby.playAreaUseCircle")}
+                    </button>
+                  )}
+                </div>
+              )}
               {activeInfoKey === "playArea" && (
                 <ParamPopover
                   paramKey="playArea"
@@ -733,6 +759,18 @@ export function LobbyScreen({
       <button className="secondary lobby-leave-button" onClick={onLeave}>
         {t("lobby.leave")}
       </button>
+
+      {drawingArea && (
+        <PlayAreaEditor
+          initial={localRuleset.map.playAreaPolygon}
+          hintCenter={localRuleset.map.startLocation}
+          onCancel={() => setDrawingArea(false)}
+          onSave={(polygon) => {
+            updateNested("map", { playAreaPolygon: polygon });
+            setDrawingArea(false);
+          }}
+        />
+      )}
     </div>
   );
 }

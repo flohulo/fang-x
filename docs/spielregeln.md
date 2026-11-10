@@ -164,6 +164,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
 |---|---|---|---|---|
 | `map.centerLat` / `map.centerLng` | number | — | Host-Position | Zentrum des Spiels. |
 | `map.playAreaRadiusMeters` | int | 100–20000 | **700** | Spielradius: Die Fläche, auf der gespielt wird (entspricht dem aufgedeckten Kreis im Screenshot). |
+| `map.playAreaPolygon` | LatLng[]/null | 3–50 Punkte | null | Optional frei gezeichnetes Spielfeld (Eckpunkte). Ist es gesetzt, ersetzt es den Kreis aus `map.playAreaRadiusMeters` für Spielfeldrand und Bonusmission. |
 | `map.startLocation` | LatLng/null | — | null | Optionaler Startpunkt des Spiels; wird nur während der laufenden Runde gespeichert und während der gesamten Runde als „Start“-Marker auf der Karte angezeigt. |
 | `map.outOfBoundsEnabled` | bool | — | **true** | Randzaun aktiv? X darf das Gebiet nicht verlassen. |
 | `map.outOfBoundsGraceSeconds` | int | 0–120 | 15 | Toleranz am Rand (GPS-Genauigkeit) — erst danach greift die Regel. |

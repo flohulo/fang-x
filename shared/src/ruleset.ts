@@ -7,6 +7,12 @@
 // TELEPORT_BACK wirkt wie WARNING: der Server kann niemanden versetzen.
 
 import type { LatLng } from "./geo";
+import {
+  distanceMeters,
+  distanceToPolygonEdgeMeters,
+  pointInPolygon,
+  polygonEquivalentRadiusMeters,
+} from "./geo";
 
 export type TransportMode = "WALK" | "BIKE" | "CAR" | "TRANSIT";
 export type RevealSchedule = "FIXED" | "DECREASING" | "RANDOM";
@@ -81,6 +87,8 @@ export interface Ruleset {
   };
   map: {
     playAreaRadiusMeters: number;
+    /** Frei gezeichnetes Spielfeld (Eckpunkte). Ist es gesetzt, ersetzt es den Kreis. */
+    playAreaPolygon: LatLng[] | null;
     startLocation: LatLng | null;
     outOfBoundsEnabled: boolean;
     outOfBoundsGraceSeconds: number;
@@ -163,6 +171,7 @@ export const DEFAULT_RULESET: Ruleset = {
   },
   map: {
     playAreaRadiusMeters: 700,
+    playAreaPolygon: null,
     startLocation: null,
     outOfBoundsEnabled: true,
     outOfBoundsGraceSeconds: 15,
@@ -254,8 +263,76 @@ export function mergeRuleset(
       ...DEFAULT_RULESET.map,
       ...(p.map ?? {}),
       startLocation: p.map?.startLocation ?? DEFAULT_RULESET.map.startLocation,
+      playAreaPolygon: sanitizePlayAreaPolygon(p.map?.playAreaPolygon),
     },
     objective: { ...DEFAULT_RULESET.objective, ...(p.objective ?? {}) },
     privacy: { ...DEFAULT_RULESET.privacy, ...(p.privacy ?? {}) },
   };
+}
+
+export const PLAY_AREA_POLYGON_MIN_POINTS = 3;
+export const PLAY_AREA_POLYGON_MAX_POINTS = 50;
+/** Maximale Ausdehnung eines gezeichneten Spielfelds (Abstand zum ersten Eckpunkt). */
+export const PLAY_AREA_POLYGON_MAX_EXTENT_METERS = 40000;
+
+// Übernimmt nur ein plausibles Polygon, sonst null (= Kreis wie bisher).
+export function sanitizePlayAreaPolygon(raw: unknown): LatLng[] | null {
+  if (!Array.isArray(raw)) return null;
+  if (raw.length < PLAY_AREA_POLYGON_MIN_POINTS || raw.length > PLAY_AREA_POLYGON_MAX_POINTS) {
+    return null;
+  }
+  const points: LatLng[] = [];
+  for (const item of raw) {
+    const lat = (item as LatLng | null)?.lat;
+    const lng = (item as LatLng | null)?.lng;
+    if (
+      typeof lat !== "number" ||
+      typeof lng !== "number" ||
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng) ||
+      Math.abs(lat) > 90 ||
+      Math.abs(lng) > 180
+    ) {
+      return null;
+    }
+    points.push({ lat, lng });
+  }
+  const tooWide = points.some(
+    (p) => distanceMeters(points[0], p) > PLAY_AREA_POLYGON_MAX_EXTENT_METERS,
+  );
+  return tooWide ? null : points;
+}
+
+type PlayAreaSettings = Pick<Ruleset["map"], "playAreaRadiusMeters" | "playAreaPolygon">;
+
+// Liegt die Position im Spielfeld? Ohne Polygon zählt der Kreis um `center`.
+export function isInsidePlayArea(
+  map: PlayAreaSettings,
+  center: LatLng | null,
+  pos: LatLng,
+): boolean {
+  const meters = metersToPlayAreaEdge(map, center, pos);
+  return meters === null || meters >= 0;
+}
+
+// Abstand zum Spielfeldrand in Metern: positiv innen, negativ außen.
+// null, wenn weder Polygon noch Mittelpunkt bekannt sind.
+export function metersToPlayAreaEdge(
+  map: PlayAreaSettings,
+  center: LatLng | null,
+  pos: LatLng,
+): number | null {
+  if (map.playAreaPolygon) {
+    const edge = distanceToPolygonEdgeMeters(pos, map.playAreaPolygon);
+    return pointInPolygon(pos, map.playAreaPolygon) ? edge : -edge;
+  }
+  if (!center) return null;
+  return map.playAreaRadiusMeters - distanceMeters(pos, center);
+}
+
+// Radius des Spielfelds bzw. eines flächengleichen Kreises.
+export function playAreaRadiusEstimate(map: PlayAreaSettings): number {
+  return map.playAreaPolygon
+    ? polygonEquivalentRadiusMeters(map.playAreaPolygon)
+    : map.playAreaRadiusMeters;
 }

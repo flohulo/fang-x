@@ -5,8 +5,16 @@
 | **Rule parameter** | `map.playAreaRadiusMeters` |
 | **Default** | 700 meters |
 
-The play area is a circle around the shared starting point. Its radius determines how far X may
-move away from this point.
+By default the play area is a circle around the shared starting point. Its radius determines how
+far X may move away from this point.
+
+## Draw the play area on the map
+
+Instead of the circle, the host can define a custom shape in the lobby via "Draw play area on the
+map": tapping the map sets the corner points (3 to 50), "Undo last point" and "Clear all" correct
+mistakes, and "Apply" saves the area. A drawn play area replaces the circle; the radius is then no
+longer used. "Use circle again" switches back to the radius. The play area can only be changed in
+the lobby.
 
 ## When X leaves the area
 

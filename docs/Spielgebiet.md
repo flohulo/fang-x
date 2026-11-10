@@ -5,8 +5,16 @@
 | **Regelparameter** | `map.playAreaRadiusMeters` |
 | **Standardwert** | 700 Meter |
 
-Das Spielgebiet ist ein Kreis um den gemeinsamen Startpunkt. Sein Radius bestimmt, wie weit sich
-X von diesem Punkt entfernen darf.
+Das Spielgebiet ist standardmäßig ein Kreis um den gemeinsamen Startpunkt. Sein Radius bestimmt,
+wie weit sich X von diesem Punkt entfernen darf.
+
+## Spielfeld auf der Karte einzeichnen
+
+Statt des Kreises kann der Host in der Lobby über „Spielfeld auf der Karte einzeichnen“ eine
+eigene Form festlegen: Auf die Karte tippen setzt die Eckpunkte (3 bis 50), „Letzter Punkt zurück“
+und „Alle löschen“ korrigieren, „Übernehmen“ speichert das Feld. Ein gezeichnetes Spielfeld ersetzt
+den Kreis; der Radius wird dann nicht mehr verwendet. Mit „Wieder Kreis verwenden“ geht es zurück
+zum Radius. Das Spielfeld lässt sich nur in der Lobby ändern.
 
 ## Wenn X das Gebiet verlässt
 
