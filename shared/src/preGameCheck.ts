@@ -2,12 +2,7 @@ import type { PlayerInfo } from "./protocol";
 import { playAreaRadiusEstimate, type Ruleset } from "./ruleset";
 
 export type PreGameCheckId =
-  | "noX"
-  | "noDetective"
-  | "disconnected"
-  | "areaSmall"
-  | "areaLarge"
-  | "noHeadStart";
+  "noX" | "noDetective" | "disconnected" | "areaSmall" | "areaLarge" | "noHeadStart";
 
 export interface PreGameCheck {
   id: PreGameCheckId;
