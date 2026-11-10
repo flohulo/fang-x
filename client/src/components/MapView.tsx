@@ -461,8 +461,8 @@ export function MapView({
         minute: "2-digit",
       });
       const content = document.createElement("div");
+      content.className = "marker-popup";
       const text = document.createElement("p");
-      text.style.margin = "0 0 6px";
       text.textContent = i18n.t("map.markerPopup", { label, name: entry.by, time });
       const remove = document.createElement("button");
       remove.type = "button";
@@ -471,7 +471,7 @@ export function MapView({
       content.append(text, remove);
       return new Marker({ element: el })
         .setLngLat([entry.pos.lng, entry.pos.lat])
-        .setPopup(new Popup().setDOMContent(content))
+        .setPopup(new Popup({ closeButton: false }).setDOMContent(content))
         .addTo(map);
     });
   }, [teamMarkers]);

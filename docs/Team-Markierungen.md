@@ -5,8 +5,9 @@ beschreiben. Die Markierungen sehen nur Detektive, **X sieht sie nie**.
 
 ## So benutzt du sie
 
-1. Tippe unten in der Kartensteuerung auf **Verdacht markieren** oder **Hier nicht markieren**.
-2. Tippe auf die Karte an die Stelle, die du markieren willst.
+1. Tippe oben auf der Karte auf **Aktionen** und wähle **Verdacht markieren** oder
+   **Hier nicht markieren**.
+2. Tippe auf die Karte an die Stelle, die du markieren willst. Mit **Abbrechen** oben brichst du ab.
 3. Die Markierung erscheint sofort bei allen Detektiven.
 
 | Markierung | Symbol | Bedeutung |
@@ -15,7 +16,7 @@ beschreiben. Die Markierungen sehen nur Detektive, **X sieht sie nie**.
 | Hier nicht | grau mit **×** | Hier haben wir nachgesehen, X ist nicht da |
 
 Tippe auf eine Markierung, um zu sehen, wer sie wann gesetzt hat. Dort kannst du sie auch
-**entfernen**. Das darf jeder Detektiv, damit veraltete Hinweise nicht stehen bleiben.
+**entfernen**. Die Infobox schliesst du mit einem Tipp auf die Karte. Das darf jeder Detektiv, damit veraltete Hinweise nicht stehen bleiben.
 
 ## Regeln
 

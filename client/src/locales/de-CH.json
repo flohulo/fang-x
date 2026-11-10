@@ -257,8 +257,7 @@
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
     "markers": {
       "suspect": "Verdacht markiere",
-      "clear": "Da nöd markiere",
-      "cancel": "Markiere abbräche"
+      "clear": "Da nöd markiere"
     },
     "stats": {
       "title": "Uswärtig",
@@ -323,7 +322,6 @@
       "street": "Charte: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Date vo <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Ziel uf de Charte uswähle",
-    "cancelChoosing": "Charte aatippe · Abbräche",
     "simulationMode": "Simulationsmodus",
     "enableGps": "GPS aktivierä",
     "emergency": "Notfall",
@@ -371,7 +369,15 @@
       "noRevealText": "Wart uf de erscht Reveal und halt dich i de Nöchi vom Gebiet uf.",
       "defaultTitle": "Spiel lauft.",
       "defaultText": "Halt dich parat."
-    }
+    },
+    "actions": {
+      "title": "Aktione"
+    },
+    "pickHint": {
+      "marker": "Tipp uf d Charte, um d Markierig z setze.",
+      "objective": "Tipp uf d Charte, um s Ziel z setze."
+    },
+    "pickCancel": "Abbräche"
   },
   "map": {
     "satellite": "Satellit",

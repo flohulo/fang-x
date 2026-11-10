@@ -261,8 +261,7 @@
     "openInOsm": "Open location on OpenStreetMap ↗",
     "markers": {
       "suspect": "Mark suspect",
-      "clear": "Mark not here",
-      "cancel": "Cancel marking"
+      "clear": "Mark not here"
     },
     "stats": {
       "title": "Round summary",
@@ -327,7 +326,6 @@
       "street": "Map: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Data from <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Choose target on map",
-    "cancelChoosing": "Tap the map · Cancel",
     "simulationMode": "Simulation mode",
     "enableGps": "Enable GPS",
     "emergency": "Emergency",
@@ -375,7 +373,15 @@
       "noRevealText": "Wait for the first reveal and stay near the area.",
       "defaultTitle": "Game running.",
       "defaultText": "Stay ready."
-    }
+    },
+    "actions": {
+      "title": "Actions"
+    },
+    "pickHint": {
+      "marker": "Tap the map to place the marker.",
+      "objective": "Tap the map to set the target."
+    },
+    "pickCancel": "Cancel"
   },
   "map": {
     "satellite": "Satellite",

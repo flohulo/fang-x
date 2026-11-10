@@ -5,8 +5,8 @@ Only detectives see the markers, **X never sees them**.
 
 ## How to use them
 
-1. Tap **Mark suspect** or **Mark not here** at the bottom of the map controls.
-2. Tap the map where you want to place the marker.
+1. Tap **Actions** at the top of the map and choose **Mark suspect** or **Mark not here**.
+2. Tap the map where you want to place the marker. Use **Cancel** at the top to abort.
 3. The marker appears for all detectives immediately.
 
 | Marker | Symbol | Meaning |
@@ -14,7 +14,7 @@ Only detectives see the markers, **X never sees them**.
 | Suspect | orange with **?** | X might be here |
 | Not here | grey with **×** | We checked here, X is not here |
 
-Tap a marker to see who placed it and when. You can also **remove** it there. Any detective may do
+Tap a marker to see who placed it and when. You can also **remove** it there. Close the info box by tapping the map. Any detective may do
 this, so outdated hints do not stay on the map.
 
 ## Rules
