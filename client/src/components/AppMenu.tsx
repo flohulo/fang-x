@@ -4,6 +4,9 @@ import { docsUrl } from "../lib/docs";
 import { type AlertNotificationPermission, AlertSettings } from "./AlertSettings";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
+/** Webseite zum Spiel (Quelle: website/). */
+const WEBSITE_URL = "https://flohulo.github.io/fang-x/";
+
 /** Weblate-Projekt, in dem die Übersetzungen gepflegt werden. */
 const TRANSLATE_URL = "https://translate.codeberg.org/engage/fang-x/";
 
@@ -156,6 +159,15 @@ export function AppMenu({
                     onClick={() => setOpen(false)}
                   >
                     <span>{t("menu.docs")}</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                  <a
+                    href={WEBSITE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span>{t("menu.website")}</span>
                     <span aria-hidden="true">↗</span>
                   </a>
                   <button
