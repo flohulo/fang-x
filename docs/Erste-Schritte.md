@@ -13,6 +13,15 @@ daran. Ist der Standortzugriff blockiert, zeigt die App eine Anleitung, wie du i
 Einstellungen wieder freigibst. In der Lobby kann der Host das Spiel erst starten, wenn der
 Standort erlaubt ist; zum Ausprobieren gibt es **Ohne Standort fortfahren (Simulationsmodus)**.
 
+## Checkliste vor dem Spiel
+
+In der Lobby zeigt eine Checkliste jeder Person, ob das Gerät bereit ist: Standortfreigabe,
+Alarm und Benachrichtigungen, Installation als App sowie ein Hinweis auf Akku und
+Bildschirm-Sperre. Dazu warnt sie vor Problemen bei Gruppe und Einstellungen, zum Beispiel
+getrennten Mitspielenden, fehlendem Detektiv, sehr kleinem oder sehr großem Spielgebiet und
+fehlendem Vorsprung. Gibt es Warnungen, fragt die App den Host beim Start noch einmal nach;
+ohne X lässt sich das Spiel weiterhin nicht starten.
+
 ## Spiel erstellen
 
 Eine Person erstellt auf der Startseite ein neues Spiel. Sie wird Host und spielt standardmäßig

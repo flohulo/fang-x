@@ -233,7 +233,37 @@
     "playAreaDrawn": "Eigenes Spielfeld mit {{count}} Eckpunkten gezeichnet.",
     "playAreaDraw": "Spielfeld auf der Karte einzeichnen",
     "playAreaEdit": "Spielfeld bearbeiten",
-    "playAreaUseCircle": "Wieder Kreis verwenden"
+    "playAreaUseCircle": "Wieder Kreis verwenden",
+    "checklist": {
+      "title": "Checkliste vor dem Spiel",
+      "location": "Standortfreigabe erteilt",
+      "notifications": "Alarm und Benachrichtigungen erlaubt",
+      "notificationsHint": "Ohne sie verpasst du Sichtungen, wenn der Bildschirm aus ist.",
+      "install": "App auf dem Startbildschirm installiert",
+      "installHint": "Installiert läuft die App stabiler im Hintergrund.",
+      "installHintIos": "Tippe auf das Teilen-Symbol und dann auf Zum Home-Bildschirm.",
+      "screen": "Akku geladen, Bildschirm-Sperre großzügig eingestellt",
+      "screenHint": "GPS und Bildschirm verbrauchen während der Runde viel Strom.",
+      "status": {
+        "ok": "Erledigt: ",
+        "warn": "Achtung: ",
+        "info": "Hinweis: "
+      },
+      "checks": {
+        "noX": "Es ist noch kein X gewählt.",
+        "noDetective": "Es gibt keinen Detektiv, niemand jagt X.",
+        "disconnected": "{{count}} Mitspielende gerade nicht verbunden: {{names}}.",
+        "areaSmall": "Das Spielgebiet ist sehr klein (ca. {{meters}} m Radius).",
+        "areaLarge": "Das Spielgebiet ist sehr groß (ca. {{meters}} m Radius).",
+        "noHeadStart": "X hat keinen Vorsprung."
+      }
+    },
+    "startConfirm": {
+      "title": "Trotzdem starten?",
+      "text": "Vor dem Start sind dir folgende Punkte aufgefallen:",
+      "go": "Trotzdem starten",
+      "back": "Zurück"
+    }
   },
   "game": {
     "phase": {

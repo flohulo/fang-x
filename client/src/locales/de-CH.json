@@ -229,7 +229,37 @@
     },
     "locationNeeded": "Ohni Standortfrigab funktioniered Charte, Sichtige und Fang nöd.",
     "needLocation": "Standort erlaube, um z starte",
-    "skipLocation": "Ohni Standort wiiterfahre (Simulationsmodus)"
+    "skipLocation": "Ohni Standort wiiterfahre (Simulationsmodus)",
+    "checklist": {
+      "title": "Checkliste vor em Spiel",
+      "location": "Standortfrigab erteilt",
+      "notifications": "Alarm und Benachrichtigunge erlaubt",
+      "notificationsHint": "Ohni si verpassisch Sichtige, wenn dr Bildschirm us isch.",
+      "install": "App uf em Startbildschirm installiert",
+      "installHint": "Installiert louft d App stabiler im Hintergrund.",
+      "installHintIos": "Tipp uf s Teile-Symbol und denn uf Zum Home-Bildschirm.",
+      "screen": "Akku glade, Bildschirm-Sperre grosszügig igstellt",
+      "screenHint": "GPS und Bildschirm brüchte während dr Rundi viel Strom.",
+      "status": {
+        "ok": "Erledigt: ",
+        "warn": "Achtung: ",
+        "info": "Hinwis: "
+      },
+      "checks": {
+        "noX": "Es isch no kes X gwählt.",
+        "noDetective": "Es het kein Detektiv, niemer jagt X.",
+        "disconnected": "{{count}} Mitspielendi grad nöd verbunde: {{names}}.",
+        "areaSmall": "S Spielgebiet isch seer chli (öppe {{meters}} m Radius).",
+        "areaLarge": "S Spielgebiet isch seer gross (öppe {{meters}} m Radius).",
+        "noHeadStart": "X het kei Vorsprung."
+      }
+    },
+    "startConfirm": {
+      "title": "Trotzdem starte?",
+      "text": "Vor em Start isch öis Folgendes ufgfalle:",
+      "go": "Trotzdem starte",
+      "back": "Zrugg"
+    }
   },
   "game": {
     "phase": {
