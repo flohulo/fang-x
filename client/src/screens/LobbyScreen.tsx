@@ -35,6 +35,9 @@ export function LobbyScreen({
   const { t } = useTranslation();
   const [localRuleset, setLocalRuleset] = useState<Ruleset>(ruleset ?? DEFAULT_RULESET);
   const [copied, setCopied] = useState<null | "link" | "code">(null);
+  const [showQr, setShowQr] = useState(false);
+  const [qrImage, setQrImage] = useState<string | null>(null);
+  const [qrFailed, setQrFailed] = useState(false);
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
   const location = useLocationPermission();
   const [skipLocation, setSkipLocation] = useState(false);
@@ -92,6 +95,30 @@ export function LobbyScreen({
       { enableHighAccuracy: true, maximumAge: 10_000, timeout: 15_000 },
     );
   };
+
+  // Der QR-Code wird erst beim ersten Öffnen erzeugt und die Bibliothek erst dann geladen.
+  useEffect(() => {
+    if (!showQr) return;
+    let cancelled = false;
+    setQrFailed(false);
+    import("qrcode")
+      .then(({ default: QRCode }) =>
+        QRCode.toDataURL(inviteUrl(code, window.location.origin), {
+          margin: 2,
+          width: 256,
+          errorCorrectionLevel: "M",
+        }),
+      )
+      .then((url) => {
+        if (!cancelled) setQrImage(url);
+      })
+      .catch(() => {
+        if (!cancelled) setQrFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showQr, code]);
 
   const flashCopied = (what: "link" | "code") => {
     setCopied(what);
@@ -155,6 +182,32 @@ export function LobbyScreen({
         <button className="secondary" style={{ marginTop: 8 }} onClick={copyCode}>
           {copied === "code" ? t("lobby.codeCopied") : t("lobby.copyCode")}
         </button>
+        <button
+          className="secondary"
+          style={{ marginTop: 8 }}
+          aria-expanded={showQr}
+          onClick={() => setShowQr((current) => !current)}
+        >
+          {showQr ? t("lobby.hideQr") : t("lobby.showQr")}
+        </button>
+        {showQr && (
+          <div className="qr-box">
+            {qrFailed ? (
+              <p role="alert">{t("lobby.qrFailed")}</p>
+            ) : qrImage ? (
+              <>
+                <img
+                  className="qr-code"
+                  src={qrImage}
+                  width={256}
+                  height={256}
+                  alt={t("lobby.qrAlt", { code })}
+                />
+                <p className="config-hint">{t("lobby.qrHint")}</p>
+              </>
+            ) : null}
+          </div>
+        )}
       </div>
 
       <div className="card">
