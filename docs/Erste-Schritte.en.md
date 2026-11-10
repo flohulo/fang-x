@@ -3,8 +3,12 @@
 ## Creating a game
 
 One person creates a new game on the start page. They become the host and play as X by default.
-They share the six-character **game code** with the group – via the invitation link, or by
-everyone entering the code and joining.
+They share the six-character **game code** with the group – via the invitation link, via the
+**QR code**, or by everyone entering the code and joining.
+
+!!! tip ":material-qrcode: QR code for everyone on site"
+    Tap **Show QR code** in the lobby. The others scan it with their phone camera and land directly
+    in the game. The QR code contains the same link as **Share invitation**.
 
 ## Choosing a role
 
