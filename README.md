@@ -44,6 +44,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Spielende gelöscht.
 - **Notfall-Knopf:** Muss X die Runde abbrechen, endet das Spiel nach einer Bestätigung. Die
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
+- **Alle sicher und Funkstille:** Kommt von jemandem länger keine Position an, werden alle
+  gewarnt. Nach dem Spielende bestätigt jede Person, dass sie sicher ist.
 
 ## Datenschutz und sicher spielen
 

@@ -26,6 +26,9 @@ interface GameScreenProps {
   lastReveal: RevealEvent | null;
   objective: ObjectiveState | null;
   transitStops: { bus: number; train: number };
+  inactivity: { playerId: string; name: string; minutes: number; at: number } | null;
+  safe: string[];
+  onConfirmSafe: () => void;
   transitNotice: {
     mode: "bus" | "train";
     count: number;
@@ -90,6 +93,9 @@ export function GameScreen({
   objective,
   transitStops,
   transitNotice,
+  inactivity,
+  safe,
+  onConfirmSafe,
   revealTimer,
   chatMessages,
   catchPending,
@@ -115,6 +121,7 @@ export function GameScreen({
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
+  const [dismissedInactivityAt, setDismissedInactivityAt] = useState<number | null>(null);
   const [clockNow, setClockNow] = useState(() => Date.now());
   const [satelliteOn, setSatelliteOn] = useState(false);
   const [settingsExported, setSettingsExported] = useState(false);
@@ -170,6 +177,15 @@ export function GameScreen({
   const transitRemaining = transitMode === "bus" ? busRemaining : trainRemaining;
   const visibleTransitNotice =
     transitNotice && transitNotice.at !== dismissedTransitNoticeAt ? transitNotice : null;
+
+  const visibleInactivity =
+    inactivity && inactivity.at !== dismissedInactivityAt ? inactivity : null;
+
+  useEffect(() => {
+    if (!inactivity) return;
+    const timer = window.setTimeout(() => setDismissedInactivityAt(inactivity.at), 30_000);
+    return () => window.clearTimeout(timer);
+  }, [inactivity]);
 
   useEffect(() => {
     if (!transitNotice) return;
@@ -362,6 +378,29 @@ export function GameScreen({
               params: gameResult.reasonParams,
             })}
           </p>
+          <section className="safety-check" aria-label={t("game.safety.title")}>
+            <h3>{t("game.safety.title")}</h3>
+            <p>{t("game.safety.hint")}</p>
+            <ul>
+              {players.map((p) => (
+                <li key={p.id}>
+                  <span>{p.name}</span>
+                  <span className={safe.includes(p.id) ? "safety-ok" : "safety-open"}>
+                    {safe.includes(p.id) ? t("game.safety.confirmed") : t("game.safety.open")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={onConfirmSafe}
+              disabled={myId !== null && safe.includes(myId)}
+            >
+              {myId !== null && safe.includes(myId)
+                ? t("game.safety.done")
+                : t("game.safety.confirm")}
+            </button>
+          </section>
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             {t("game.backToStart")}
           </button>
@@ -479,6 +518,28 @@ export function GameScreen({
               className="transit-notice-close"
               aria-label={t("game.transitNotice.dismiss")}
               onClick={() => setDismissedTransitNoticeAt(visibleTransitNotice.at)}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {visibleInactivity && (
+          <div className="transit-notice inactivity-notice" role="alert">
+            <span>
+              <strong>{t("game.inactivity.label")}</strong>{" "}
+              {visibleInactivity.playerId === myId
+                ? t("game.inactivity.self", { minutes: visibleInactivity.minutes })
+                : t("game.inactivity.other", {
+                    name: visibleInactivity.name,
+                    minutes: visibleInactivity.minutes,
+                  })}
+            </span>
+            <button
+              type="button"
+              className="transit-notice-close"
+              aria-label={t("game.inactivity.dismiss")}
+              onClick={() => setDismissedInactivityAt(visibleInactivity.at)}
             >
               ×
             </button>

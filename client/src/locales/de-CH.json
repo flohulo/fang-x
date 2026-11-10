@@ -250,6 +250,20 @@
     "surrenderLive": "De exakt Live-Standort isch a d Detektivä übertreit worde.",
     "surrenderNoPosition": "Es Standort isch nöd verfüegbar gsi.",
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
+    "inactivity": {
+      "label": "Funkstilli:",
+      "other": "Vo {{name}} chunnt sit {{minutes}} Minute kei Position a. Mäldet öi churz bi {{name}}.",
+      "self": "Vo dir chunnt sit {{minutes}} Minute kei Position a. Prüef GPS und Verbindig.",
+      "dismiss": "Hiwis zuemache"
+    },
+    "safety": {
+      "title": "Alli sicher?",
+      "hint": "Bestätig churz, dass du guet acho bisch, damit d Gruppe weiss, dass alles i Ornig isch.",
+      "confirmed": "sicher",
+      "open": "offe",
+      "confirm": "I ha's gschafft",
+      "done": "Bestätigt"
+    },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
     "settingsExported": "Istelige exportiert ✓",

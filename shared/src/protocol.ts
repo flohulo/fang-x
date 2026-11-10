@@ -37,6 +37,7 @@ export type ClientMessage =
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
+  | { t: "confirmSafe" }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -169,5 +170,18 @@ export type ServerMessage =
       message: string;
       code?: string;
       params?: MessageParams;
+    }
+  | {
+      /** Von einer Person kommt seit einer Weile keine Position mehr an. */
+      t: "inactivity";
+      playerId: string;
+      name: string;
+      minutes: number;
+      at: number;
+    }
+  | {
+      /** Wer nach Spielende "Ich bin sicher" bestätigt hat. */
+      t: "safety";
+      safe: string[];
     }
   | { t: "pong" };
