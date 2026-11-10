@@ -1,4 +1,4 @@
-name: Handbuch veröffentlichen
+name: Webseite und Handbuch veröffentlichen
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "docs/**"
+      - "website/**"
       - "mkdocs.yml"
       - "requirements-docs.txt"
       - ".github/workflows/deploy-docs.yml"
@@ -35,11 +36,19 @@ jobs:
       - name: Abhängigkeiten installieren
         run: pip install -r requirements-docs.txt
 
-      - name: Handbuch bauen
-        run: mkdocs build --strict
+      - name: Webseite und Handbuch bauen
+        run: |
+          mkdir -p _site
+          cp -r website/. _site/
+          mkdocs build --strict -d _site/handbuch
 
       - name: Auf gh-pages veröffentlichen
         run: |
+          touch _site/.nojekyll
+          cd _site
+          git init -q -b gh-pages
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          mkdocs gh-deploy --force
+          git add -A
+          git commit -q -m "chore: webseite und handbuch veröffentlichen"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
