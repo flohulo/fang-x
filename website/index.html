@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fang X – das GPS-Fangspiel für draussen</title>
+    <meta
+      name="description"
+      content="Fang X ist ein kostenloses, werbefreies GPS-Fangspiel für draussen. Eine Person ist X und flüchtet, alle anderen jagen sie als Detektive. Ohne Konto, direkt im Browser, Open Source."
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fang X – das GPS-Fangspiel für draussen" />
+    <meta
+      property="og:description"
+      content="Eine Person flüchtet, alle anderen jagen sie. Kostenlos, werbefrei, ohne Konto und Open Source."
+    />
+    <meta property="og:locale" content="de_CH" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+    <header class="top">
+      <div class="wrap">
+        <a class="brand" href="#"><img src="favicon.svg" alt="" />Fang X</a>
+        <nav class="links" aria-label="Hauptnavigation">
+          <a href="#ablauf">So funktioniert's</a>
+          <a href="#funktionen">Funktionen</a>
+          <a href="#datenschutz">Datenschutz</a>
+          <a href="handbuch/">Handbuch</a>
+          <a class="btn primary small" href="https://fang-x.freizeit.workers.dev/">Jetzt spielen</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="inhalt">
+      <section class="hero">
+        <div class="wrap">
+          <div>
+            <span class="eyebrow">GPS-Fangspiel für draussen</span>
+            <h1>Eine Person flüchtet. Alle anderen <em>jagen</em> sie.</h1>
+            <p class="lead">
+              Fang X verwandelt eure Stadt in ein Spielfeld. Eine Person ist X und versucht zu
+              entkommen, die Detektive bekommen regelmässig ungefähre Hinweise auf ihren Standort.
+              Wer X im Fangradius erreicht, gewinnt.
+            </p>
+            <div class="cta">
+              <a class="btn primary" href="https://fang-x.freizeit.workers.dev/">Jetzt spielen</a>
+              <a class="btn" href="handbuch/Erste-Schritte/">Erste Schritte lesen</a>
+            </div>
+            <ul class="badges">
+              <li>Kostenlos</li>
+              <li>Werbefrei</li>
+              <li>Kein Konto nötig</li>
+              <li>Open Source</li>
+            </ul>
+          </div>
+
+          <svg
+            class="radar"
+            viewBox="0 0 440 440"
+            role="img"
+            aria-label="Karte mit Fangradius und Standort-Hinweis"
+          >
+            <rect width="440" height="440" rx="32" fill="#1e293b" />
+            <g stroke="#334155" stroke-width="2" fill="none">
+              <path d="M0 110 H440 M0 300 H440 M120 0 V440 M320 0 V440" />
+              <path d="M0 380 L440 60 M40 0 L230 440" stroke-width="1.5" opacity="0.6" />
+            </g>
+            <circle
+              cx="220"
+              cy="220"
+              r="150"
+              fill="rgba(56,189,248,0.07)"
+              stroke="#38bdf8"
+              stroke-width="2"
+              stroke-dasharray="10 8"
+              opacity="0.7"
+            />
+            <circle
+              class="pulse"
+              cx="220"
+              cy="220"
+              r="150"
+              fill="none"
+              stroke="#38bdf8"
+              stroke-width="3"
+            />
+            <circle
+              class="pulse p2"
+              cx="220"
+              cy="220"
+              r="150"
+              fill="none"
+              stroke="#38bdf8"
+              stroke-width="3"
+            />
+            <path
+              d="M205 205 L235 235 M235 205 L205 235"
+              stroke="#38bdf8"
+              stroke-width="12"
+              stroke-linecap="round"
+            />
+            <g fill="#f1f5f9">
+              <circle cx="96" cy="326" r="9" />
+              <circle cx="338" cy="352" r="9" />
+              <circle cx="364" cy="108" r="9" />
+            </g>
+            <g fill="none" stroke="#f1f5f9" stroke-width="2" opacity="0.5">
+              <circle cx="96" cy="326" r="16" />
+              <circle cx="338" cy="352" r="16" />
+              <circle cx="364" cy="108" r="16" />
+            </g>
+            <text
+              x="220"
+              y="62"
+              text-anchor="middle"
+              fill="#94a3b8"
+              font-size="16"
+              font-family="system-ui, sans-serif"
+            >
+              Letzte Sichtung: ungefährer Bereich
+            </text>
+          </svg>
+        </div>
+      </section>
+
+      <section id="ablauf" class="alt">
+        <div class="wrap">
+          <h2>In vier Schritten zur Runde</h2>
+          <p class="sub">
+            Kein Download, keine Anmeldung. Ihr öffnet Fang X im Browser und seid in wenigen Minuten
+            unterwegs.
+          </p>
+          <ol class="steps">
+            <li>
+              <h3>Spiel erstellen</h3>
+              <p>Eine Person erstellt ein Spiel und teilt den sechsstelligen Spielcode.</p>
+            </li>
+            <li>
+              <h3>Rolle wählen</h3>
+              <p>Alle treten bei und entscheiden sich für X oder Detektiv.</p>
+            </li>
+            <li>
+              <h3>Regeln festlegen</h3>
+              <p>Der Host stellt Dauer, Vorsprung, Hinweis-Intervall und mehr ein.</p>
+            </li>
+            <li>
+              <h3>Los geht's</h3>
+              <p>X läuft voraus, die Detektive suchen mit Karte und Hinweisen.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="rollen">
+        <div class="wrap">
+          <h2>Zwei Seiten, ein Spielfeld</h2>
+          <p class="sub">Jede Runde lebt vom Katz-und-Maus-Prinzip.</p>
+          <div class="roles">
+            <div class="role x">
+              <h3>X – die Gejagte</h3>
+              <p>Du läufst los, bleibst im Spielgebiet und versuchst, die Zeit zu überleben.</p>
+              <ul>
+                <li>Bonusmission: erreiche einen geheimen Zielpunkt vor der nächsten Sichtung.</li>
+                <li>Vorsprung, damit du in Ruhe verschwinden kannst.</li>
+                <li>Notfall-Knopf, falls du die Runde abbrechen musst.</li>
+              </ul>
+            </div>
+            <div class="role d">
+              <h3>Detektive – das Team</h3>
+              <p>Ihr wertet die Hinweise aus, grenzt X ein und schliesst den Kreis.</p>
+              <ul>
+                <li>Regelmässige Sichtungen zeigen X' ungefähren Standort.</li>
+                <li>Auf Wunsch seht ihr die Live-Standorte eurer Teammitglieder.</li>
+                <li>Der Fang klappt im Fangradius oder per Foto-Fang.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="funktionen" class="alt">
+        <div class="wrap">
+          <h2>Eure Regeln, eure Runde</h2>
+          <p class="sub">
+            Ob kurze Mittagspause oder ein ganzer Nachmittag: Der Host passt jede Einstellung an die
+            Gruppe an.
+          </p>
+          <div class="grid">
+            <div class="card">
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0" />
+                <circle cx="16" cy="6" r="2" />
+                <circle cx="8" cy="12" r="2" />
+                <circle cx="18" cy="18" r="2" />
+              </svg>
+              <h3>Eigene Regeln</h3>
+              <p>
+                Spieldauer, Vorsprung, Sichtungs-Intervall, Sichtradius, Fangradius und Spielgebiet
+                stellst du einzeln ein.
+              </p>
+            </div>
+            <div class="card">
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+              </svg>
+              <h3>Bonusmission</h3>
+              <p>Optional jagt X einem geheimen Zielpunkt hinterher und muss dabei riskieren.</p>
+            </div>
+            <div class="card">
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+              <h3>Foto-Fang</h3>
+              <p>Den Fang bestätigt ihr direkt in der App, gemeinsam und ohne Foto-Upload.</p>
+            </div>
+            <div class="card">
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 5h16v11H9l-5 4z" />
+              </svg>
+              <h3>Integrierter Chat</h3>
+              <p>
+                Alle schreiben sich während der Runde. Nach Spielende wird der Verlauf gelöscht.
+              </p>
+            </div>
+            <div class="card">
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 3l10 18H2z" />
+                <path d="M12 10v5M12 18h0" />
+              </svg>
+              <h3>Notfall-Knopf</h3>
+              <p>
+                Muss X abbrechen, endet das Spiel nach Bestätigung. Die Detektive erhalten den
+                exakten Standort.
+              </p>
+            </div>
+            <div class="card">
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="7" y="2" width="10" height="20" rx="2.5" />
+                <path d="M11 18h2" />
+              </svg>
+              <h3>Als App installierbar</h3>
+              <p>Fang X läuft im Browser und lässt sich auf den Startbildschirm legen.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="datenschutz">
+        <div class="wrap">
+          <h2>Ohne Konto, ohne Standortverlauf</h2>
+          <p class="sub">
+            Ein Spiel mit Standorten braucht Vertrauen. Deshalb sammelt Fang X so wenig wie möglich.
+          </p>
+          <ul class="privacy">
+            <li><strong>Keine Benutzerkonten.</strong> Spielcode teilen genügt.</li>
+            <li>
+              <strong>Live-Standorte nur im Spiel.</strong> Routenverläufe werden nicht gespeichert.
+            </li>
+            <li><strong>Chat nur im Arbeitsspeicher.</strong> Nach Spielende wird er verworfen.</li>
+            <li>
+              <strong>Du behältst die Kontrolle.</strong> Die Standortfreigabe kannst du jederzeit
+              in den Geräteeinstellungen widerrufen.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="alt" id="opensource">
+        <div class="wrap">
+          <h2>Offen, frei und von der Community</h2>
+          <p class="sub">
+            Fang X steht unter der AGPL-3.0 und ist komplett einsehbar. Fehler melden,
+            Verbesserungen vorschlagen oder Übersetzungen beisteuern: Mitmachen ist ausdrücklich
+            erwünscht. Das Spiel gibt es auf Deutsch und Englisch.
+          </p>
+          <div class="cta">
+            <a class="btn" href="https://github.com/flohulo/fang-x">Quellcode auf GitHub</a>
+            <a class="btn" href="https://github.com/flohulo/fang-x/issues/new/choose"
+              >Idee oder Fehler melden</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="final">
+        <div class="wrap">
+          <h2>Bereit für die erste Jagd?</h2>
+          <p class="sub">
+            Trommle deine Freunde zusammen, wähle einen sicheren öffentlichen Ort und startet eine
+            Runde.
+          </p>
+          <div class="cta">
+            <a class="btn primary" href="https://fang-x.freizeit.workers.dev/">Jetzt spielen</a>
+            <a class="btn" href="handbuch/">Zum Handbuch</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>Fang X · AGPL-3.0-only</span>
+        <span class="fl">
+          <a href="handbuch/">Handbuch</a>
+          <a href="https://github.com/flohulo/fang-x">GitHub</a>
+          <a href="https://openfreemap.org/">Karten: OpenFreeMap</a>
+          <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>

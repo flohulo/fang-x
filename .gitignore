@@ -10,3 +10,4 @@ site/
 .env.*.local
 .freebuff/
 *.pid
+_site/

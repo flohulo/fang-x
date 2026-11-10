@@ -38,6 +38,8 @@ export type ClientMessage =
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
   | { t: "confirmSafe" }
+  /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
+  | { t: "batteryLow"; level: number }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -206,5 +208,13 @@ export type ServerMessage =
       /** Wer nach Spielende "Ich bin sicher" bestätigt hat. */
       t: "safety";
       safe: string[];
+    }
+  | {
+      /** Der Akku einer Person ist niedrig. Geht an alle. */
+      t: "batteryLow";
+      playerId: string;
+      name: string;
+      level: number;
+      at: number;
     }
   | { t: "pong" };

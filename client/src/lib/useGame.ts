@@ -66,6 +66,12 @@ export function useGame() {
     at: number;
   } | null>(null);
   const [safe, setSafe] = useState<string[]>([]);
+  const [batteryWarning, setBatteryWarning] = useState<{
+    playerId: string;
+    name: string;
+    level: number;
+    at: number;
+  } | null>(null);
   const [catchPending, setCatchPending] = useState(false);
   const [lastReveal, setLastReveal] = useState<RevealEvent | null>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -189,6 +195,7 @@ export function useGame() {
             setTransitNotice(null);
             setInactivity(null);
             setSafe([]);
+            setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -238,6 +245,14 @@ export function useGame() {
           break;
         case "safety":
           setSafe(msg.safe);
+          break;
+        case "batteryLow":
+          setBatteryWarning({
+            playerId: msg.playerId,
+            name: msg.name,
+            level: msg.level,
+            at: msg.at,
+          });
           break;
         case "playerPosition":
           setPlayers((current) =>
@@ -374,6 +389,10 @@ export function useGame() {
     send({ t: "confirmSafe" });
   };
 
+  const sendBatteryLow = (level: number) => {
+    send({ t: "batteryLow", level });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -421,6 +440,7 @@ export function useGame() {
     transitNotice,
     inactivity,
     safe,
+    batteryWarning,
     revealTimer,
     chatMessages,
     catchPending,
@@ -435,6 +455,7 @@ export function useGame() {
     reconnecting,
     join,
     confirmSafe,
+    sendBatteryLow,
     configure,
     setRole,
     start,
