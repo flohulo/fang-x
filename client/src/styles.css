@@ -1028,6 +1028,20 @@ label {
   line-height: 1.2;
 }
 
+.qr-box {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.qr-code {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  background: #fff;
+}
+
 .transit-dialog-backdrop {
   position: fixed;
   inset: 0;
