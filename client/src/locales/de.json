@@ -254,6 +254,14 @@
     "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
     "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
     "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "stats": {
+      "title": "Auswertung",
+      "duration": "Spielzeit",
+      "reveals": "Sichtungen",
+      "closest": "Knappster Abstand",
+      "farthest": "Am weitesten gelaufen",
+      "roleX": "X"
+    },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",
     "settingsExported": "Einstellungen exportiert ✓",
