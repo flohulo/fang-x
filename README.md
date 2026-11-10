@@ -98,7 +98,9 @@ Fang X kann Fehler an ein gehostetes GlitchTip-Projekt melden. Lege dafür in Gl
 Projekt an und hinterlege dessen DSN:
 
 - **Server:** als Secret mit `npx wrangler secret put GLITCHTIP_DSN` im Ordner `server`.
-- **Client:** als Umgebungsvariable `VITE_GLITCHTIP_DSN` beim Bauen (`npm run build`).
+- **Client:** als Umgebungsvariable `VITE_GLITCHTIP_DSN` beim Bauen (`npm run build`). Im
+  Release-Workflow kommt sie aus der GitHub-Variable `VITE_GLITCHTIP_DSN` im Environment
+  `production`.
 
 Ohne DSN ist die Fehlerberichterstattung ausgeschaltet. Die Bereinigung der Berichte steht in
 [`shared/src/error-report.ts`](shared/src/error-report.ts).
