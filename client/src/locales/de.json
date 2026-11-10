@@ -254,6 +254,11 @@
     "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
     "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
     "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "markers": {
+      "suspect": "Verdacht markieren",
+      "clear": "Hier nicht markieren",
+      "cancel": "Markieren abbrechen"
+    },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",
     "settingsExported": "Einstellungen exportiert ✓",
@@ -366,6 +371,10 @@
     "showStreetMap": "Strassenkarte anzeigen",
     "objective": "Missionsziel",
     "start": "Start",
+    "markerSuspect": "Verdacht",
+    "markerClear": "Hier nicht",
+    "markerPopup": "{{label}} von {{name}} um {{time}} Uhr",
+    "markerRemove": "Entfernen",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",

@@ -250,6 +250,11 @@
     "surrenderLive": "De exakt Live-Standort isch a d Detektivä übertreit worde.",
     "surrenderNoPosition": "Es Standort isch nöd verfüegbar gsi.",
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
+    "markers": {
+      "suspect": "Verdacht markiere",
+      "clear": "Da nöd markiere",
+      "cancel": "Markiere abbräche"
+    },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
     "settingsExported": "Istelige exportiert ✓",
@@ -362,6 +367,10 @@
     "showStreetMap": "Strassecharte aazeige",
     "objective": "Missionsziel",
     "start": "Start",
+    "markerSuspect": "Verdacht",
+    "markerClear": "Da nöd",
+    "markerPopup": "{{label}} vo {{name}} um {{time}} Uhr",
+    "markerRemove": "Entferne",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",

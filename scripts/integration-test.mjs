@@ -241,6 +241,23 @@ async function run() {
   host.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
   await host.waitFor((m) => m.t === "yourPositionIsShared" && !m.shared);
 
+  // Team-Markierungen: nur Detektive sehen und setzen sie
+  det.ws.send(JSON.stringify({ t: "addMarker", pos: xPos, kind: "SUSPECT" }));
+  const markerList = await det.waitFor((m) => m.t === "markers" && m.markers.length === 1, 5000);
+  assert(
+    markerList.markers[0].kind === "SUSPECT" && markerList.markers[0].by === "Detektiv",
+    "Detektiv setzt eine Team-Markierung",
+  );
+  host.ws.send(JSON.stringify({ t: "addMarker", pos: xPos, kind: "CLEAR" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !host.messages.some((m) => m.t === "markers"),
+    "X sieht keine Team-Markierungen und kann keine setzen",
+  );
+  det.ws.send(JSON.stringify({ t: "removeMarker", id: markerList.markers[0].id }));
+  const emptied = await det.waitFor((m) => m.t === "markers" && m.markers.length === 0, 5000);
+  assert(emptied.markers.length === 0, "Team-Markierung lässt sich wieder entfernen");
+
   // 9. Detektiv bewegt sich zu X → Fang
   console.log("\nDetektiv bewegt sich zu X...");
   det.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));

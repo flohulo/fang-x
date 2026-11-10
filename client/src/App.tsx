@@ -511,6 +511,7 @@ export default function App() {
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
+        teamMarkers={game.teamMarkers}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
         catchPending={game.catchPending}
@@ -521,6 +522,8 @@ export default function App() {
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
+        onAddTeamMarker={game.addTeamMarker}
+        onRemoveTeamMarker={game.removeTeamMarker}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}

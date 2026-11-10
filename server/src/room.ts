@@ -30,6 +30,7 @@ import {
   type Role,
   type Ruleset,
   type ServerMessage,
+  type TeamMarker,
 } from "@fang-x/shared";
 
 const PLAYER_COLORS = [
@@ -74,6 +75,9 @@ const CHAT_WINDOW_MS = 5_000;
 /** Tick-Abstand: 1 s, solange Live-Standort, Gebietsfrist oder Fang-Bestätigung laufen. */
 const TICK_FAST_MS = 1_000;
 const TICK_IDLE_MS = 5_000;
+
+/** Team-Markierungen: höchstens so viele gleichzeitig, die ältesten fallen heraus. */
+const MAX_TEAM_MARKERS = 20;
 
 const STATE_KEY = "room";
 
@@ -169,6 +173,9 @@ export class GameRoom {
   private endDetail: EndDetail | null = null;
   private surrenderInfo: SurrenderInfo | null = null;
   private transitStops = { bus: 0, train: 0 };
+  /** Nur im Arbeitsspeicher; wird weder gespeichert noch nach der Runde behalten. */
+  private teamMarkers: TeamMarker[] = [];
+  private nextMarkerId = 1;
   private chatMessages: ChatMessage[] = [];
   private nextChatMessageId = 1;
   private catchPending = false;
@@ -562,6 +569,7 @@ export class GameRoom {
           this.sendTo(ws, this.phaseMessage());
           this.sendTo(ws, this.revealTimerMessage());
           this.sendObjective(player);
+          this.sendMarkers(player);
           // Detektiv-Standorte nachliefern, soweit dieser Spieler sie sehen darf.
           for (const other of this.players.values()) {
             if (!other.position || !this.canSeeDetectivePosition(player, other)) continue;
@@ -669,6 +677,14 @@ export class GameRoom {
         }
         case "surrender": {
           this.surrender(player);
+          break;
+        }
+        case "addMarker": {
+          this.addTeamMarker(player, msg.pos, msg.kind);
+          break;
+        }
+        case "removeMarker": {
+          this.removeTeamMarker(player, msg.id);
           break;
         }
         case "start": {
@@ -871,6 +887,7 @@ export class GameRoom {
     this.lastRevealAt = 0;
     this.nextRevealAt = null;
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.transitStops = { bus: 0, train: 0 };
     this.catchPending = false;
     this.broadcast({ t: "transitStops", ...this.transitStops });
@@ -1289,6 +1306,58 @@ export class GameRoom {
     return this.playAreaCenter;
   }
 
+  private canUseMarkers(player: Player | null): player is Player {
+    return (
+      !!player &&
+      player.role !== "X" &&
+      player.role !== "HOST" &&
+      (this.phase === "HEADSTART" || this.phase === "RUNNING")
+    );
+  }
+
+  private addTeamMarker(player: Player | null, pos: LatLng, kind: TeamMarker["kind"]) {
+    if (!this.canUseMarkers(player)) return;
+    if (kind !== "SUSPECT" && kind !== "CLEAR") return;
+    if (!isValidPosition(pos)) return;
+    this.teamMarkers.push({
+      id: this.nextMarkerId++,
+      pos: { lat: pos.lat, lng: pos.lng },
+      kind,
+      by: player.name,
+      at: Date.now(),
+    });
+    if (this.teamMarkers.length > MAX_TEAM_MARKERS) {
+      this.teamMarkers.splice(0, this.teamMarkers.length - MAX_TEAM_MARKERS);
+    }
+    this.broadcastMarkers();
+  }
+
+  private removeTeamMarker(player: Player | null, id: unknown) {
+    if (!this.canUseMarkers(player) || typeof id !== "number") return;
+    const before = this.teamMarkers.length;
+    this.teamMarkers = this.teamMarkers.filter((m) => m.id !== id);
+    if (this.teamMarkers.length !== before) this.broadcastMarkers();
+  }
+
+  /** Markierungen sehen nur Detektive; X und der Host in der Lobby bekommen nichts. */
+  private sendMarkers(player: Player) {
+    if (player.role === "X" || this.teamMarkers.length === 0) return;
+    this.sendTo(player.ws, { t: "markers", markers: this.teamMarkers });
+  }
+
+  private broadcastMarkers() {
+    for (const p of this.players.values()) {
+      if (p.role === "X") continue;
+      this.sendTo(p.ws, { t: "markers", markers: this.teamMarkers });
+    }
+  }
+
+  private clearTeamMarkers() {
+    if (this.teamMarkers.length === 0) return;
+    this.teamMarkers = [];
+    this.broadcastMarkers();
+  }
+
   /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */
   private surrender(player: Player | null) {
     if (player?.role !== "X") {
@@ -1361,6 +1430,7 @@ export class GameRoom {
       player.position = null;
     }
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.broadcastPhase();
     this.lastActiveAt = Date.now();
     this.persist();
@@ -1503,6 +1573,7 @@ export class GameRoom {
     this.lastRevealIndex = 0;
     this.lastRevealAt = 0;
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.stopTick();
   }
 

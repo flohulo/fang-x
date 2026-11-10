@@ -1,4 +1,11 @@
-import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
+import type {
+  ChatMessage,
+  LatLng,
+  ObjectiveState,
+  RevealEvent,
+  Ruleset,
+  TeamMarker,
+} from "@fang-x/shared";
 import { metersToPlayAreaEdge } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
@@ -15,6 +22,9 @@ import { useGeolocation } from "../lib/useGeolocation";
 import type { GameResult, PlayerView } from "../lib/useGame";
 
 interface GameScreenProps {
+  teamMarkers: TeamMarker[];
+  onAddTeamMarker: (pos: LatLng, kind: TeamMarker["kind"]) => void;
+  onRemoveTeamMarker: (id: number) => void;
   code: string;
   phase: string;
   pingHistory: RevealEvent[];
@@ -90,6 +100,9 @@ export function GameScreen({
   objective,
   transitStops,
   transitNotice,
+  teamMarkers,
+  onAddTeamMarker,
+  onRemoveTeamMarker,
   revealTimer,
   chatMessages,
   catchPending,
@@ -110,6 +123,7 @@ export function GameScreen({
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSimHint, setShowSimHint] = useState(false);
   const [choosingObjective, setChoosingObjective] = useState(false);
+  const [markingKind, setMarkingKind] = useState<TeamMarker["kind"] | null>(null);
   const [transitDialogOpen, setTransitDialogOpen] = useState(false);
   const [surrenderDialogOpen, setSurrenderDialogOpen] = useState(false);
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
@@ -240,10 +254,17 @@ export function GameScreen({
     setSimulatedPosition(mapCenter ?? center);
   };
 
+  const canMark = !isX && (phase === "RUNNING" || phase === "HEADSTART");
+
   const handleMapClick = (pos: LatLng) => {
     if (choosingObjective) {
       onSetObjective(pos);
       setChoosingObjective(false);
+      return;
+    }
+    if (markingKind) {
+      onAddTeamMarker(pos, markingKind);
+      setMarkingKind(null);
       return;
     }
     if (simulated || showSimHint) {
@@ -396,6 +417,8 @@ export function GameScreen({
           lastReveal={lastReveal}
           pingHistory={isX ? pingHistory : []}
           objective={isX ? objective : null}
+          teamMarkers={isX ? [] : teamMarkers}
+          onRemoveTeamMarker={onRemoveTeamMarker}
           startPoint={playAreaCenter ?? ruleset?.map?.startLocation ?? null}
           onMapClick={handleMapClick}
           onSatelliteChange={setSatelliteOn}
@@ -591,6 +614,19 @@ export function GameScreen({
         <div className="map-bottom-controls">
           {canChooseObjective && !choosingObjective && (
             <button onClick={() => setChoosingObjective(true)}>{t("game.chooseObjective")}</button>
+          )}
+          {canMark && !markingKind && (
+            <>
+              <button onClick={() => setMarkingKind("SUSPECT")}>{t("game.markers.suspect")}</button>
+              <button className="secondary" onClick={() => setMarkingKind("CLEAR")}>
+                {t("game.markers.clear")}
+              </button>
+            </>
+          )}
+          {markingKind && (
+            <button className="secondary" onClick={() => setMarkingKind(null)}>
+              {t("game.markers.cancel")}
+            </button>
           )}
           {choosingObjective && (
             <button className="secondary" onClick={() => setChoosingObjective(false)}>

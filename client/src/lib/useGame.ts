@@ -1,6 +1,7 @@
 import type {
   ChatMessage,
   ClientMessage,
+  TeamMarker,
   LatLng,
   MessageParams,
   ObjectiveState,
@@ -57,6 +58,7 @@ export function useGame() {
     train: number;
     at: number;
   } | null>(null);
+  const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
   const [catchPending, setCatchPending] = useState(false);
   const [lastReveal, setLastReveal] = useState<RevealEvent | null>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -178,6 +180,7 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setTeamMarkers([]);
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -216,6 +219,9 @@ export function useGame() {
           break;
         case "catchPending":
           setCatchPending(msg.pending);
+          break;
+        case "markers":
+          setTeamMarkers(msg.markers);
           break;
         case "playerPosition":
           setPlayers((current) =>
@@ -347,6 +353,14 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const addTeamMarker = (pos: LatLng, kind: TeamMarker["kind"]) => {
+    send({ t: "addMarker", pos, kind });
+  };
+
+  const removeTeamMarker = (id: number) => {
+    send({ t: "removeMarker", id });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -392,6 +406,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    teamMarkers,
     revealTimer,
     chatMessages,
     catchPending,
@@ -405,6 +420,8 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    addTeamMarker,
+    removeTeamMarker,
     configure,
     setRole,
     start,

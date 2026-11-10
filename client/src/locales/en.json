@@ -254,6 +254,11 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "markers": {
+      "suspect": "Mark suspect",
+      "clear": "Mark not here",
+      "cancel": "Cancel marking"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",
@@ -366,6 +371,10 @@
     "showStreetMap": "Show street map",
     "objective": "Mission target",
     "start": "Start",
+    "markerSuspect": "Suspect",
+    "markerClear": "Not here",
+    "markerPopup": "{{label}} by {{name}} at {{time}}",
+    "markerRemove": "Remove",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} at {{time}}",
     "startPoint": "Starting point",

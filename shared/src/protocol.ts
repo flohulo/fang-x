@@ -4,6 +4,17 @@
 import type { LatLng } from "./geo";
 import type { Ruleset } from "./ruleset";
 
+/** Markierung der Detektive auf der Karte. X sieht sie nie. */
+export interface TeamMarker {
+  id: number;
+  pos: LatLng;
+  /** SUSPECT = Verdacht, CLEAR = hier ist X nicht. */
+  kind: "SUSPECT" | "CLEAR";
+  /** Name der Person, die markiert hat. */
+  by: string;
+  at: number;
+}
+
 export type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
 export type Role = "X" | "DETECTIVE" | "HOST";
@@ -37,6 +48,8 @@ export type ClientMessage =
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
+  | { t: "addMarker"; pos: LatLng; kind: TeamMarker["kind"] }
+  | { t: "removeMarker"; id: number }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -169,5 +182,10 @@ export type ServerMessage =
       message: string;
       code?: string;
       params?: MessageParams;
+    }
+  | {
+      /** Alle Team-Markierungen; geht nur an Detektive. */
+      t: "markers";
+      markers: TeamMarker[];
     }
   | { t: "pong" };
