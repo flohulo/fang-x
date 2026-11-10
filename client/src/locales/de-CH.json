@@ -269,6 +269,14 @@
       "confirm": "I ha's gschafft",
       "done": "Bestätigt"
     },
+    "stats": {
+      "title": "Uswärtig",
+      "duration": "Spielziit",
+      "reveals": "Sichtige",
+      "closest": "Chnappste Abstand",
+      "farthest": "Am wiitischte glaufe",
+      "roleX": "X"
+    },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
     "settingsExported": "Istelige exportiert ✓",

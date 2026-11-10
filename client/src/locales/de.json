@@ -273,6 +273,14 @@
       "confirm": "Ich bin sicher",
       "done": "Bestätigt"
     },
+    "stats": {
+      "title": "Auswertung",
+      "duration": "Spielzeit",
+      "reveals": "Sichtungen",
+      "closest": "Knappster Abstand",
+      "farthest": "Am weitesten gelaufen",
+      "roleX": "X"
+    },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",
     "settingsExported": "Einstellungen exportiert ✓",

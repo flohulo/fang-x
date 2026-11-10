@@ -273,6 +273,14 @@
       "confirm": "I am safe",
       "done": "Confirmed"
     },
+    "stats": {
+      "title": "Round summary",
+      "duration": "Play time",
+      "reveals": "Reveals",
+      "closest": "Closest approach",
+      "farthest": "Walked the farthest",
+      "roleX": "X"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",

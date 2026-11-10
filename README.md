@@ -46,6 +46,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
 - **Alle sicher und Funkstille:** Kommt von jemandem länger keine Position an, werden alle
   gewarnt. Nach dem Spielende bestätigt jede Person, dass sie sicher ist.
+- **Auswertung:** Am Ende zeigt die App Spielzeit, Sichtungen, knappsten Abstand und die
+  gelaufene Strecke pro Person. Gespeichert werden nur Summen, kein Routenverlauf.
 
 ## Datenschutz und sicher spielen
 

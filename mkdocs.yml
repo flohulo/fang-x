@@ -48,6 +48,7 @@ nav:
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
+  - Spielende-Auswertung: Spielende-Auswertung.md
 
 # Die interne Regelwerk-Spezifikation bleibt im Repository, gehört aber nicht ins Handbuch.
 exclude_docs: |
@@ -101,6 +102,7 @@ plugins:
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
             Alle sicher und Funkstille: Everyone safe and radio silence
+            Spielende-Auswertung: Round summary
 
 extra:
   social:
