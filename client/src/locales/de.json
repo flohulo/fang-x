@@ -109,6 +109,24 @@
     "send": "Senden",
     "hint": "Chat der laufenden Runde – nach Spielende wird er gelöscht."
   },
+  "radio": {
+    "title": "Funk",
+    "open": "Funk öffnen",
+    "close": "Funk schließen",
+    "onlyDetectives": "Nur für Detektive",
+    "intro": "Sprich per Knopfdruck mit den anderen Detektiven. X hört nichts mit.",
+    "start": "Funk einschalten",
+    "stop": "Funk ausschalten",
+    "hold": "Zum Sprechen gedrückt halten",
+    "transmitting": "Du sendest …",
+    "speaking": "Es spricht: {{names}}",
+    "linked": "Verbunden mit {{linked}} von {{total}} Detektiven",
+    "privacy": "Der Ton läuft direkt zwischen den Geräten der Detektive. Zum Verbindungsaufbau sehen sich die Geräte gegenseitig ihre IP-Adressen und fragen einen STUN-Server (standardmäßig von Cloudflare) danach. Es wird nichts aufgezeichnet.",
+    "error": {
+      "unsupported": "Dein Browser unterstützt keinen Funk.",
+      "denied": "Ohne Zugriff auf das Mikrofon kannst du den Funk nicht nutzen. Erlaube ihn in den Browser-Einstellungen."
+    }
+  },
   "lobby": {
     "title": "Spielvorbereitung",
     "waiting": {

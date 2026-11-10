@@ -31,6 +31,7 @@ playing outdoors.
 | :material-map: [Play area](Spielgebiet.md) | The permitted radius of action |
 | :material-flag-checkered: [Bonus mission for X](Bonusmission-fuer-X.md) | An extra goal for X |
 | :material-alert-octagon: [Emergency button](Notfall-Knopf.md) | Ending the round and sharing the location |
+| :material-microphone: [Detective radio](Detektiv-Funk.md) | Voice radio between detectives |
 
 ## Playing safely
 

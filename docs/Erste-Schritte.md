@@ -47,6 +47,7 @@ Karte ausprobieren.
   anderen Detektive. Ein Fang ist je nach Regel automatisch im Fangradius oder per Foto-Fang
   möglich.
 - Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht.
+- Detektive können sich per [Funk](Detektiv-Funk.md) unterhalten, ohne dass X mithört.
 
 ## Spielende
 

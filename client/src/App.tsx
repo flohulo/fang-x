@@ -513,6 +513,7 @@ export default function App() {
         transitNotice={game.transitNotice}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
+        iceServers={game.iceServers}
         catchPending={game.catchPending}
         serverError={gameErrorText}
         yourPositionIsShared={game.yourPositionIsShared}
@@ -521,6 +522,8 @@ export default function App() {
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
+        onSendRtc={game.sendRtc}
+        onSubscribeRtc={game.subscribeRtc}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}

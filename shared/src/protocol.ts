@@ -11,6 +11,32 @@ export type Role = "X" | "DETECTIVE" | "HOST";
 /** Platzhalter für übersetzbare Servermeldungen (z. B. { meters: 25 }). */
 export type MessageParams = Record<string, string | number>;
 
+// --- Sprachfunk (WebRTC) ---
+
+/** Signalisierung für den Detektiv-Funk. Der Server leitet sie nur zwischen Detektiven weiter. */
+export type RtcSignal =
+  | { kind: "hello"; reply: boolean }
+  | { kind: "offer"; sdp: string }
+  | { kind: "answer"; sdp: string }
+  | {
+      kind: "ice";
+      candidate: {
+        candidate: string;
+        sdpMid?: string | null;
+        sdpMLineIndex?: number | null;
+      } | null;
+    }
+  | { kind: "bye" };
+
+export interface RtcIceServer {
+  urls: string | string[];
+  username?: string;
+  credential?: string;
+}
+
+/** Rückfall, wenn der Betreiber keine eigenen ICE-Server (STUN/TURN) konfiguriert hat. */
+export const DEFAULT_ICE_SERVERS: RtcIceServer[] = [{ urls: "stun:stun.cloudflare.com:3478" }];
+
 // --- Client → Server ---
 
 export type ClientMessage =
@@ -34,6 +60,8 @@ export type ClientMessage =
       count?: number;
     }
   | { t: "chat"; text: string }
+  /** Funk-Signal an einen Detektiv (`to`) oder, ohne `to`, an alle anderen Detektive. */
+  | { t: "rtc"; to?: string; signal: RtcSignal }
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
@@ -96,6 +124,8 @@ export type ServerMessage =
       chat: ChatMessage[];
       catchPending: boolean;
       youAreHost: boolean;
+      /** ICE-Server (STUN/TURN) für den Detektiv-Funk. */
+      iceServers?: RtcIceServer[];
     }
   | { t: "players"; players: PlayerInfo[] }
   | {
@@ -121,6 +151,7 @@ export type ServerMessage =
     }
   | { t: "transitStops"; bus: number; train: number }
   | { t: "chat"; message: ChatMessage }
+  | { t: "rtc"; from: string; signal: RtcSignal }
   | {
       t: "transitNotice";
       mode: "bus" | "train";

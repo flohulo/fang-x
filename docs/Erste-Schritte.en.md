@@ -32,6 +32,7 @@ your location. Without GPS you can try out the game in **simulation mode** on th
   the other detectives. Depending on the rule, a catch happens automatically within the catch
   radius or via a photo catch.
 - Everyone can write in the chat. The history is deleted after the game ends.
+- Detectives can talk over the [radio](Detektiv-Funk.md) without X listening in.
 
 ## End of the game
 

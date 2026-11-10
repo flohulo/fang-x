@@ -1,9 +1,18 @@
-import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
+import type {
+  ChatMessage,
+  LatLng,
+  ObjectiveState,
+  RevealEvent,
+  RtcIceServer,
+  RtcSignal,
+  Ruleset,
+} from "@fang-x/shared";
 import { metersToPlayAreaEdge } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { ChatPanel } from "../components/ChatPanel";
+import { RadioPanel } from "../components/RadioPanel";
 import { MapView } from "../components/MapView";
 import {
   buildSettingsExport,
@@ -12,7 +21,7 @@ import {
 } from "../lib/settingsExport";
 import { formatEndReason } from "../lib/serverMessages";
 import { useGeolocation } from "../lib/useGeolocation";
-import type { GameResult, PlayerView } from "../lib/useGame";
+import type { GameResult, PlayerView, RtcHandler } from "../lib/useGame";
 
 interface GameScreenProps {
   code: string;
@@ -39,6 +48,7 @@ interface GameScreenProps {
     indeterminate: boolean;
   } | null;
   chatMessages: ChatMessage[];
+  iceServers: RtcIceServer[];
   catchPending: boolean;
   serverError: string | null;
   yourPositionIsShared: boolean;
@@ -47,6 +57,8 @@ interface GameScreenProps {
   onSetObjective: (target: LatLng) => void;
   onUseTransitStop: (mode: "bus" | "train", count: number) => void;
   onSendChat: (text: string) => void;
+  onSendRtc: (signal: RtcSignal, to?: string) => void;
+  onSubscribeRtc: (handler: RtcHandler) => () => void;
   onReportCatch: () => void;
   onResolveCatch: (caught: boolean) => void;
   onSurrender: () => void;
@@ -92,6 +104,7 @@ export function GameScreen({
   transitNotice,
   revealTimer,
   chatMessages,
+  iceServers,
   catchPending,
   serverError,
   yourPositionIsShared,
@@ -100,6 +113,8 @@ export function GameScreen({
   onSetObjective,
   onUseTransitStop,
   onSendChat,
+  onSendRtc,
+  onSubscribeRtc,
   onReportCatch,
   onResolveCatch,
   onSurrender,
@@ -621,6 +636,15 @@ export function GameScreen({
         </div>
 
         <ChatPanel messages={chatMessages} myId={myId} onSend={onSendChat} />
+        {!isX && (phase === "HEADSTART" || phase === "RUNNING") && (
+          <RadioPanel
+            myId={myId}
+            players={players}
+            iceServers={iceServers}
+            onSendRtc={onSendRtc}
+            onSubscribeRtc={onSubscribeRtc}
+          />
+        )}
 
         {surrenderDialogOpen && (
           <div

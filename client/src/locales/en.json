@@ -109,6 +109,24 @@
     "send": "Send",
     "hint": "Chat of the current round – it is deleted when the game ends."
   },
+  "radio": {
+    "title": "Radio",
+    "open": "Open radio",
+    "close": "Close radio",
+    "onlyDetectives": "Detectives only",
+    "intro": "Talk to the other detectives at the push of a button. X cannot hear anything.",
+    "start": "Turn radio on",
+    "stop": "Turn radio off",
+    "hold": "Hold to talk",
+    "transmitting": "You are transmitting …",
+    "speaking": "Speaking: {{names}}",
+    "linked": "Connected to {{linked}} of {{total}} detectives",
+    "privacy": "Audio goes directly between the detectives' devices. To connect, the devices see each other's IP addresses and ask a STUN server (Cloudflare by default). Nothing is recorded.",
+    "error": {
+      "unsupported": "Your browser does not support the radio.",
+      "denied": "You need to allow microphone access in your browser settings to use the radio."
+    }
+  },
   "lobby": {
     "title": "Game setup",
     "waiting": {

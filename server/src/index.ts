@@ -9,6 +9,8 @@ export interface Env {
   GAME_ROOM: DurableObjectNamespace;
   RATE_LIMIT: DurableObjectNamespace;
   ASSETS: Fetcher;
+  /** Optional: JSON-Liste von ICE-Servern (STUN/TURN) für den Detektiv-Funk. */
+  ICE_SERVERS?: string;
 }
 
 // 6-Buchstaben-Code ohne mehrdeutige Zeichen (kein I, O, 0, 1)
