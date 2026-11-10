@@ -260,6 +260,12 @@
     "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
     "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
     "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "battery": {
+      "label": "Akku:",
+      "other": "Der Akku von {{name}} ist bei {{level}} %. Gleich könnte die Position ausfallen.",
+      "self": "Dein Akku ist bei {{level}} %. Lade das Gerät, damit deine Position nicht ausfällt.",
+      "dismiss": "Hinweis schliessen"
+    },
     "stats": {
       "title": "Auswertung",
       "duration": "Spielzeit",

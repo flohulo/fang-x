@@ -47,6 +47,7 @@ nav:
       - Spielgebiet: Spielgebiet.md
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
+  - Akku-Warnung: Akku-Warnung.md
   - Spielende-Auswertung: Spielende-Auswertung.md
 
 # Die interne Regelwerk-Spezifikation bleibt im Repository, gehört aber nicht ins Handbuch.
@@ -100,6 +101,7 @@ plugins:
             Spielgebiet: Play area
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
+            Akku-Warnung: Low battery warning
             Spielende-Auswertung: Round summary
 
 extra:

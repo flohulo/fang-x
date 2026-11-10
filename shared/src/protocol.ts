@@ -37,6 +37,8 @@ export type ClientMessage =
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
+  /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
+  | { t: "batteryLow"; level: number }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -192,5 +194,13 @@ export type ServerMessage =
       message: string;
       code?: string;
       params?: MessageParams;
+    }
+  | {
+      /** Der Akku einer Person ist niedrig. Geht an alle. */
+      t: "batteryLow";
+      playerId: string;
+      name: string;
+      level: number;
+      at: number;
     }
   | { t: "pong" };
