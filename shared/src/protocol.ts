@@ -4,6 +4,9 @@
 import type { LatLng } from "./geo";
 import type { Ruleset } from "./ruleset";
 
+/** Ping-Trick von X: einmal pro Runde, entweder eine falsche oder eine übersprungene Sichtung. */
+export type PingTrickMode = "FAKE" | "SKIP";
+
 export type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
 export type Role = "X" | "DETECTIVE" | "HOST";
@@ -37,6 +40,8 @@ export type ClientMessage =
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
+  /** X schaltet den Ping-Trick für die nächste Sichtung scharf oder nimmt ihn zurück. */
+  | { t: "setPingTrick"; mode: PingTrickMode | "CANCEL" }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -169,5 +174,13 @@ export type ServerMessage =
       message: string;
       code?: string;
       params?: MessageParams;
+    }
+  | {
+      /** Stand des Ping-Tricks; geht nur an X. */
+      t: "pingTrick";
+      /** Für die nächste Sichtung scharf geschaltet. */
+      armed: PingTrickMode | null;
+      /** Schon verbraucht (die Sichtung ist erfolgt). */
+      used: PingTrickMode | null;
     }
   | { t: "pong" };

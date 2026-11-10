@@ -199,6 +199,46 @@ async function run() {
     "X wird informiert, wenn die Sichtung an Detektive übermittelt wird",
   );
 
+  // Ping-Trick: scharf schalten, zurücknehmen, dann falscher Ping bei der nächsten Sichtung
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "SKIP" }));
+  await host.waitFor((m) => m.t === "pingTrick" && m.armed === "SKIP", 5000);
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "CANCEL" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const trickStates = host.messages.filter((m) => m.t === "pingTrick");
+  assert(
+    trickStates[trickStates.length - 1].armed === null,
+    "Ping-Trick lässt sich vor der Sichtung zurücknehmen",
+  );
+  det.ws.send(JSON.stringify({ t: "setPingTrick", mode: "FAKE" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(!det.messages.some((m) => m.t === "pingTrick"), "Nur X kann den Ping-Trick benutzen");
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "FAKE" }));
+  await host.waitFor((m) => m.t === "pingTrick" && m.armed === "FAKE", 5000);
+  const fakeShared = await host.waitFor(
+    (m) => m.t === "positionShared" && !m.live && m.index > reveal.reveal.index,
+    15000,
+  );
+  const metersFromX = Math.hypot(
+    (fakeShared.pos.lat - xPos.lat) * 111_000,
+    (fakeShared.pos.lng - xPos.lng) * 111_000 * Math.cos((xPos.lat * Math.PI) / 180),
+  );
+  assert(metersFromX >= 30, `Falscher Ping liegt abseits von X (${Math.round(metersFromX)} m)`);
+  const fakeReveal = await det.waitFor(
+    (m) => m.t === "reveal" && m.reveal.index === fakeShared.index,
+    5000,
+  );
+  assert(
+    fakeReveal.reveal.pos.lat === fakeShared.pos.lat &&
+      fakeReveal.reveal.pos.lng === fakeShared.pos.lng,
+    "Detektive sehen den falschen Ping wie eine echte Sichtung",
+  );
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "SKIP" }));
+  const trickUsed = await host.waitFor(
+    (m) => m.t === "error" && m.code === "PING_TRICK_USED",
+    5000,
+  );
+  assert(!!trickUsed, "Der Ping-Trick gilt nur einmal pro Runde");
+
   const objectiveTarget = { lat: xPos.lat, lng: xPos.lng + 0.0008 };
   det.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
   const unauthorizedObjective = await det.waitFor(
@@ -709,6 +749,7 @@ async function run() {
       ruleset: {
         game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
         catch: { xCanSurrender: false },
+        reveal: { xCanTrick: false },
         map: { outOfBoundsEnabled: false },
       },
     }),
@@ -726,8 +767,53 @@ async function run() {
     !noSurrenderDetective.messages.some((m) => m.t === "end"),
     "Die Runde läuft nach einem abgelehnten Aufgeben weiter",
   );
+  noSurrenderX.ws.send(JSON.stringify({ t: "setPingTrick", mode: "FAKE" }));
+  const trickDisabled = await noSurrenderX.waitFor(
+    (m) => m.t === "error" && m.code === "PING_TRICK_DISABLED",
+    5000,
+  );
+  assert(!!trickDisabled, "Ohne Regel wird der Ping-Trick abgelehnt");
   noSurrenderX.ws.close();
   noSurrenderDetective.ws.close();
+
+  // 19. Ping-Trick: Sichtung überspringen
+  console.log("\n=== Ping-Trick: Sichtung überspringen ===");
+  const code9 = await createGame();
+  const skipX = await connect(code9);
+  skipX.ws.send(JSON.stringify({ t: "join", code: code9, name: "Skip-X", wantsX: true }));
+  await skipX.waitFor((m) => m.t === "joined");
+  const skipDetective = await connect(code9);
+  skipDetective.ws.send(
+    JSON.stringify({ t: "join", code: code9, name: "Skip-Detektiv", wantsX: false }),
+  );
+  await skipDetective.waitFor((m) => m.t === "joined");
+  skipX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        reveal: { intervalMinutes: 0.1, firstRevealAfterMinutes: 0.05 },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await skipX.waitFor((m) => m.t === "config");
+  skipX.ws.send(JSON.stringify({ t: "start" }));
+  await skipX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  skipX.ws.send(JSON.stringify({ t: "position", pos: surrenderPos }));
+  skipX.ws.send(JSON.stringify({ t: "setPingTrick", mode: "SKIP" }));
+  await skipX.waitFor((m) => m.t === "pingTrick" && m.used === "SKIP", 10000);
+  assert(
+    !skipDetective.messages.some((m) => m.t === "reveal"),
+    "Übersprungene Sichtung erreicht die Detektive nicht",
+  );
+  const afterSkip = await skipDetective.waitFor((m) => m.t === "reveal", 15000);
+  assert(
+    afterSkip.reveal.index === 1,
+    "Die Sichtung nach dem Überspringen zählt unauffällig als erste",
+  );
+  skipX.ws.close();
+  skipDetective.ws.close();
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);

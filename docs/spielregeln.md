@@ -75,6 +75,7 @@ Einstellungen überschreibt.
 | `reveal.radiusShrinkEnabled` | bool | — | false | Sichtradius wird über die Zeit kleiner (Spannung steigt). |
 | `reveal.radiusShrinkStepMeters` | int | — | 100 | Verkleinerung pro Aufdeckung. |
 | `reveal.radiusFloorMeters` | int | 0–500 | 5 | Kleinster Sichtradius beim Schrumpfen — nie größer als `revealRadiusMeters`. |
+| `reveal.xCanTrick` | bool | — | true | Ping-Trick: X darf einmal pro Runde eine Sichtung fälschen (150–300 m Versatz) oder überspringen. Gemeinsames Kontingent. |
 | `reveal.showExactPoint` | bool | — | true | Zusätzlich zum Kreis den exakten letzten Punkt zeigen. |
 | `reveal.jitterMeters` | int | 0–500 | 0 | X's gemeldeter Punkt wird um bis zu ±N m verstellt (täuscht Detektive). |
 | `reveal.showTrail` | enum | `NONE` / `LAST3` / `FULL` | LAST3 | Frühere Sichtungen bleiben als Spur sichtbar. |

@@ -1,6 +1,7 @@
 import type {
   ChatMessage,
   ClientMessage,
+  PingTrickMode,
   LatLng,
   MessageParams,
   ObjectiveState,
@@ -57,6 +58,10 @@ export function useGame() {
     train: number;
     at: number;
   } | null>(null);
+  const [pingTrick, setPingTrick] = useState<{
+    armed: PingTrickMode | null;
+    used: PingTrickMode | null;
+  }>({ armed: null, used: null });
   const [catchPending, setCatchPending] = useState(false);
   const [lastReveal, setLastReveal] = useState<RevealEvent | null>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -178,6 +183,7 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setPingTrick({ armed: null, used: null });
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -216,6 +222,9 @@ export function useGame() {
           break;
         case "catchPending":
           setCatchPending(msg.pending);
+          break;
+        case "pingTrick":
+          setPingTrick({ armed: msg.armed, used: msg.used });
           break;
         case "playerPosition":
           setPlayers((current) =>
@@ -347,6 +356,10 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const requestPingTrick = (mode: PingTrickMode | "CANCEL") => {
+    send({ t: "setPingTrick", mode });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -392,6 +405,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    pingTrick,
     revealTimer,
     chatMessages,
     catchPending,
@@ -405,6 +419,7 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    requestPingTrick,
     configure,
     setRole,
     start,

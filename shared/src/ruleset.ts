@@ -43,6 +43,8 @@ export interface Ruleset {
     randomMinMinutes: number;
     randomMaxMinutes: number;
     revealRadiusMeters: number;
+    /** X darf einmal pro Runde eine Sichtung fälschen oder überspringen. */
+    xCanTrick: boolean;
     radiusShrinkEnabled: boolean;
     radiusShrinkStepMeters: number;
     radiusFloorMeters: number;
@@ -127,6 +129,7 @@ export const DEFAULT_RULESET: Ruleset = {
     randomMinMinutes: 2,
     randomMaxMinutes: 5,
     revealRadiusMeters: 5,
+    xCanTrick: true,
     radiusShrinkEnabled: false,
     radiusShrinkStepMeters: 100,
     radiusFloorMeters: 5,

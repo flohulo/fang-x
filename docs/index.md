@@ -31,6 +31,7 @@ Freien achten solltet.
 | :material-map: [Spielgebiet](Spielgebiet.md) | Der erlaubte Aktionsradius |
 | :material-flag-checkered: [Bonusmission für X](Bonusmission-fuer-X.md) | Zusatzziel für X |
 | :material-alert-octagon: [Notfall-Knopf](Notfall-Knopf.md) | Runde abbrechen und Standort teilen |
+| :material-drama-masks: [Ping-Trick](Ping-Trick.md) | X fälscht oder überspringt einmal eine Sichtung |
 
 ## Sicher spielen
 

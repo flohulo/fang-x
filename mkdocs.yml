@@ -47,6 +47,7 @@ nav:
       - Spielgebiet: Spielgebiet.md
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
+      - Ping-Trick: Ping-Trick.md
 
 # Die interne Regelwerk-Spezifikation bleibt im Repository, gehört aber nicht ins Handbuch.
 exclude_docs: |
@@ -99,6 +100,7 @@ plugins:
             Spielgebiet: Play area
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
+            Ping-Trick: Ping trick
 
 extra:
   social:

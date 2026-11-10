@@ -18,12 +18,14 @@ import {
   type ChatMessage,
   type ClientMessage,
   DEFAULT_RULESET,
+  destinationPoint,
   distanceMeters,
   isInsidePlayArea,
   jitterPoint,
   type LatLng,
   mergeRuleset,
   type ObjectiveState,
+  type PingTrickMode,
   type PlayerInfo,
   playAreaRadiusEstimate,
   type RevealEvent,
@@ -92,6 +94,10 @@ interface Player {
   disconnectedAt: number | null;
   position: LatLng | null;
   lastPositionAt: number;
+  /** Ping-Trick, der bei der nächsten Sichtung greift. */
+  trickArmed: PingTrickMode | null;
+  /** Ping-Trick, der in dieser Runde schon verbraucht wurde. */
+  trickUsed: PingTrickMode | null;
 }
 
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
@@ -123,6 +129,8 @@ interface RoomSnapshot {
     wantsX: boolean;
     color: string;
     token?: string | null;
+    trickArmed?: PingTrickMode | null;
+    trickUsed?: PingTrickMode | null;
   }>;
   ruleset: Ruleset;
   phaseEndsAt: number | null;
@@ -229,6 +237,8 @@ export class GameRoom {
         wantsX: p.wantsX,
         color: p.color,
         token: p.token,
+        trickArmed: p.trickArmed,
+        trickUsed: p.trickUsed,
       })),
       ruleset: this.ruleset,
       phaseEndsAt: this.phaseEndsAt,
@@ -310,6 +320,8 @@ export class GameRoom {
         disconnectedAt: now,
         position: null,
         lastPositionAt: 0,
+        trickArmed: p.trickArmed ?? null,
+        trickUsed: p.trickUsed ?? null,
       });
     }
 
@@ -562,6 +574,7 @@ export class GameRoom {
           this.sendTo(ws, this.phaseMessage());
           this.sendTo(ws, this.revealTimerMessage());
           this.sendObjective(player);
+          this.sendPingTrick(player);
           // Detektiv-Standorte nachliefern, soweit dieser Spieler sie sehen darf.
           for (const other of this.players.values()) {
             if (!other.position || !this.canSeeDetectivePosition(player, other)) continue;
@@ -671,6 +684,10 @@ export class GameRoom {
           this.surrender(player);
           break;
         }
+        case "setPingTrick": {
+          this.setPingTrick(player, msg.mode);
+          break;
+        }
         case "start": {
           if (!player?.isHost) return;
           if (this.phase !== "LOBBY") return;
@@ -761,6 +778,8 @@ export class GameRoom {
       disconnectedAt: null,
       position: null,
       lastPositionAt: 0,
+      trickArmed: null,
+      trickUsed: null,
     };
     this.players.set(id, player);
     return player;
@@ -871,6 +890,10 @@ export class GameRoom {
     this.lastRevealAt = 0;
     this.nextRevealAt = null;
     this.xPositions.length = 0;
+    for (const p of this.players.values()) {
+      p.trickArmed = null;
+      p.trickUsed = null;
+    }
     this.transitStops = { bus: 0, train: 0 };
     this.catchPending = false;
     this.broadcast({ t: "transitStops", ...this.transitStops });
@@ -991,16 +1014,42 @@ export class GameRoom {
       radius = Math.max(this.ruleset.reveal.radiusFloorMeters, shrunk);
     }
     const revealIndex = this.lastRevealIndex + 1;
+    let revealed = false;
 
     for (const x of xPlayers) {
       if (!x.position) continue;
 
+      // Ping-Trick: Sichtung überspringen oder an einen falschen Ort verlegen.
+      const trick = this.ruleset.reveal.xCanTrick ? x.trickArmed : null;
+      x.trickArmed = null;
+      if (trick === "SKIP") {
+        x.trickUsed = "SKIP";
+        this.lastRevealAt = now;
+        this.sendPingTrick(x);
+        continue;
+      }
+
       // Jitter: gemeldete Position versetzt, um Detektive zu täuschen
-      const reportedPos =
+      let reportedPos =
         this.ruleset.reveal.jitterMeters > 0
           ? jitterPoint(x.position, this.ruleset.reveal.jitterMeters)
           : { ...x.position };
+      if (trick === "FAKE") {
+        const fake = this.fakePingPosition(x.position, radius);
+        if (fake) {
+          reportedPos = fake;
+          x.trickUsed = "FAKE";
+        } else {
+          this.sendTo(x.ws, {
+            t: "error",
+            message: "Kein passender Ort für den falschen Ping gefunden. Es wurde echt gemeldet.",
+            code: "PING_TRICK_NO_SPOT",
+          });
+        }
+        this.sendPingTrick(x);
+      }
 
+      revealed = true;
       this.lastRevealAt = now;
       this.xPositions.push({ pos: reportedPos, at: now, radius });
       if (this.xPositions.length > 50) this.xPositions.shift();
@@ -1025,9 +1074,9 @@ export class GameRoom {
         });
       }
     }
-    this.lastRevealIndex = revealIndex;
+    if (revealed) this.lastRevealIndex = revealIndex;
 
-    if (this.ruleset.reveal.xSeesDetectives === "ON_REVEAL") {
+    if (revealed && this.ruleset.reveal.xSeesDetectives === "ON_REVEAL") {
       this.broadcastDetectiveSnapshotToX();
     }
 
@@ -1287,6 +1336,57 @@ export class GameRoom {
     // Zentrum = Standort von X beim Spielstart. Einmal festgelegt und dann fix,
     // damit das Spielgebiet nicht mit X mitwandert.
     return this.playAreaCenter;
+  }
+
+  /** Falscher Ping: ein Punkt 150 bis 300 m entfernt (mindestens zwei Sichtradien), im Spielgebiet. */
+  private fakePingPosition(real: LatLng, radius: number): LatLng | null {
+    const center = this.getGameCenter();
+    const hasArea = !!center || !!this.ruleset.map.playAreaPolygon;
+    // In kleinen Spielgebieten wird der Abstand schrittweise verkürzt, aber nie unter zwei Radien.
+    for (const scale of [1, 0.5, 0.25]) {
+      const minDistance = Math.max(radius * 2, 150 * scale);
+      const maxDistance = Math.max(minDistance + 10, 300 * scale);
+      for (let attempt = 0; attempt < 20; attempt++) {
+        const distance = minDistance + Math.random() * (maxDistance - minDistance);
+        const candidate = destinationPoint(real, Math.random() * 360, distance);
+        if (!hasArea || isInsidePlayArea(this.ruleset.map, center, candidate)) return candidate;
+      }
+    }
+    return null;
+  }
+
+  private sendPingTrick(player: Player) {
+    if (player.role !== "X") return;
+    this.sendTo(player.ws, { t: "pingTrick", armed: player.trickArmed, used: player.trickUsed });
+  }
+
+  private setPingTrick(player: Player | null, mode: unknown) {
+    if (player?.role !== "X" || (this.phase !== "HEADSTART" && this.phase !== "RUNNING")) return;
+    if (!this.ruleset.reveal.xCanTrick) {
+      this.sendTo(player.ws, {
+        t: "error",
+        message: "Der Ping-Trick ist in dieser Runde nicht vorgesehen.",
+        code: "PING_TRICK_DISABLED",
+      });
+      return;
+    }
+    if (mode === "CANCEL") {
+      player.trickArmed = null;
+    } else if (mode === "FAKE" || mode === "SKIP") {
+      if (player.trickUsed) {
+        this.sendTo(player.ws, {
+          t: "error",
+          message: "Den Ping-Trick hast du in dieser Runde schon benutzt.",
+          code: "PING_TRICK_USED",
+        });
+        return;
+      }
+      player.trickArmed = mode;
+    } else {
+      return;
+    }
+    this.sendPingTrick(player);
+    this.persist();
   }
 
   /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */

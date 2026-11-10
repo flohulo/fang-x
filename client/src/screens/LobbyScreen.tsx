@@ -242,6 +242,16 @@ export function LobbyScreen({
                 {t("lobby.detectivesShareLive")}
               </label>
             </ConfigOptionHelp>
+            <ConfigOptionHelp>
+              <label className="objective-option">
+                <input
+                  type="checkbox"
+                  checked={localRuleset.reveal.xCanTrick}
+                  onChange={(event) => updateNested("reveal", { xCanTrick: event.target.checked })}
+                />
+                {t("lobby.xCanTrick")}
+              </label>
+            </ConfigOptionHelp>
             <div className="config-field">
               <div className="config-label-row">
                 <label htmlFor="cfg-x-sees-detectives">{t("lobby.xSeesDetectives")}</label>
