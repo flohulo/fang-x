@@ -254,6 +254,12 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "battery": {
+      "label": "Battery:",
+      "other": "{{name}}'s battery is at {{level}}%. Their position may drop out soon.",
+      "self": "Your battery is at {{level}}%. Charge your device so your position does not drop out.",
+      "dismiss": "Dismiss notice"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",

@@ -44,6 +44,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Spielende gelöscht.
 - **Notfall-Knopf:** Muss X die Runde abbrechen, endet das Spiel nach einer Bestätigung. Die
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
+- **Akku-Warnung:** Wird bei jemandem der Akku knapp, erfahren es alle (nur in Chromium-basierten
+  Browsern).
 
 ## Datenschutz und sicher spielen
 

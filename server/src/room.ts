@@ -75,6 +75,10 @@ const CHAT_WINDOW_MS = 5_000;
 const TICK_FAST_MS = 1_000;
 const TICK_IDLE_MS = 5_000;
 
+/** Akku-Warnung: höchstens alle 10 Minuten je Person, nur bei plausiblem Wert bis 30 Prozent. */
+const BATTERY_WARN_COOLDOWN_MS = 10 * 60_000;
+const BATTERY_WARN_MAX_LEVEL = 30;
+
 const STATE_KEY = "room";
 
 interface Player {
@@ -92,6 +96,8 @@ interface Player {
   disconnectedAt: number | null;
   position: LatLng | null;
   lastPositionAt: number;
+  /** Zeitpunkt der letzten Akku-Warnung (nur Arbeitsspeicher). */
+  lastBatteryWarnAt: number;
 }
 
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
@@ -310,6 +316,7 @@ export class GameRoom {
         disconnectedAt: now,
         position: null,
         lastPositionAt: 0,
+        lastBatteryWarnAt: 0,
       });
     }
 
@@ -671,6 +678,10 @@ export class GameRoom {
           this.surrender(player);
           break;
         }
+        case "batteryLow": {
+          this.warnBatteryLow(player, msg.level);
+          break;
+        }
         case "start": {
           if (!player?.isHost) return;
           if (this.phase !== "LOBBY") return;
@@ -761,6 +772,7 @@ export class GameRoom {
       disconnectedAt: null,
       position: null,
       lastPositionAt: 0,
+      lastBatteryWarnAt: 0,
     };
     this.players.set(id, player);
     return player;
@@ -1287,6 +1299,24 @@ export class GameRoom {
     // Zentrum = Standort von X beim Spielstart. Einmal festgelegt und dann fix,
     // damit das Spielgebiet nicht mit X mitwandert.
     return this.playAreaCenter;
+  }
+
+  /** Akku niedrig: alle erfahren es einmalig, damit niemand unbemerkt ausfällt. */
+  private warnBatteryLow(player: Player | null, level: unknown) {
+    if (!player || (this.phase !== "HEADSTART" && this.phase !== "RUNNING")) return;
+    if (typeof level !== "number" || !Number.isFinite(level)) return;
+    const percent = Math.round(level);
+    if (percent < 0 || percent > BATTERY_WARN_MAX_LEVEL) return;
+    const now = Date.now();
+    if (now - player.lastBatteryWarnAt < BATTERY_WARN_COOLDOWN_MS) return;
+    player.lastBatteryWarnAt = now;
+    this.broadcast({
+      t: "batteryLow",
+      playerId: player.id,
+      name: player.name,
+      level: percent,
+      at: now,
+    });
   }
 
   /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */
