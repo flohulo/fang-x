@@ -50,6 +50,8 @@ export type ClientMessage =
   | { t: "surrender" }
   | { t: "addMarker"; pos: LatLng; kind: TeamMarker["kind"] }
   | { t: "removeMarker"; id: number }
+  /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
+  | { t: "batteryLow"; level: number }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -210,5 +212,13 @@ export type ServerMessage =
       /** Alle Team-Markierungen; geht nur an Detektive. */
       t: "markers";
       markers: TeamMarker[];
+    }
+  | {
+      /** Der Akku einer Person ist niedrig. Geht an alle. */
+      t: "batteryLow";
+      playerId: string;
+      name: string;
+      level: number;
+      at: number;
     }
   | { t: "pong" };

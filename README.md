@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://flohulo.github.io/fang-x/">Handbuch</a> ·
+  <a href="https://flohulo.github.io/fang-x/handbuch/">Handbuch</a> ·
   <a href="#so-funktionierts">So funktioniert's</a> ·
   <a href="#datenschutz-und-sicher-spielen">Datenschutz</a> ·
   <a href="#lokal-ausprobieren">Lokal ausprobieren</a> ·
@@ -46,6 +46,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
 - **Team-Markierungen:** Detektive markieren Verdachtsorte und abgesuchte Stellen auf der Karte. X
   sieht sie nicht.
+- **Akku-Warnung:** Wird bei jemandem der Akku knapp, erfahren es alle (nur in Chromium-basierten
+  Browsern).
 - **Auswertung:** Am Ende zeigt die App Spielzeit, Sichtungen, knappsten Abstand und die
   gelaufene Strecke pro Person. Gespeichert werden nur Summen, kein Routenverlauf.
 
@@ -63,6 +65,12 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Geräteeinstellungen widerrufen.
 - Spielt rücksichtsvoll: Bleibt an sicheren, öffentlichen Orten, achtet auf den Verkehr und
   respektiert die Privatsphäre anderer.
+
+### Fehlerberichte (optional)
+
+Wenn der Betreiber ein [GlitchTip](https://glitchtip.com/)-Projekt eingerichtet hat, werden
+Programmfehler dorthin gemeldet. Vor dem Senden werden Standortdaten, Nutzerdaten, Header,
+Cookies, Breadcrumbs und Spielcodes entfernt. Ohne eingerichtetes Projekt wird nichts gesendet.
 
 ### Kartendaten
 
@@ -88,6 +96,19 @@ npx wrangler dev --ip 127.0.0.1 --port 8787
 Öffne anschliessend <http://localhost:8787>. Der lokale Server liefert Spiel und API gemeinsam
 aus. Das Spiel benötigt eine Internetverbindung.
 
+### Fehlerberichte einrichten (optional)
+
+Fang X kann Fehler an ein gehostetes GlitchTip-Projekt melden. Lege dafür in GlitchTip ein
+Projekt an und hinterlege dessen DSN:
+
+- **Server:** als Secret mit `npx wrangler secret put GLITCHTIP_DSN` im Ordner `server`.
+- **Client:** als Umgebungsvariable `VITE_GLITCHTIP_DSN` beim Bauen (`npm run build`). Im
+  Release-Workflow kommt sie aus der GitHub-Variable `VITE_GLITCHTIP_DSN` im Environment
+  `production`.
+
+Ohne DSN ist die Fehlerberichterstattung ausgeschaltet. Die Bereinigung der Berichte steht in
+[`shared/src/error-report.ts`](shared/src/error-report.ts).
+
 ### Prüfen
 
 > [!NOTE]
@@ -105,8 +126,9 @@ Weitere Hinweise zum Entwickeln und Mitwirken stehen in
 
 ## Handbuch
 
-Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
-<https://flohulo.github.io/fang-x/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
+Die Webseite zum Spiel (Quelle: [`website/`](website/)) liegt unter
+<https://flohulo.github.io/fang-x/>. Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
+<https://flohulo.github.io/fang-x/handbuch/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
 aus den Seiten in [`docs/`](docs/) gebaut:
 
 ```bash
@@ -114,7 +136,7 @@ pip install -r requirements-docs.txt
 mkdocs serve
 ```
 
-Die Seite wird bei Änderungen an `docs/` oder `mkdocs.yml` automatisch über den Workflow
+Webseite und Handbuch werden bei Änderungen an `website/`, `docs/` oder `mkdocs.yml` automatisch über den Workflow
 `.github/workflows/deploy-docs.yml` auf GitHub Pages veröffentlicht.
 
 ## Übersetzen

@@ -61,6 +61,12 @@ export function useGame() {
     at: number;
   } | null>(null);
   const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
+  const [batteryWarning, setBatteryWarning] = useState<{
+    playerId: string;
+    name: string;
+    level: number;
+    at: number;
+  } | null>(null);
   const [catchPending, setCatchPending] = useState(false);
   const [lastReveal, setLastReveal] = useState<RevealEvent | null>(null);
   const [lastPositionShared, setLastPositionShared] = useState<{
@@ -183,6 +189,7 @@ export function useGame() {
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
             setTeamMarkers([]);
+            setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -224,6 +231,14 @@ export function useGame() {
           break;
         case "markers":
           setTeamMarkers(msg.markers);
+          break;
+        case "batteryLow":
+          setBatteryWarning({
+            playerId: msg.playerId,
+            name: msg.name,
+            level: msg.level,
+            at: msg.at,
+          });
           break;
         case "playerPosition":
           setPlayers((current) =>
@@ -364,6 +379,10 @@ export function useGame() {
     send({ t: "removeMarker", id });
   };
 
+  const sendBatteryLow = (level: number) => {
+    send({ t: "batteryLow", level });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -410,6 +429,7 @@ export function useGame() {
     transitStops,
     transitNotice,
     teamMarkers,
+    batteryWarning,
     revealTimer,
     chatMessages,
     catchPending,
@@ -425,6 +445,7 @@ export function useGame() {
     join,
     addTeamMarker,
     removeTeamMarker,
+    sendBatteryLow,
     configure,
     setRole,
     start,

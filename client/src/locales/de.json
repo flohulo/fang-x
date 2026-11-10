@@ -16,6 +16,7 @@
     "settings": "Einstellungen",
     "moreLinks": "Weitere Seiten",
     "docs": "Handbuch",
+    "website": "Webseite",
     "changelog": "Changelog",
     "contributors": "Mitarbeiter",
     "privacy": "Datenschutz",
@@ -262,6 +263,12 @@
     "markers": {
       "suspect": "Verdacht markieren",
       "clear": "Hier nicht markieren"
+    },
+    "battery": {
+      "label": "Akku:",
+      "other": "Der Akku von {{name}} ist bei {{level}} %. Gleich könnte die Position ausfallen.",
+      "self": "Dein Akku ist bei {{level}} %. Lade das Gerät, damit deine Position nicht ausfällt.",
+      "dismiss": "Hinweis schliessen"
     },
     "stats": {
       "title": "Auswertung",

@@ -79,6 +79,9 @@ const TICK_IDLE_MS = 5_000;
 
 /** Team-Markierungen: höchstens so viele gleichzeitig, die ältesten fallen heraus. */
 const MAX_TEAM_MARKERS = 20;
+/** Akku-Warnung: höchstens alle 10 Minuten je Person, nur bei plausiblem Wert bis 30 Prozent. */
+const BATTERY_WARN_COOLDOWN_MS = 10 * 60_000;
+const BATTERY_WARN_MAX_LEVEL = 30;
 /** Auswertung: GPS-Rauschen unter 5 m zählt nicht, Sprünge über 400 m werden ignoriert. */
 const STAT_MIN_STEP_METERS = 5;
 const STAT_MAX_STEP_METERS = 400;
@@ -100,6 +103,8 @@ interface Player {
   disconnectedAt: number | null;
   position: LatLng | null;
   lastPositionAt: number;
+  /** Zeitpunkt der letzten Akku-Warnung (nur Arbeitsspeicher). */
+  lastBatteryWarnAt: number;
   /** Summe der zurückgelegten Strecke für die Auswertung (kein Verlauf). */
   distanceMeters: number;
   /** Zuletzt für die Strecke gewertete Position; nur im Arbeitsspeicher. */
@@ -335,6 +340,7 @@ export class GameRoom {
         disconnectedAt: now,
         position: null,
         lastPositionAt: 0,
+        lastBatteryWarnAt: 0,
         distanceMeters: p.distanceMeters ?? 0,
         statPos: null,
       });
@@ -708,6 +714,10 @@ export class GameRoom {
           this.removeTeamMarker(player, msg.id);
           break;
         }
+        case "batteryLow": {
+          this.warnBatteryLow(player, msg.level);
+          break;
+        }
         case "start": {
           if (!player?.isHost) return;
           if (this.phase !== "LOBBY") return;
@@ -799,6 +809,7 @@ export class GameRoom {
       disconnectedAt: null,
       position: null,
       lastPositionAt: 0,
+      lastBatteryWarnAt: 0,
       distanceMeters: 0,
       statPos: null,
     };
@@ -1386,6 +1397,24 @@ export class GameRoom {
     if (this.teamMarkers.length === 0) return;
     this.teamMarkers = [];
     this.broadcastMarkers();
+  }
+
+  /** Akku niedrig: alle erfahren es einmalig, damit niemand unbemerkt ausfällt. */
+  private warnBatteryLow(player: Player | null, level: unknown) {
+    if (!player || (this.phase !== "HEADSTART" && this.phase !== "RUNNING")) return;
+    if (typeof level !== "number" || !Number.isFinite(level)) return;
+    const percent = Math.round(level);
+    if (percent < 0 || percent > BATTERY_WARN_MAX_LEVEL) return;
+    const now = Date.now();
+    if (now - player.lastBatteryWarnAt < BATTERY_WARN_COOLDOWN_MS) return;
+    player.lastBatteryWarnAt = now;
+    this.broadcast({
+      t: "batteryLow",
+      playerId: player.id,
+      name: player.name,
+      level: percent,
+      at: now,
+    });
   }
 
   /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */

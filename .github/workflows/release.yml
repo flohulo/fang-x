@@ -59,6 +59,9 @@ jobs:
         run: npm run typecheck
 
       - name: Build production assets
+        env:
+          # Öffentliche DSN des GlitchTip-Projekts für den Client (optional, siehe README)
+          VITE_GLITCHTIP_DSN: ${{ vars.VITE_GLITCHTIP_DSN }}
         run: npm run build
 
       - name: Run integration test

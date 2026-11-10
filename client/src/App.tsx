@@ -512,6 +512,7 @@ export default function App() {
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
         teamMarkers={game.teamMarkers}
+        batteryWarning={game.batteryWarning}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
         catchPending={game.catchPending}
@@ -524,6 +525,7 @@ export default function App() {
         onSendChat={game.sendChat}
         onAddTeamMarker={game.addTeamMarker}
         onRemoveTeamMarker={game.removeTeamMarker}
+        onBatteryLow={game.sendBatteryLow}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}
