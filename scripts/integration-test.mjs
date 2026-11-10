@@ -293,6 +293,18 @@ async function run() {
     typeof end.reasonCode === "string",
     `Spielende trägt einen Grund-Code (${end.reasonCode})`,
   );
+  assert(
+    end.stats && Array.isArray(end.stats.players) && end.stats.players.length >= 2,
+    "Spielende enthält die Auswertung mit allen Spielenden",
+  );
+  assert(
+    typeof end.stats.closestApproachMeters === "number" && end.stats.closestApproachMeters <= 5,
+    `Auswertung nennt den knappsten Abstand (${end.stats.closestApproachMeters} m)`,
+  );
+  assert(
+    end.stats.players.every((p) => p.distanceMeters >= 0 && !("pos" in p) && !("track" in p)),
+    "Auswertung enthält nur Summen, keine Standorte",
+  );
 
   // Chat ist nach dem Spielende gesperrt
   host.ws.send(JSON.stringify({ t: "chat", text: "Nach dem Spiel" }));

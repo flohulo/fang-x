@@ -2,6 +2,7 @@ import type {
   ChatMessage,
   ClientMessage,
   PingTrickMode,
+  GameStats,
   LatLng,
   MessageParams,
   ObjectiveState,
@@ -23,6 +24,7 @@ export interface GameResult {
   reasonCode?: string;
   reasonParams?: MessageParams;
   surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
+  stats?: GameStats;
 }
 
 interface Session {
@@ -264,6 +266,7 @@ export function useGame() {
             reasonCode: msg.reasonCode,
             reasonParams: msg.reasonParams,
             surrender: msg.surrender,
+            stats: msg.stats,
           });
           setPlayers(msg.players);
           setRevealTimer(null);

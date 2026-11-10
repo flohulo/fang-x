@@ -24,7 +24,7 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
 
 ## So funktioniert's
 
-1. Eine Person erstellt ein Spiel und teilt den Spielcode mit der Gruppe.
+1. Eine Person erstellt ein Spiel und teilt den Spielcode mit der Gruppe, auch per QR-Code.
 2. Alle treten bei und wählen ihre Rolle: X oder Detektiv.
 3. Der Host legt die Regeln fest und startet das Spiel.
 4. X läuft voraus; die Detektive suchen X mithilfe der Karte und der Standort-Hinweise.
@@ -46,6 +46,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
 - **Ping-Trick:** X darf einmal pro Runde eine Sichtung fälschen oder überspringen. Der Host kann das
   abschalten.
+- **Auswertung:** Am Ende zeigt die App Spielzeit, Sichtungen, knappsten Abstand und die
+  gelaufene Strecke pro Person. Gespeichert werden nur Summen, kein Routenverlauf.
 
 ## Datenschutz und sicher spielen
 

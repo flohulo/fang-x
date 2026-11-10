@@ -16,8 +16,12 @@ Standort erlaubt ist; zum Ausprobieren gibt es **Ohne Standort fortfahren (Simul
 ## Spiel erstellen
 
 Eine Person erstellt auf der Startseite ein neues Spiel. Sie wird Host und spielt standardmäßig
-als X. Den sechsstelligen **Spiel-Code** teilt sie mit der Gruppe – über den Einladungslink oder
-indem alle den Code eingeben und beitreten.
+als X. Den sechsstelligen **Spiel-Code** teilt sie mit der Gruppe – über den Einladungslink, über
+den **QR-Code** oder indem alle den Code eingeben und beitreten.
+
+!!! tip ":material-qrcode: QR-Code für alle vor Ort"
+    Tippe in der Lobby auf **QR-Code anzeigen**. Die anderen scannen ihn mit der Handykamera und
+    landen direkt im Spiel. Der QR-Code enthält denselben Link wie **Einladung teilen**.
 
 ## Rolle wählen
 

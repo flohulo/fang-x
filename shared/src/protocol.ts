@@ -87,6 +87,27 @@ export interface ObjectiveState {
   radiusMeters: number;
 }
 
+/** Aggregierte Kennzahlen eines Spielers — ohne Streckenverlauf. */
+export interface PlayerStats {
+  playerId: string;
+  name: string;
+  color: string;
+  role: Role;
+  /** Zurückgelegte Strecke in Metern (Summe, kein Verlauf). */
+  distanceMeters: number;
+}
+
+/** Auswertung am Spielende. Enthält nur Summen und Extremwerte, keine Standorte. */
+export interface GameStats {
+  /** Dauer der laufenden Phase in Sekunden (ohne Countdown und Vorsprung). */
+  durationSeconds: number;
+  /** Anzahl der Sichtungen von X. */
+  revealCount: number;
+  /** Geringster Abstand zwischen X und einem Detektiv während der Runde. */
+  closestApproachMeters: number | null;
+  players: PlayerStats[];
+}
+
 export type ServerMessage =
   | {
       t: "joined";
@@ -160,6 +181,8 @@ export type ServerMessage =
       reasonCode?: string;
       reasonParams?: MessageParams;
       players: PlayerInfo[];
+      /** Auswertung der Runde; ältere Server senden sie nicht. */
+      stats?: GameStats;
       /** X hat aufgegeben und den exakten Standort geteilt. */
       surrender?: {
         playerId: string;
