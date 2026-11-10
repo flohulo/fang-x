@@ -19,11 +19,13 @@ import {
   type ClientMessage,
   DEFAULT_RULESET,
   distanceMeters,
+  isInsidePlayArea,
   jitterPoint,
   type LatLng,
   mergeRuleset,
   type ObjectiveState,
   type PlayerInfo,
+  playAreaRadiusEstimate,
   type RevealEvent,
   type Role,
   type Ruleset,
@@ -1040,9 +1042,8 @@ export class GameRoom {
     if (this.phase !== "RUNNING") return;
 
     const center = this.getGameCenter();
-    if (!center) return;
-    const dist = distanceMeters(x.position, center);
-    const outside = dist > this.ruleset.map.playAreaRadiusMeters;
+    if (!center && !this.ruleset.map.playAreaPolygon) return;
+    const outside = !isInsidePlayArea(this.ruleset.map, center, x.position);
     const penalty = this.ruleset.map.outOfBoundsPenalty;
 
     if (outside) {
@@ -1146,8 +1147,8 @@ export class GameRoom {
       return;
     }
 
-    const areaRadius = this.ruleset.map.playAreaRadiusMeters;
-    if (distanceMeters(this.playAreaCenter, target) > areaRadius) {
+    const areaRadius = playAreaRadiusEstimate(this.ruleset.map);
+    if (!isInsidePlayArea(this.ruleset.map, this.playAreaCenter, target)) {
       this.sendTo(player.ws, {
         t: "error",
         message: "Das Ziel muss innerhalb des Spielgebiets liegen.",

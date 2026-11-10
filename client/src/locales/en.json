@@ -229,7 +229,11 @@
     },
     "locationNeeded": "Without location access the map, sightings and catches do not work.",
     "needLocation": "Allow location to start",
-    "skipLocation": "Continue without location (simulation mode)"
+    "skipLocation": "Continue without location (simulation mode)",
+    "playAreaDrawn": "Custom play area with {{count}} corner points drawn.",
+    "playAreaDraw": "Draw play area on the map",
+    "playAreaEdit": "Edit play area",
+    "playAreaUseCircle": "Use circle again"
   },
   "game": {
     "phase": {
@@ -456,5 +460,14 @@
     "text": "Install Fang X as an app: faster start, full screen and reliable notifications.",
     "textIos": "Install Fang X as an app: tap the share icon and choose \"Add to Home Screen\". Notifications only work on iPhone this way.",
     "dismiss": "Not now"
+  },
+  "areaEditor": {
+    "title": "Draw play area",
+    "hint": "Tap the map to set the corner points of the play area (at least {{min}}).",
+    "hintReady": "{{count}} corner points set. Keep tapping to refine the area, or apply it.",
+    "undo": "Undo last point",
+    "clear": "Clear all",
+    "cancel": "Cancel",
+    "save": "Apply"
   }
 }

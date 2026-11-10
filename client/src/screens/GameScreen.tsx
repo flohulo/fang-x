@@ -1,5 +1,5 @@
 import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
-import { distanceMeters } from "@fang-x/shared";
+import { metersToPlayAreaEdge } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
@@ -129,6 +129,7 @@ export function GameScreen({
     (phase === "HEADSTART" && (!ruleset?.game.detectivesWaitDuringHeadStart || isX));
 
   const playAreaRadius: number = ruleset?.map?.playAreaRadiusMeters ?? 700;
+  const playAreaPolygon = ruleset?.map?.playAreaPolygon ?? null;
 
   const handlePosition = useCallback(
     (pos: LatLng) => {
@@ -224,9 +225,14 @@ export function GameScreen({
     (revealTimer.indeterminate || revealTimer.nextRevealAt !== null);
 
   const center = playAreaCenter ?? mapCenter ?? FALLBACK_CENTER;
-  const distanceFromCenter = position ? distanceMeters(position, center) : null;
-  const metersToEdge =
-    distanceFromCenter === null ? null : Math.round(playAreaRadius - distanceFromCenter);
+  const edgeDistance = position
+    ? metersToPlayAreaEdge(
+        { playAreaRadiusMeters: playAreaRadius, playAreaPolygon },
+        center,
+        position,
+      )
+    : null;
+  const metersToEdge = edgeDistance === null ? null : Math.round(edgeDistance);
   const isOutside = metersToEdge !== null && metersToEdge < 0;
 
   const handleSimMode = () => {
@@ -385,6 +391,7 @@ export function GameScreen({
         <MapView
           center={center}
           playAreaRadiusMeters={playAreaRadius}
+          playAreaPolygon={playAreaPolygon}
           players={playerMarkers}
           lastReveal={lastReveal}
           pingHistory={isX ? pingHistory : []}

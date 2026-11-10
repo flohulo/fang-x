@@ -18,7 +18,7 @@ import i18n from "../i18n";
 
 setWorkerUrl(mapLibreWorkerUrl);
 
-const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
+export const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
 // OpenFreeMap liefert Details bis Zoom 14; MapLibre vergrössert diese Kacheln
 // darüber hinaus ohne zusätzliche, nicht vorhandene Kacheln anzufordern.
 const MAP_MAX_ZOOM = 18;
@@ -210,6 +210,8 @@ interface PlayerMarker {
 interface MapViewProps {
   center: LatLng;
   playAreaRadiusMeters: number;
+  /** Frei gezeichnetes Spielfeld; ersetzt den Kreis, wenn gesetzt. */
+  playAreaPolygon?: LatLng[] | null;
   players: PlayerMarker[];
   lastReveal: RevealEvent | null;
   /** Bisherige Pings von X (nur für X selbst) — nummerierte Marker mit Radius. */
@@ -224,6 +226,7 @@ interface MapViewProps {
 export function MapView({
   center,
   playAreaRadiusMeters,
+  playAreaPolygon = null,
   players,
   lastReveal,
   pingHistory = [],
@@ -307,55 +310,37 @@ export function MapView({
     if (!map) return;
 
     const addPlayArea = () => {
-      if (map.getSource("play-area")) {
-        (map.getSource("play-area") as GeoJSONSource).setData({
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              circlePolygon(center, playAreaRadiusMeters).map((p): [number, number] => [
-                p.lng,
-                p.lat,
-              ]),
-            ],
-          },
-          properties: {},
-        });
-      } else {
-        map.addSource("play-area", {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            geometry: {
-              type: "Polygon",
-              coordinates: [
-                circlePolygon(center, playAreaRadiusMeters).map((p): [number, number] => [
-                  p.lng,
-                  p.lat,
-                ]),
-              ],
-            },
-            properties: {},
-          },
-        });
-        map.addLayer({
-          id: "play-area-fill",
-          type: "fill",
-          source: "play-area",
-          paint: { "fill-color": "#38bdf8", "fill-opacity": 0.08 },
-        });
-        map.addLayer({
-          id: "play-area-line",
-          type: "line",
-          source: "play-area",
-          paint: { "line-color": "#38bdf8", "line-width": 2, "line-opacity": 0.6 },
-        });
+      const ring: [number, number][] = playAreaPolygon
+        ? [...playAreaPolygon, playAreaPolygon[0]].map((p): [number, number] => [p.lng, p.lat])
+        : circlePolygon(center, playAreaRadiusMeters).map((p): [number, number] => [p.lng, p.lat]);
+      const data: Feature<Polygon> = {
+        type: "Feature",
+        geometry: { type: "Polygon", coordinates: [ring] },
+        properties: {},
+      };
+      const source = map.getSource("play-area") as GeoJSONSource | undefined;
+      if (source) {
+        source.setData(data);
+        return;
       }
+      map.addSource("play-area", { type: "geojson", data });
+      map.addLayer({
+        id: "play-area-fill",
+        type: "fill",
+        source: "play-area",
+        paint: { "fill-color": "#38bdf8", "fill-opacity": 0.08 },
+      });
+      map.addLayer({
+        id: "play-area-line",
+        type: "line",
+        source: "play-area",
+        paint: { "line-color": "#38bdf8", "line-width": 2, "line-opacity": 0.6 },
+      });
     };
 
     if (map.isStyleLoaded()) addPlayArea();
     else map.on("load", addPlayArea);
-  }, [center.lat, center.lng, playAreaRadiusMeters, center]);
+  }, [center, playAreaRadiusMeters, playAreaPolygon]);
 
   // X-Reveal-Kreis zeichnen
   useEffect(() => {

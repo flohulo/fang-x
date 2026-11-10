@@ -381,6 +381,12 @@ async function run() {
         },
         map: {
           startLocation: { lat: 47.3769, lng: 8.5417 },
+          playAreaPolygon: [
+            { lat: 47.375, lng: 8.539 },
+            { lat: 47.375, lng: 8.544 },
+            { lat: 47.379, lng: 8.544 },
+            { lat: 47.379, lng: 8.539 },
+          ],
           outOfBoundsEnabled: false,
         },
       },
@@ -392,6 +398,10 @@ async function run() {
       configuredRules.ruleset.movement.transportModes.includes("TRANSIT") &&
       !configuredRules.ruleset.map.outOfBoundsEnabled,
     "Verkehrsmittel und Spielfeldrand lassen sich unabhängig festlegen",
+  );
+  assert(
+    configuredRules.ruleset.map.playAreaPolygon?.length === 4,
+    "Gezeichnetes Spielfeld wird übernommen",
   );
 
   mrX.ws.send(JSON.stringify({ t: "start" }));

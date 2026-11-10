@@ -229,7 +229,11 @@
     },
     "locationNeeded": "Ohne Standortfreigabe funktionieren Karte, Sichtungen und Fang nicht.",
     "needLocation": "Standort erlauben, um zu starten",
-    "skipLocation": "Ohne Standort fortfahren (Simulationsmodus)"
+    "skipLocation": "Ohne Standort fortfahren (Simulationsmodus)",
+    "playAreaDrawn": "Eigenes Spielfeld mit {{count}} Eckpunkten gezeichnet.",
+    "playAreaDraw": "Spielfeld auf der Karte einzeichnen",
+    "playAreaEdit": "Spielfeld bearbeiten",
+    "playAreaUseCircle": "Wieder Kreis verwenden"
   },
   "game": {
     "phase": {
@@ -456,5 +460,14 @@
     "text": "Installiere Fang X als App: schnellerer Start, Vollbild und zuverlässige Benachrichtigungen.",
     "textIos": "Installiere Fang X als App: Tippe auf das Teilen-Symbol und wähle \"Zum Home-Bildschirm\". Nur so funktionieren Benachrichtigungen auf dem iPhone.",
     "dismiss": "Nicht jetzt"
+  },
+  "areaEditor": {
+    "title": "Spielfeld einzeichnen",
+    "hint": "Tippe auf die Karte, um die Eckpunkte des Spielfelds zu setzen (mindestens {{min}}).",
+    "hintReady": "{{count}} Eckpunkte gesetzt. Tippe weiter, um das Feld zu verfeinern, oder übernimm es.",
+    "undo": "Letzter Punkt zurück",
+    "clear": "Alle löschen",
+    "cancel": "Abbrechen",
+    "save": "Übernehmen"
   }
 }
