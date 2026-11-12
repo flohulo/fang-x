@@ -7,6 +7,8 @@ import type {
   ObjectiveState,
   PlayerInfo,
   RevealEvent,
+  RtcIceServer,
+  RtcSignal,
   Ruleset,
   ServerMessage,
 } from "@fang-x/shared";
@@ -32,6 +34,8 @@ interface Session {
   wantsX: boolean;
 }
 
+export type RtcHandler = (from: string, signal: RtcSignal) => void;
+
 /** Reconnect-Versuche mit wachsendem Abstand, aber gedeckelt. */
 const MAX_RECONNECT_DELAY_MS = 10_000;
 /** Fehler, bei denen ein erneuter Versuch sinnlos ist. */
@@ -52,6 +56,7 @@ export function useGame() {
     indeterminate: boolean;
   } | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [iceServers, setIceServers] = useState<RtcIceServer[]>([]);
   const [transitNotice, setTransitNotice] = useState<{
     mode: "bus" | "train";
     count: number;
@@ -93,6 +98,7 @@ export function useGame() {
   const retryTimerRef = useRef<number | null>(null);
   const attemptRef = useRef(0);
   const connectRef = useRef<(session: Session) => void>(() => {});
+  const rtcHandlersRef = useRef(new Set<RtcHandler>());
 
   const send = (msg: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -164,6 +170,7 @@ export function useGame() {
           setTransitStops(msg.transitStops);
           setRevealTimer(null);
           setChatMessages(msg.chat ?? []);
+          setIceServers(msg.iceServers ?? []);
           setCatchPending(msg.catchPending);
           setYouAreHost(msg.youAreHost);
           setReconnecting(false);
@@ -222,6 +229,9 @@ export function useGame() {
         }
         case "chat":
           setChatMessages((current) => [...current, msg.message].slice(-100));
+          break;
+        case "rtc":
+          for (const handler of rtcHandlersRef.current) handler(msg.from, msg.signal);
           break;
         case "transitNotice":
           setTransitNotice({
@@ -373,6 +383,17 @@ export function useGame() {
     send({ t: "chat", text });
   };
 
+  const sendRtc = (signal: RtcSignal, to?: string) => {
+    send({ t: "rtc", to, signal });
+  };
+
+  const subscribeRtc = (handler: RtcHandler) => {
+    rtcHandlersRef.current.add(handler);
+    return () => {
+      rtcHandlersRef.current.delete(handler);
+    };
+  };
+
   const reportCatch = () => {
     send({ t: "reportCatch" });
   };
@@ -443,6 +464,7 @@ export function useGame() {
     batteryWarning,
     revealTimer,
     chatMessages,
+    iceServers,
     catchPending,
     lastReveal,
     lastPositionShared,
@@ -462,6 +484,8 @@ export function useGame() {
     setObjectiveTarget,
     requestTransitStop,
     sendChat,
+    sendRtc,
+    subscribeRtc,
     reportCatch,
     resolveCatch,
     surrender,

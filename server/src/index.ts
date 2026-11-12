@@ -12,6 +12,8 @@ export interface Env {
   GAME_ROOM: DurableObjectNamespace;
   RATE_LIMIT: DurableObjectNamespace;
   ASSETS: Fetcher;
+  /** Optional: JSON-Liste von ICE-Servern (STUN/TURN) für den Detektiv-Funk. */
+  ICE_SERVERS?: string;
   // Optional: DSN des GlitchTip-Projekts. Ohne DSN ist die Fehlerberichterstattung aus.
   GLITCHTIP_DSN?: string;
 }

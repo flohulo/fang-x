@@ -107,6 +107,15 @@ async function run() {
     "Host-Rolle zu X gewechselt",
   );
 
+  // 3b. Zweiter Detektiv (für den Funk)
+  const det2 = await connect(code);
+  det2.ws.send(JSON.stringify({ t: "join", code, name: "Detektivin", wantsX: false }));
+  const det2Joined = await det2.waitFor((m) => m.t === "joined");
+  assert(
+    Array.isArray(det2Joined.iceServers) && det2Joined.iceServers.length > 0,
+    "Beitritt liefert ICE-Server für den Funk",
+  );
+
   // 4. Konfiguration: kurze Zeiten für Test
   host.ws.send(
     JSON.stringify({
@@ -129,6 +138,14 @@ async function run() {
   assert(
     !det.messages.some((message) => message.t === "chat"),
     "Chat ist in der Lobby deaktiviert",
+  );
+
+  // 4c. Funk ist in der Lobby deaktiviert
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !det2.messages.some((message) => message.t === "rtc"),
+    "Funk ist in der Lobby deaktiviert",
   );
 
   // 5. Spiel starten
@@ -163,6 +180,30 @@ async function run() {
   assert(
     chatToHost.message.playerId === detJoined.playerId,
     "Chat-Nachrichten tragen den richtigen Absender",
+  );
+
+  // 5c. Funk: Signale gehen nur zwischen Detektiven, X bekommt nichts
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  const hello = await det2.waitFor((m) => m.t === "rtc" && m.signal.kind === "hello");
+  assert(hello.from === detJoined.playerId, "Funk-Signal erreicht den anderen Detektiv");
+  det.ws.send(
+    JSON.stringify({
+      t: "rtc",
+      to: det2Joined.playerId,
+      signal: { kind: "offer", sdp: "v=0\r\n" },
+    }),
+  );
+  const offer = await det2.waitFor((m) => m.t === "rtc" && m.signal.kind === "offer");
+  assert(offer.signal.sdp === "v=0\r\n", "Gezieltes Funk-Signal wird weitergeleitet");
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "offer", sdp: 42 } }));
+  det.ws.send(JSON.stringify({ t: "rtc", to: hostJoined.playerId, signal: { kind: "bye" } }));
+  host.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(!host.messages.some((message) => message.t === "rtc"), "X erhält keine Funk-Signale");
+  assert(
+    det.messages.every((message) => message.t !== "rtc") &&
+      det2.messages.filter((message) => message.t === "rtc").length === 2,
+    "X kann nicht funken und ungültige Signale werden verworfen",
   );
 
   // 6. X positioniert sich (im Spielgebiet)

@@ -17,6 +17,7 @@
 import {
   type ChatMessage,
   type ClientMessage,
+  DEFAULT_ICE_SERVERS,
   DEFAULT_RULESET,
   distanceMeters,
   type GameStats,
@@ -29,6 +30,8 @@ import {
   playAreaRadiusEstimate,
   type RevealEvent,
   type Role,
+  type RtcIceServer,
+  type RtcSignal,
   type Ruleset,
   type ServerMessage,
 } from "@fang-x/shared";
@@ -206,9 +209,11 @@ export class GameRoom {
   /** Wurde dieser Raum über das Matchmaking angelegt? */
   private created = false;
   private lastActiveAt = Date.now();
+  private iceServers: RtcIceServer[];
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env?: { ICE_SERVERS?: string }) {
     this.state = state;
+    this.iceServers = parseIceServers(env?.ICE_SERVERS);
     // Vor dem ersten Request laden, damit kein halber Zustand bedient wird.
     this.state.blockConcurrencyWhile(async () => {
       await this.load();
@@ -597,6 +602,7 @@ export class GameRoom {
             chat: this.chatMessages,
             catchPending: this.catchPending,
             youAreHost: player.isHost,
+            iceServers: this.iceServers,
           });
           // Phase/Zeit/Reveals nachliefern — nach einem Reload fehlt dem
           // Client sonst der komplette Spielzustand.
@@ -698,6 +704,10 @@ export class GameRoom {
           }
           chatTimes.push(Date.now());
           this.postChatMessage(player, msg.text);
+          break;
+        }
+        case "rtc": {
+          this.relayRtc(player, msg.to, msg.signal);
           break;
         }
         case "reportCatch": {
@@ -1607,6 +1617,28 @@ export class GameRoom {
     this.broadcast({ t: "chat", message });
   }
 
+  /**
+   * Leitet Funk-Signale nur zwischen Detektiven weiter, solange die Runde läuft.
+   * X bekommt nie ein Signal und kann keines senden. Inhalte (SDP, Kandidaten)
+   * werden nicht geloggt, weil sie IP-Adressen enthalten.
+   */
+  private relayRtc(player: Player | null, to: unknown, signal: unknown) {
+    if (!player || player.role === "X") return;
+    if (this.phase !== "HEADSTART" && this.phase !== "RUNNING") return;
+    const clean = sanitizeRtcSignal(signal);
+    if (!clean) return;
+
+    const message: ServerMessage = { t: "rtc", from: player.id, signal: clean };
+    if (typeof to === "string") {
+      const target = this.players.get(to);
+      if (target && target.id !== player.id && target.role !== "X") this.sendTo(target.ws, message);
+      return;
+    }
+    for (const other of this.players.values()) {
+      if (other.id !== player.id && other.role !== "X") this.sendTo(other.ws, message);
+    }
+  }
+
   private reportCatch(player: Player | null) {
     if (
       player?.role !== "DETECTIVE" ||
@@ -1798,6 +1830,62 @@ export class GameRoom {
     } catch {
       // Verbindung tot — Ignore
     }
+  }
+}
+
+const MAX_SDP_LENGTH = 16_000;
+const MAX_CANDIDATE_LENGTH = 1_000;
+
+/** Übernimmt nur bekannte Felder mit begrenzter Länge; alles andere wird verworfen. */
+function sanitizeRtcSignal(value: unknown): RtcSignal | null {
+  if (!value || typeof value !== "object") return null;
+  const s = value as Record<string, unknown>;
+  switch (s.kind) {
+    case "hello":
+      return { kind: "hello", reply: s.reply === true };
+    case "bye":
+      return { kind: "bye" };
+    case "offer":
+    case "answer":
+      return typeof s.sdp === "string" && s.sdp.length > 0 && s.sdp.length <= MAX_SDP_LENGTH
+        ? { kind: s.kind, sdp: s.sdp }
+        : null;
+    case "ice": {
+      if (s.candidate === null) return { kind: "ice", candidate: null };
+      const c = s.candidate as Record<string, unknown> | undefined;
+      if (!c || typeof c.candidate !== "string" || c.candidate.length > MAX_CANDIDATE_LENGTH) {
+        return null;
+      }
+      return {
+        kind: "ice",
+        candidate: {
+          candidate: c.candidate,
+          sdpMid: typeof c.sdpMid === "string" ? c.sdpMid.slice(0, 64) : null,
+          sdpMLineIndex: typeof c.sdpMLineIndex === "number" ? c.sdpMLineIndex : null,
+        },
+      };
+    }
+    default:
+      return null;
+  }
+}
+
+/** Liest die optionale ICE_SERVERS-Variable; bei Fehlern gilt der Standard. */
+function parseIceServers(raw: string | undefined): RtcIceServer[] {
+  if (!raw) return DEFAULT_ICE_SERVERS;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return DEFAULT_ICE_SERVERS;
+    const servers = parsed.filter(
+      (entry): entry is RtcIceServer =>
+        !!entry &&
+        typeof entry === "object" &&
+        (typeof entry.urls === "string" ||
+          (Array.isArray(entry.urls) && entry.urls.every((u: unknown) => typeof u === "string"))),
+    );
+    return servers.length > 0 ? servers : DEFAULT_ICE_SERVERS;
+  } catch {
+    return DEFAULT_ICE_SERVERS;
   }
 }
 

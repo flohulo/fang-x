@@ -1274,6 +1274,100 @@ label {
   font-weight: 700;
 }
 
+.radio-fab {
+  position: absolute;
+  top: 64px;
+  left: 64px;
+  z-index: 14;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.94);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.radio-fab:hover,
+.radio-fab.is-open,
+.radio-fab.is-active {
+  border-color: rgba(56, 189, 248, 0.55);
+  color: var(--accent);
+}
+
+.radio-fab svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.radio-live {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.radio-window {
+  position: absolute;
+  top: 116px;
+  left: 12px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(320px, calc(100vw - 24px));
+  padding: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.96);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.radio-text,
+.radio-status,
+.radio-error {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.radio-status {
+  color: var(--text-dim);
+}
+
+.radio-error {
+  color: var(--danger);
+}
+
+.radio-ptt {
+  min-height: 96px;
+  border-radius: var(--radius);
+  font-size: 1.05rem;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.radio-ptt.is-talking {
+  background: var(--danger);
+  color: #fff;
+}
+
 .chat-window {
   position: absolute;
   top: 116px;
