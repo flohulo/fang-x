@@ -286,6 +286,17 @@ async function run() {
     "Auswertung enthält nur Summen, keine Standorte",
   );
 
+  // Alle sicher? Nach Spielende kann jede Person bestätigen.
+  det.ws.send(JSON.stringify({ t: "confirmSafe" }));
+  const safety = await host.waitFor(
+    (m) => m.t === "safety" && m.safe.includes(detJoined.playerId),
+    5000,
+  );
+  assert(
+    !safety.safe.includes(hostJoined.playerId),
+    "Sicherheitsabfrage zeigt nur die Personen, die bestätigt haben",
+  );
+
   // Chat ist nach dem Spielende gesperrt
   host.ws.send(JSON.stringify({ t: "chat", text: "Nach dem Spiel" }));
   await new Promise((resolve) => setTimeout(resolve, 300));

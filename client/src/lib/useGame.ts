@@ -59,6 +59,13 @@ export function useGame() {
     train: number;
     at: number;
   } | null>(null);
+  const [inactivity, setInactivity] = useState<{
+    playerId: string;
+    name: string;
+    minutes: number;
+    at: number;
+  } | null>(null);
+  const [safe, setSafe] = useState<string[]>([]);
   const [batteryWarning, setBatteryWarning] = useState<{
     playerId: string;
     name: string;
@@ -186,6 +193,8 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setInactivity(null);
+            setSafe([]);
             setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
@@ -225,6 +234,17 @@ export function useGame() {
           break;
         case "catchPending":
           setCatchPending(msg.pending);
+          break;
+        case "inactivity":
+          setInactivity({
+            playerId: msg.playerId,
+            name: msg.name,
+            minutes: msg.minutes,
+            at: msg.at,
+          });
+          break;
+        case "safety":
+          setSafe(msg.safe);
           break;
         case "batteryLow":
           setBatteryWarning({
@@ -365,6 +385,10 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const confirmSafe = () => {
+    send({ t: "confirmSafe" });
+  };
+
   const sendBatteryLow = (level: number) => {
     send({ t: "batteryLow", level });
   };
@@ -414,6 +438,8 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    inactivity,
+    safe,
     batteryWarning,
     revealTimer,
     chatMessages,
@@ -428,6 +454,7 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    confirmSafe,
     sendBatteryLow,
     configure,
     setRole,

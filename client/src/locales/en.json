@@ -260,6 +260,20 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "inactivity": {
+      "label": "Radio silence:",
+      "other": "No position has come in from {{name}} for {{minutes}} minutes. Check in with {{name}}.",
+      "self": "No position has come in from you for {{minutes}} minutes. Check your GPS and connection.",
+      "dismiss": "Dismiss notice"
+    },
+    "safety": {
+      "title": "Is everyone safe?",
+      "hint": "Confirm that you are fine so the group knows everything is all right.",
+      "confirmed": "safe",
+      "open": "open",
+      "confirm": "I am safe",
+      "done": "Confirmed"
+    },
     "battery": {
       "label": "Battery:",
       "other": "{{name}}'s battery is at {{level}}%. Their position may drop out soon.",
