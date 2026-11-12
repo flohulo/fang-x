@@ -37,6 +37,7 @@
     "enable": "Alarm aktivieren"
   },
   "notifications": {
+    "chatTitle": "{{name}} im Chat",
     "surrenderTitle": "X hat aufgegeben",
     "surrenderBody": "{{name}} hat das Spiel aufgegeben. Der Live-Standort wurde geteilt.",
     "positionLiveTitle": "Achtung: Standort wird geteilt",

@@ -1348,6 +1348,31 @@ label {
   font-weight: 700;
 }
 
+.chat-toast {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: min(320px, calc(100vw - 24px));
+  padding: 10px 12px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.96);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  color: var(--text);
+  text-align: left;
+  transform: translateX(-50%);
+}
+
+.chat-toast span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .chat-window {
   position: absolute;
   top: 116px;

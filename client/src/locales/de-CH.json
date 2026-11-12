@@ -36,6 +36,7 @@
     "enable": "Alarm aktivierä"
   },
   "notifications": {
+    "chatTitle": "{{name}} im Chat",
     "surrenderTitle": "X hät ufgäh",
     "surrenderBody": "{{name}} hät s Spiel ufgäh. De Live-Standort isch gteilt worde.",
     "positionLiveTitle": "Achtung: Standort wird gteilt",
