@@ -1,5 +1,14 @@
 # Getting started
 
+## Pre-game checklist
+
+In the lobby a checklist shows everyone whether their device is ready: location access,
+alerts and notifications, installation as an app, and a reminder about battery and screen
+lock. It also warns about problems with the group and settings, for example disconnected
+players, no detective, a very small or very large play area, and no head start. If there are
+warnings, the app asks the host to confirm when starting; without an X the game still cannot
+be started.
+
 ## Creating a game
 
 One person creates a new game on the start page. They become the host and play as X by default.

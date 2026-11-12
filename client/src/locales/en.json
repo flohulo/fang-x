@@ -239,7 +239,37 @@
     "playAreaDrawn": "Custom play area with {{count}} corner points drawn.",
     "playAreaDraw": "Draw play area on the map",
     "playAreaEdit": "Edit play area",
-    "playAreaUseCircle": "Use circle again"
+    "playAreaUseCircle": "Use circle again",
+    "checklist": {
+      "title": "Pre-game checklist",
+      "location": "Location access granted",
+      "notifications": "Alerts and notifications allowed",
+      "notificationsHint": "Without them you miss reveals while the screen is off.",
+      "install": "App installed on the home screen",
+      "installHint": "Installed, the app runs more reliably in the background.",
+      "installHintIos": "Tap the share icon, then Add to Home Screen.",
+      "screen": "Battery charged, screen lock set generously",
+      "screenHint": "GPS and screen use a lot of power during a round.",
+      "status": {
+        "ok": "Done: ",
+        "warn": "Warning: ",
+        "info": "Note: "
+      },
+      "checks": {
+        "noX": "No X has been chosen yet.",
+        "noDetective": "There is no detective, nobody is chasing X.",
+        "disconnected": "{{count}} players currently not connected: {{names}}.",
+        "areaSmall": "The play area is very small (about {{meters}} m radius).",
+        "areaLarge": "The play area is very large (about {{meters}} m radius).",
+        "noHeadStart": "X has no head start."
+      }
+    },
+    "startConfirm": {
+      "title": "Start anyway?",
+      "text": "These points came up before the start:",
+      "go": "Start anyway",
+      "back": "Back"
+    }
   },
   "game": {
     "phase": {

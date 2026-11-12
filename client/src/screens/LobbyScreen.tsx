@@ -1,8 +1,9 @@
 import { LocationAccess } from "../components/LocationAccess";
 import { PlayAreaEditor } from "../components/PlayAreaEditor";
+import { PreGameChecklist, PreGameChecklistItems } from "../components/PreGameChecklist";
 import { useLocationPermission } from "../lib/useLocationPermission";
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
-import { DEFAULT_RULESET } from "@fang-x/shared";
+import { DEFAULT_RULESET, evaluatePreGameChecks } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { docsUrl } from "../lib/docs";
@@ -43,6 +44,7 @@ export function LobbyScreen({
   const [skipLocation, setSkipLocation] = useState(false);
   const [startLocationError, setStartLocationError] = useState<string | null>(null);
   const [drawingArea, setDrawingArea] = useState(false);
+  const [confirmingStart, setConfirmingStart] = useState(false);
 
   useEffect(() => {
     if (!activeInfoKey) return;
@@ -158,6 +160,12 @@ export function LobbyScreen({
   const others = players.filter((p) => p.id !== myId);
   const locationOk = location.state === "granted" || skipLocation;
   const canStart = hasX && locationOk;
+  const checks = evaluatePreGameChecks(localRuleset, players);
+  const startWarnings = checks.filter((check) => check.severity === "warning");
+  const handleStartClick = () => {
+    if (startWarnings.length > 0) setConfirmingStart(true);
+    else onStart();
+  };
 
   return (
     <div className="screen">
@@ -249,6 +257,12 @@ export function LobbyScreen({
       </div>
 
       <LocationAccess state={location.state} busy={location.busy} onRequest={location.request} />
+
+      <PreGameChecklist
+        locationState={location.state}
+        locationSkipped={skipLocation}
+        checks={checks}
+      />
 
       {youAreHost && (
         <div className="card">
@@ -792,7 +806,39 @@ export function LobbyScreen({
             </a>
           </div>
 
-          <button onClick={onStart} disabled={!canStart} style={{ marginTop: 16 }}>
+          {confirmingStart && canStart && (
+            <div className="card" role="alertdialog" aria-labelledby="start-confirm-title">
+              <h3 id="start-confirm-title">{t("lobby.startConfirm.title")}</h3>
+              <p className="card-text">{t("lobby.startConfirm.text")}</p>
+              <PreGameChecklistItems
+                items={startWarnings.map((check) => ({
+                  id: check.id,
+                  status: "warn" as const,
+                  label: t(`lobby.checklist.checks.${check.id}`, check.params),
+                }))}
+              />
+              <button
+                type="button"
+                style={{ marginTop: 12 }}
+                onClick={() => {
+                  setConfirmingStart(false);
+                  onStart();
+                }}
+              >
+                {t("lobby.startConfirm.go")}
+              </button>
+              <button
+                className="secondary"
+                type="button"
+                style={{ marginTop: 8 }}
+                onClick={() => setConfirmingStart(false)}
+              >
+                {t("lobby.startConfirm.back")}
+              </button>
+            </div>
+          )}
+
+          <button onClick={handleStartClick} disabled={!canStart} style={{ marginTop: 16 }}>
             {!hasX ? t("lobby.needX") : !locationOk ? t("lobby.needLocation") : t("lobby.start")}
           </button>
           {hasX && !locationOk && (
