@@ -277,6 +277,20 @@
         "SKIP": "Überspringen"
       }
     },
+    "inactivity": {
+      "label": "Funkstille:",
+      "other": "Von {{name}} kommt seit {{minutes}} Minuten keine Position an. Meldet euch kurz bei {{name}}.",
+      "self": "Von dir kommt seit {{minutes}} Minuten keine Position an. Prüfe GPS und Verbindung.",
+      "dismiss": "Hinweis schliessen"
+    },
+    "safety": {
+      "title": "Alle sicher?",
+      "hint": "Bestätige kurz, dass du gut angekommen bist, damit die Gruppe weiss, dass alles in Ordnung ist.",
+      "confirmed": "sicher",
+      "open": "offen",
+      "confirm": "Ich bin sicher",
+      "done": "Bestätigt"
+    },
     "battery": {
       "label": "Akku:",
       "other": "Der Akku von {{name}} ist bei {{level}} %. Gleich könnte die Position ausfallen.",

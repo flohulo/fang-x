@@ -64,6 +64,13 @@ export function useGame() {
     armed: PingTrickMode | null;
     used: PingTrickMode | null;
   }>({ armed: null, used: null });
+  const [inactivity, setInactivity] = useState<{
+    playerId: string;
+    name: string;
+    minutes: number;
+    at: number;
+  } | null>(null);
+  const [safe, setSafe] = useState<string[]>([]);
   const [batteryWarning, setBatteryWarning] = useState<{
     playerId: string;
     name: string;
@@ -192,6 +199,8 @@ export function useGame() {
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
             setPingTrick({ armed: null, used: null });
+            setInactivity(null);
+            setSafe([]);
             setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
@@ -234,6 +243,17 @@ export function useGame() {
           break;
         case "pingTrick":
           setPingTrick({ armed: msg.armed, used: msg.used });
+          break;
+        case "inactivity":
+          setInactivity({
+            playerId: msg.playerId,
+            name: msg.name,
+            minutes: msg.minutes,
+            at: msg.at,
+          });
+          break;
+        case "safety":
+          setSafe(msg.safe);
           break;
         case "batteryLow":
           setBatteryWarning({
@@ -378,6 +398,10 @@ export function useGame() {
     send({ t: "setPingTrick", mode });
   };
 
+  const confirmSafe = () => {
+    send({ t: "confirmSafe" });
+  };
+
   const sendBatteryLow = (level: number) => {
     send({ t: "batteryLow", level });
   };
@@ -428,6 +452,8 @@ export function useGame() {
     transitStops,
     transitNotice,
     pingTrick,
+    inactivity,
+    safe,
     batteryWarning,
     revealTimer,
     chatMessages,
@@ -443,6 +469,7 @@ export function useGame() {
     reconnecting,
     join,
     requestPingTrick,
+    confirmSafe,
     sendBatteryLow,
     configure,
     setRole,

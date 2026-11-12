@@ -42,6 +42,7 @@ export type ClientMessage =
   | { t: "surrender" }
   /** X schaltet den Ping-Trick für die nächste Sichtung scharf oder nimmt ihn zurück. */
   | { t: "setPingTrick"; mode: PingTrickMode | "CANCEL" }
+  | { t: "confirmSafe" }
   /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
   | { t: "batteryLow"; level: number }
   | { t: "start" }
@@ -207,6 +208,19 @@ export type ServerMessage =
       armed: PingTrickMode | null;
       /** Schon verbraucht (die Sichtung ist erfolgt). */
       used: PingTrickMode | null;
+    }
+  | {
+      /** Von einer Person kommt seit einer Weile keine Position mehr an. */
+      t: "inactivity";
+      playerId: string;
+      name: string;
+      minutes: number;
+      at: number;
+    }
+  | {
+      /** Wer nach Spielende "Ich bin sicher" bestätigt hat. */
+      t: "safety";
+      safe: string[];
     }
   | {
       /** Der Akku einer Person ist niedrig. Geht an alle. */

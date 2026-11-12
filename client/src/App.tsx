@@ -12,6 +12,7 @@ import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
 import { formatServerError } from "./lib/serverMessages";
 import { clearSession, loadSession, saveSession } from "./lib/session";
+import { markChangelogAfterUpdate } from "./lib/updateChangelog";
 import { useGame } from "./lib/useGame";
 import { GameScreen } from "./screens/GameScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -140,7 +141,13 @@ function PwaUpdatePrompt() {
       >
         <h2 id="pwa-update-title">{t("pwa.updateTitle")}</h2>
         <p id="pwa-update-description">{t("pwa.updateText")}</p>
-        <button type="button" onClick={() => void updateServiceWorker(true)}>
+        <button
+          type="button"
+          onClick={() => {
+            markChangelogAfterUpdate();
+            void updateServiceWorker(true);
+          }}
+        >
           {t("pwa.reload")}
         </button>
         <button className="secondary" type="button" onClick={() => setNeedRefresh(false)}>
@@ -512,6 +519,8 @@ export default function App() {
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
         pingTrick={game.pingTrick}
+        inactivity={game.inactivity}
+        safe={game.safe}
         batteryWarning={game.batteryWarning}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
@@ -524,6 +533,7 @@ export default function App() {
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
         onPingTrick={game.requestPingTrick}
+        onConfirmSafe={game.confirmSafe}
         onBatteryLow={game.sendBatteryLow}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
