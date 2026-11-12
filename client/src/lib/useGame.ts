@@ -1,6 +1,7 @@
 import type {
   ChatMessage,
   ClientMessage,
+  TeamMarker,
   GameStats,
   LatLng,
   MessageParams,
@@ -59,6 +60,7 @@ export function useGame() {
     train: number;
     at: number;
   } | null>(null);
+  const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
   const [inactivity, setInactivity] = useState<{
     playerId: string;
     name: string;
@@ -193,6 +195,7 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setTeamMarkers([]);
             setInactivity(null);
             setSafe([]);
             setBatteryWarning(null);
@@ -234,6 +237,9 @@ export function useGame() {
           break;
         case "catchPending":
           setCatchPending(msg.pending);
+          break;
+        case "markers":
+          setTeamMarkers(msg.markers);
           break;
         case "inactivity":
           setInactivity({
@@ -385,6 +391,14 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const addTeamMarker = (pos: LatLng, kind: TeamMarker["kind"]) => {
+    send({ t: "addMarker", pos, kind });
+  };
+
+  const removeTeamMarker = (id: number) => {
+    send({ t: "removeMarker", id });
+  };
+
   const confirmSafe = () => {
     send({ t: "confirmSafe" });
   };
@@ -438,6 +452,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    teamMarkers,
     inactivity,
     safe,
     batteryWarning,
@@ -454,6 +469,8 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    addTeamMarker,
+    removeTeamMarker,
     confirmSafe,
     sendBatteryLow,
     configure,

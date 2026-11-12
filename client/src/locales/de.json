@@ -290,6 +290,10 @@
     "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
     "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
     "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "markers": {
+      "suspect": "Verdacht markieren",
+      "clear": "Hier nicht markieren"
+    },
     "inactivity": {
       "label": "Funkstille:",
       "other": "Von {{name}} kommt seit {{minutes}} Minuten keine Position an. Meldet euch kurz bei {{name}}.",
@@ -373,7 +377,6 @@
       "street": "Karte: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Daten von <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Ziel auf Karte wählen",
-    "cancelChoosing": "Karte antippen · Abbrechen",
     "simulationMode": "Simulationsmodus",
     "enableGps": "GPS aktivieren",
     "emergency": "Notfall",
@@ -421,7 +424,15 @@
       "noRevealText": "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets.",
       "defaultTitle": "Spiel läuft.",
       "defaultText": "Halte dich bereit."
-    }
+    },
+    "actions": {
+      "title": "Aktionen"
+    },
+    "pickHint": {
+      "marker": "Tippe auf die Karte, um die Markierung zu setzen.",
+      "objective": "Tippe auf die Karte, um das Ziel zu setzen."
+    },
+    "pickCancel": "Abbrechen"
   },
   "map": {
     "satellite": "Satellit",
@@ -430,6 +441,10 @@
     "showStreetMap": "Strassenkarte anzeigen",
     "objective": "Missionsziel",
     "start": "Start",
+    "markerSuspect": "Verdacht",
+    "markerClear": "Hier nicht",
+    "markerPopup": "{{label}} von {{name}} um {{time}} Uhr",
+    "markerRemove": "Entfernen",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",

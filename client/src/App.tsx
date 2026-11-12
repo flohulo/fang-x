@@ -518,6 +518,7 @@ export default function App() {
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
+        teamMarkers={game.teamMarkers}
         inactivity={game.inactivity}
         safe={game.safe}
         batteryWarning={game.batteryWarning}
@@ -531,6 +532,8 @@ export default function App() {
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
+        onAddTeamMarker={game.addTeamMarker}
+        onRemoveTeamMarker={game.removeTeamMarker}
         onConfirmSafe={game.confirmSafe}
         onBatteryLow={game.sendBatteryLow}
         onReportCatch={game.reportCatch}

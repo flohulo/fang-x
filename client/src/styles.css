@@ -576,6 +576,80 @@ label {
   gap: 8px;
 }
 
+.marker-popup p {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 0.85rem;
+}
+
+.marker-popup button {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+.action-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.action-menu-button {
+  width: auto;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.action-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 12;
+  display: grid;
+  gap: 6px;
+  min-width: 210px;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.97);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.action-menu-list button {
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.pick-bar {
+  position: absolute;
+  top: 116px;
+  left: 12px;
+  right: 76px;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  border-radius: var(--radius);
+  background: rgba(8, 47, 73, 0.95);
+  color: #bae6fd;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.pick-bar span {
+  flex: 1;
+}
+
+.pick-bar button {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
 .reveal-progress {
   position: absolute;
   top: 58px;

@@ -285,6 +285,10 @@
     "surrenderLive": "De exakt Live-Standort isch a d Detektivä übertreit worde.",
     "surrenderNoPosition": "Es Standort isch nöd verfüegbar gsi.",
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
+    "markers": {
+      "suspect": "Verdacht markiere",
+      "clear": "Da nöd markiere"
+    },
     "inactivity": {
       "label": "Funkstilli:",
       "other": "Vo {{name}} chunnt sit {{minutes}} Minute kei Position a. Mäldet öi churz bi {{name}}.",
@@ -368,7 +372,6 @@
       "street": "Charte: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Date vo <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Ziel uf de Charte uswähle",
-    "cancelChoosing": "Charte aatippe · Abbräche",
     "simulationMode": "Simulationsmodus",
     "enableGps": "GPS aktivierä",
     "emergency": "Notfall",
@@ -416,7 +419,15 @@
       "noRevealText": "Wart uf de erscht Reveal und halt dich i de Nöchi vom Gebiet uf.",
       "defaultTitle": "Spiel lauft.",
       "defaultText": "Halt dich parat."
-    }
+    },
+    "actions": {
+      "title": "Aktione"
+    },
+    "pickHint": {
+      "marker": "Tipp uf d Charte, um d Markierig z setze.",
+      "objective": "Tipp uf d Charte, um s Ziel z setze."
+    },
+    "pickCancel": "Abbräche"
   },
   "map": {
     "satellite": "Satellit",
@@ -425,6 +436,10 @@
     "showStreetMap": "Strassecharte aazeige",
     "objective": "Missionsziel",
     "start": "Start",
+    "markerSuspect": "Verdacht",
+    "markerClear": "Da nöd",
+    "markerPopup": "{{label}} vo {{name}} um {{time}} Uhr",
+    "markerRemove": "Entferne",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",

@@ -47,6 +47,7 @@ nav:
       - Spielgebiet: Spielgebiet.md
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
+  - Team-Markierungen: Team-Markierungen.md
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
   - Akku-Warnung: Akku-Warnung.md
   - Spielende-Auswertung: Spielende-Auswertung.md
@@ -102,6 +103,7 @@ plugins:
             Spielgebiet: Play area
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
+            Team-Markierungen: Team markers
             Alle sicher und Funkstille: Everyone safe and radio silence
             Akku-Warnung: Low battery warning
             Spielende-Auswertung: Round summary
