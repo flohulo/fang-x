@@ -1,6 +1,6 @@
 site_name: Fang X Handbuch
 site_description: Spielregeln, Einstellungen und Tipps für Fang X – das GPS-Fangspiel für draussen.
-site_url: https://flohulo.github.io/fang-x/
+site_url: https://flohulo.github.io/fang-x/handbuch/
 repo_url: https://github.com/flohulo/fang-x
 repo_name: flohulo/fang-x
 edit_uri: edit/main/docs/
@@ -48,6 +48,8 @@ nav:
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
   - Detektiv-Funk: Detektiv-Funk.md
+  - Akku-Warnung: Akku-Warnung.md
+  - Spielende-Auswertung: Spielende-Auswertung.md
 
 # Die interne Regelwerk-Spezifikation bleibt im Repository, gehört aber nicht ins Handbuch.
 exclude_docs: |
@@ -101,6 +103,8 @@ plugins:
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
             Detektiv-Funk: Detective radio
+            Akku-Warnung: Low battery warning
+            Spielende-Auswertung: Round summary
 
 extra:
   social:

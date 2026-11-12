@@ -16,8 +16,12 @@ Standort erlaubt ist; zum Ausprobieren gibt es **Ohne Standort fortfahren (Simul
 ## Spiel erstellen
 
 Eine Person erstellt auf der Startseite ein neues Spiel. Sie wird Host und spielt standardmäßig
-als X. Den sechsstelligen **Spiel-Code** teilt sie mit der Gruppe – über den Einladungslink oder
-indem alle den Code eingeben und beitreten.
+als X. Den sechsstelligen **Spiel-Code** teilt sie mit der Gruppe – über den Einladungslink, über
+den **QR-Code** oder indem alle den Code eingeben und beitreten.
+
+!!! tip ":material-qrcode: QR-Code für alle vor Ort"
+    Tippe in der Lobby auf **QR-Code anzeigen**. Die anderen scannen ihn mit der Handykamera und
+    landen direkt im Spiel. Der QR-Code enthält denselben Link wie **Einladung teilen**.
 
 ## Rolle wählen
 
@@ -67,3 +71,11 @@ Benachrichtigung.
 
 Schon während des Countdowns ("Start in …") siehst du deinen eigenen Standort auf der Karte. Dein
 Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet.
+
+## App-Updates
+
+Steht eine neue Version bereit, fragt dich die App, ob sie neu geladen werden soll. Nach **Neu
+laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerungen. Du kommst
+über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
+aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
+Startseite.

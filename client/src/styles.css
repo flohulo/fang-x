@@ -825,6 +825,61 @@ label {
   text-decoration: underline;
 }
 
+.result-stats {
+  margin: 16px 0 0;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.result-stats h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.result-stats dl {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 12px;
+}
+
+.result-stats dl > div,
+.result-stats-players li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-stats dt {
+  color: var(--text-dim);
+}
+
+.result-stats dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-stats-players {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-stats-players li {
+  align-items: center;
+}
+
+.result-stats-name {
+  flex: 1;
+}
+
+.result-stats-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
 .map-overlay {
   position: absolute;
   top: 0;
@@ -1026,6 +1081,31 @@ label {
   color: inherit;
   font-size: 1rem;
   line-height: 1.2;
+}
+
+.battery-notice {
+  top: 116px;
+  border-color: rgba(245, 158, 11, 0.6);
+  background: rgba(69, 26, 3, 0.95);
+  color: #fde68a;
+}
+
+.battery-notice strong {
+  color: #fef3c7;
+}
+
+.qr-box {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.qr-code {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  background: #fff;
 }
 
 .transit-dialog-backdrop {
