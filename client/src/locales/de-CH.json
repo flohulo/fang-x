@@ -123,6 +123,11 @@
     "codeLabel": "Spiel-Code",
     "shareInvite": "Iladig teile",
     "linkCopied": "Link kopiert ✓",
+    "showQr": "QR-Code aazeige",
+    "hideQr": "QR-Code usblände",
+    "qrAlt": "QR-Code zum Biitritt is Spiel {{code}}",
+    "qrHint": "Anderi scanned de Code mit de Kamera und träted direkt bi.",
+    "qrFailed": "De QR-Code het nöd chöne erzügt werde. Teil de Link oder de Code.",
     "copyCode": "Nur Code kopiere",
     "codeCopied": "Code kopiert ✓",
     "myPlayer": "Min Spieler",
@@ -280,6 +285,20 @@
     "surrenderLive": "De exakt Live-Standort isch a d Detektivä übertreit worde.",
     "surrenderNoPosition": "Es Standort isch nöd verfüegbar gsi.",
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
+    "battery": {
+      "label": "Akku:",
+      "other": "De Akku vo {{name}} isch bi {{level}} %. Gli chönnt d Position usfalle.",
+      "self": "Din Akku isch bi {{level}} %. Lad s Gerät uf, damit di Position nöd usfallt.",
+      "dismiss": "Hiwis zuemache"
+    },
+    "stats": {
+      "title": "Uswärtig",
+      "duration": "Spielziit",
+      "reveals": "Sichtige",
+      "closest": "Chnappste Abstand",
+      "farthest": "Am wiitischte glaufe",
+      "roleX": "X"
+    },
     "backToStart": "Zrugg zur Startsite",
     "exportSettings": "Istelige vo dere Rundi exportiere",
     "settingsExported": "Istelige exportiert ✓",

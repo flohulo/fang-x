@@ -1,6 +1,7 @@
 import type {
   ChatMessage,
   ClientMessage,
+  GameStats,
   LatLng,
   MessageParams,
   ObjectiveState,
@@ -22,6 +23,7 @@ export interface GameResult {
   reasonCode?: string;
   reasonParams?: MessageParams;
   surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
+  stats?: GameStats;
 }
 
 interface Session {
@@ -55,6 +57,12 @@ export function useGame() {
     count: number;
     bus: number;
     train: number;
+    at: number;
+  } | null>(null);
+  const [batteryWarning, setBatteryWarning] = useState<{
+    playerId: string;
+    name: string;
+    level: number;
     at: number;
   } | null>(null);
   const [catchPending, setCatchPending] = useState(false);
@@ -178,6 +186,7 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -217,6 +226,14 @@ export function useGame() {
         case "catchPending":
           setCatchPending(msg.pending);
           break;
+        case "batteryLow":
+          setBatteryWarning({
+            playerId: msg.playerId,
+            name: msg.name,
+            level: msg.level,
+            at: msg.at,
+          });
+          break;
         case "playerPosition":
           setPlayers((current) =>
             current.map((player) =>
@@ -255,6 +272,7 @@ export function useGame() {
             reasonCode: msg.reasonCode,
             reasonParams: msg.reasonParams,
             surrender: msg.surrender,
+            stats: msg.stats,
           });
           setPlayers(msg.players);
           setRevealTimer(null);
@@ -347,6 +365,10 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const sendBatteryLow = (level: number) => {
+    send({ t: "batteryLow", level });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -392,6 +414,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    batteryWarning,
     revealTimer,
     chatMessages,
     catchPending,
@@ -405,6 +428,7 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    sendBatteryLow,
     configure,
     setRole,
     start,

@@ -37,6 +37,8 @@ export type ClientMessage =
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
   | { t: "surrender" }
+  /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
+  | { t: "batteryLow"; level: number }
   | { t: "start" }
   | { t: "position"; pos: LatLng }
   | { t: "leave" };
@@ -80,6 +82,27 @@ export interface ObjectiveState {
   status: "PENDING" | "ACTIVE" | "COMPLETED";
   target: LatLng | null;
   radiusMeters: number;
+}
+
+/** Aggregierte Kennzahlen eines Spielers — ohne Streckenverlauf. */
+export interface PlayerStats {
+  playerId: string;
+  name: string;
+  color: string;
+  role: Role;
+  /** Zurückgelegte Strecke in Metern (Summe, kein Verlauf). */
+  distanceMeters: number;
+}
+
+/** Auswertung am Spielende. Enthält nur Summen und Extremwerte, keine Standorte. */
+export interface GameStats {
+  /** Dauer der laufenden Phase in Sekunden (ohne Countdown und Vorsprung). */
+  durationSeconds: number;
+  /** Anzahl der Sichtungen von X. */
+  revealCount: number;
+  /** Geringster Abstand zwischen X und einem Detektiv während der Runde. */
+  closestApproachMeters: number | null;
+  players: PlayerStats[];
 }
 
 export type ServerMessage =
@@ -155,6 +178,8 @@ export type ServerMessage =
       reasonCode?: string;
       reasonParams?: MessageParams;
       players: PlayerInfo[];
+      /** Auswertung der Runde; ältere Server senden sie nicht. */
+      stats?: GameStats;
       /** X hat aufgegeben und den exakten Standort geteilt. */
       surrender?: {
         playerId: string;
@@ -169,5 +194,13 @@ export type ServerMessage =
       message: string;
       code?: string;
       params?: MessageParams;
+    }
+  | {
+      /** Der Akku einer Person ist niedrig. Geht an alle. */
+      t: "batteryLow";
+      playerId: string;
+      name: string;
+      level: number;
+      at: number;
     }
   | { t: "pong" };

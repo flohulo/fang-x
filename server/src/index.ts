@@ -2,6 +2,9 @@
 // Statische Assets (Client-PWA) + HTTP-Routen fürs Spielraum-Matchmaking.
 // Die eigentliche Spiellogik lebt in der GameRoom-Durable-Object.
 
+import type { DurableObject } from "cloudflare:workers";
+import * as Sentry from "@sentry/cloudflare";
+import { scrubErrorEvent } from "@fang-x/shared";
 import { RateLimiter } from "./rate-limit";
 import { GameRoom } from "./room";
 
@@ -9,6 +12,19 @@ export interface Env {
   GAME_ROOM: DurableObjectNamespace;
   RATE_LIMIT: DurableObjectNamespace;
   ASSETS: Fetcher;
+  // Optional: DSN des GlitchTip-Projekts. Ohne DSN ist die Fehlerberichterstattung aus.
+  GLITCHTIP_DSN?: string;
+}
+
+// GlitchTip spricht das Sentry-Protokoll. Berichte werden vor dem Senden bereinigt,
+// damit weder Standorte noch Nutzerdaten oder Spiel-Codes das System verlassen.
+function sentryOptions(env: Env): Sentry.CloudflareOptions {
+  return {
+    dsn: env.GLITCHTIP_DSN,
+    tracesSampleRate: 0,
+    beforeBreadcrumb: () => null,
+    beforeSend: (event) => scrubErrorEvent(event),
+  };
 }
 
 // 6-Buchstaben-Code ohne mehrdeutige Zeichen (kein I, O, 0, 1)
@@ -70,7 +86,7 @@ async function checkRateLimit(
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
-export default {
+const handler = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
@@ -134,4 +150,18 @@ export default {
   },
 };
 
-export { GameRoom, RateLimiter };
+export default Sentry.withSentry<Env>(sentryOptions, handler);
+
+// Die Raum-Klassen erben nicht von DurableObject; für die Sentry-Typen reicht diese Form.
+type DurableObjectClass = new (state: DurableObjectState, env: Env) => DurableObject<Env>;
+
+const GameRoomInstrumented = Sentry.instrumentDurableObjectWithSentry(
+  sentryOptions,
+  GameRoom as unknown as DurableObjectClass,
+);
+const RateLimiterInstrumented = Sentry.instrumentDurableObjectWithSentry(
+  sentryOptions,
+  RateLimiter as unknown as DurableObjectClass,
+);
+
+export { GameRoomInstrumented as GameRoom, RateLimiterInstrumented as RateLimiter };
