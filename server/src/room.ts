@@ -79,6 +79,13 @@ const TICK_IDLE_MS = 5_000;
 
 /** Team-Markierungen: höchstens so viele gleichzeitig, die ältesten fallen heraus. */
 const MAX_TEAM_MARKERS = 20;
+/**
+ * Inaktivität: Keine Positionsmeldung seit zwei Reveal-Intervallen, mindestens 5 und höchstens
+ * 30 Minuten. Bei Zufallsintervall gilt ein fester Wert.
+ */
+const INACTIVITY_MIN_MS = 5 * 60_000;
+const INACTIVITY_MAX_MS = 30 * 60_000;
+const INACTIVITY_RANDOM_MS = 10 * 60_000;
 /** Akku-Warnung: höchstens alle 10 Minuten je Person, nur bei plausiblem Wert bis 30 Prozent. */
 const BATTERY_WARN_COOLDOWN_MS = 10 * 60_000;
 const BATTERY_WARN_MAX_LEVEL = 30;
@@ -103,6 +110,8 @@ interface Player {
   disconnectedAt: number | null;
   position: LatLng | null;
   lastPositionAt: number;
+  /** Für diese Funkstille wurde bereits gewarnt (nur Arbeitsspeicher). */
+  inactivityNotified: boolean;
   /** Zeitpunkt der letzten Akku-Warnung (nur Arbeitsspeicher). */
   lastBatteryWarnAt: number;
   /** Summe der zurückgelegten Strecke für die Auswertung (kein Verlauf). */
@@ -156,6 +165,7 @@ interface RoomSnapshot {
   endDetail?: EndDetail | null;
   surrender?: SurrenderInfo | null;
   transitStops?: { bus: number; train: number };
+  safe?: string[];
   closestApproachMeters?: number | null;
   stats?: GameStats | null;
   catchPending?: boolean;
@@ -192,6 +202,7 @@ export class GameRoom {
   /** Nur im Arbeitsspeicher; wird weder gespeichert noch nach der Runde behalten. */
   private teamMarkers: TeamMarker[] = [];
   private nextMarkerId = 1;
+  private safe = new Set<string>();
   private closestApproachMeters: number | null = null;
   private endStats: GameStats | null = null;
   private chatMessages: ChatMessage[] = [];
@@ -276,6 +287,7 @@ export class GameRoom {
       endDetail: this.endDetail,
       surrender: this.surrenderInfo,
       transitStops: this.transitStops,
+      safe: [...this.safe],
       closestApproachMeters: this.closestApproachMeters,
       stats: this.endStats,
       catchPending: this.catchPending,
@@ -323,6 +335,7 @@ export class GameRoom {
     this.endDetail = snap.endDetail ?? null;
     this.surrenderInfo = snap.surrender ?? null;
     this.transitStops = snap.transitStops ?? { bus: 0, train: 0 };
+    this.safe = new Set(snap.safe ?? []);
     this.closestApproachMeters = snap.closestApproachMeters ?? null;
     this.endStats = snap.stats ?? null;
     this.catchPending = snap.catchPending ?? false;
@@ -340,6 +353,7 @@ export class GameRoom {
         disconnectedAt: now,
         position: null,
         lastPositionAt: 0,
+        inactivityNotified: false,
         lastBatteryWarnAt: 0,
         distanceMeters: p.distanceMeters ?? 0,
         statPos: null,
@@ -616,6 +630,7 @@ export class GameRoom {
               ...(this.endStats ? { stats: this.endStats } : {}),
               ...(this.surrenderInfo ? { surrender: this.surrenderInfo } : {}),
             });
+            this.sendTo(ws, { t: "safety", safe: [...this.safe] });
           }
           this.persist();
           this.scheduleAlarm();
@@ -714,6 +729,13 @@ export class GameRoom {
           this.removeTeamMarker(player, msg.id);
           break;
         }
+        case "confirmSafe": {
+          if (!player || this.phase !== "ENDED") return;
+          this.safe.add(player.id);
+          this.broadcast({ t: "safety", safe: [...this.safe] });
+          this.persist();
+          break;
+        }
         case "batteryLow": {
           this.warnBatteryLow(player, msg.level);
           break;
@@ -746,6 +768,7 @@ export class GameRoom {
           if (!isValidPosition(msg.pos)) return;
           player.position = msg.pos;
           player.lastPositionAt = Date.now();
+          player.inactivityNotified = false;
           this.trackStats(player, msg.pos);
           this.lastActiveAt = player.lastPositionAt;
           // Spielgebiet einmalig auf die Startposition von X festlegen, damit der
@@ -809,6 +832,7 @@ export class GameRoom {
       disconnectedAt: null,
       position: null,
       lastPositionAt: 0,
+      inactivityNotified: false,
       lastBatteryWarnAt: 0,
       distanceMeters: 0,
       statPos: null,
@@ -924,6 +948,7 @@ export class GameRoom {
     this.xPositions.length = 0;
     this.clearTeamMarkers();
     this.transitStops = { bus: 0, train: 0 };
+    this.safe.clear();
     this.closestApproachMeters = null;
     this.endStats = null;
     for (const p of this.players.values()) {
@@ -1329,6 +1354,8 @@ export class GameRoom {
       if (this.phase !== "RUNNING") return;
     }
 
+    this.checkInactivity(now);
+
     // Stale-Positions-Aufräumen (Datenminimierung: alte Standorte verwerfen)
     const cutoff = this.ruleset.movement.minUpdateSeconds * 3 * 1000;
     for (const p of this.players.values()) {
@@ -1338,6 +1365,33 @@ export class GameRoom {
           this.broadcastDetectivePosition(p, null);
         }
       }
+    }
+  }
+
+  /** Schwelle für die Inaktivitätswarnung, relativ zum Reveal-Intervall. */
+  private inactivityThresholdMs(): number {
+    const r = this.ruleset.reveal;
+    if (r.schedule === "RANDOM") return INACTIVITY_RANDOM_MS;
+    const intervalMinutes =
+      r.schedule === "DECREASING" ? r.decreaseFloorMinutes : r.intervalMinutes;
+    return Math.min(INACTIVITY_MAX_MS, Math.max(INACTIVITY_MIN_MS, intervalMinutes * 2 * 60_000));
+  }
+
+  /** Warnt alle einmal, wenn von einer verbundenen Person keine Position mehr ankommt. */
+  private checkInactivity(now: number) {
+    const threshold = this.inactivityThresholdMs();
+    for (const p of this.players.values()) {
+      if (!p.connected || p.inactivityNotified) continue;
+      const since = Math.max(p.lastPositionAt, this.gameStartedAt ?? 0);
+      if (since === 0 || now - since < threshold) continue;
+      p.inactivityNotified = true;
+      this.broadcast({
+        t: "inactivity",
+        playerId: p.id,
+        name: p.name,
+        minutes: Math.round((now - since) / 60_000),
+        at: now,
+      });
     }
   }
 

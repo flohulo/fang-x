@@ -259,6 +259,20 @@
       "suspect": "Verdacht markiere",
       "clear": "Da nöd markiere"
     },
+    "inactivity": {
+      "label": "Funkstilli:",
+      "other": "Vo {{name}} chunnt sit {{minutes}} Minute kei Position a. Mäldet öi churz bi {{name}}.",
+      "self": "Vo dir chunnt sit {{minutes}} Minute kei Position a. Prüef GPS und Verbindig.",
+      "dismiss": "Hiwis zuemache"
+    },
+    "safety": {
+      "title": "Alli sicher?",
+      "hint": "Bestätig churz, dass du guet acho bisch, damit d Gruppe weiss, dass alles i Ornig isch.",
+      "confirmed": "sicher",
+      "open": "offe",
+      "confirm": "I ha's gschafft",
+      "done": "Bestätigt"
+    },
     "battery": {
       "label": "Akku:",
       "other": "De Akku vo {{name}} isch bi {{level}} %. Gli chönnt d Position usfalle.",

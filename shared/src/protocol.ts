@@ -50,6 +50,7 @@ export type ClientMessage =
   | { t: "surrender" }
   | { t: "addMarker"; pos: LatLng; kind: TeamMarker["kind"] }
   | { t: "removeMarker"; id: number }
+  | { t: "confirmSafe" }
   /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
   | { t: "batteryLow"; level: number }
   | { t: "start" }
@@ -212,6 +213,19 @@ export type ServerMessage =
       /** Alle Team-Markierungen; geht nur an Detektive. */
       t: "markers";
       markers: TeamMarker[];
+    }
+  | {
+      /** Von einer Person kommt seit einer Weile keine Position mehr an. */
+      t: "inactivity";
+      playerId: string;
+      name: string;
+      minutes: number;
+      at: number;
+    }
+  | {
+      /** Wer nach Spielende "Ich bin sicher" bestätigt hat. */
+      t: "safety";
+      safe: string[];
     }
   | {
       /** Der Akku einer Person ist niedrig. Geht an alle. */
