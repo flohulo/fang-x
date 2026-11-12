@@ -413,6 +413,11 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             <strong>Sichtbarkeit für Mitspieler:</strong> Mitspieler sehen deinen gewählten Namen
             und – je nach Rolle und Spielphase – deinen aktuellen Standort.
           </li>
+          <li>
+            <strong>Detektiv-Funk:</strong> Der optionale Sprechfunk läuft direkt zwischen den
+            Geräten der Detektive. Der Ton wird weder aufgezeichnet noch über unseren Server
+            geleitet. Das Mikrofon ist nur offen, solange du den Sprechknopf hältst.
+          </li>
         </ul>
       </section>
 
@@ -462,6 +467,14 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
             des Spielmittelpunkts und für Live-Standortupdates während des Spiels. Der
             Spielmittelpunkt wird während Lobby und Runde gespeichert.
           </li>
+          <li>
+            <strong>Mikrofon & Verbindungsdaten des Funks:</strong> Nur wenn ein Detektiv den Funk
+            einschaltet und den Mikrofonzugriff erlaubt. Der Ton wird direkt (Peer-to-Peer, WebRTC)
+            an die anderen Detektive der Runde übertragen. Für den Verbindungsaufbau sehen sich die
+            beteiligten Geräte gegenseitig ihre IP-Adressen. Unser Server vermittelt dabei nur die
+            Verbindungsdaten (Signalisierung) zwischen den Detektiven und speichert sie nicht. X
+            erhält weder Ton noch Verbindungsdaten.
+          </li>
         </ul>
       </section>
 
@@ -504,6 +517,21 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           über das Bundesgeoportal (wmts.geo.admin.ch) geladen; dabei wird die IP-Adresse an dieses
           übermittelt. Die Ansicht ist optional und lässt sich jederzeit wieder ausschalten.
         </p>
+        <p>
+          Schaltest du den Detektiv-Funk ein, fragt dein Gerät zum Verbindungsaufbau einen
+          STUN-Server nach deiner öffentlichen Adresse. Standardmässig ist das{" "}
+          <a
+            href="https://www.cloudflare.com/privacypolicy/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Cloudflare (stun.cloudflare.com) ↗
+          </a>
+          ; dabei wird deine IP-Adresse an Cloudflare übermittelt. Der Betreiber kann stattdessen
+          eigene STUN- oder TURN-Server einsetzen. Über einen TURN-Server würde in dem Fall der Ton
+          verschlüsselt weitergeleitet, wenn keine direkte Verbindung möglich ist. Der Funk ist
+          optional; ohne Einschalten findet keine dieser Übermittlungen statt.
+        </p>
       </section>
 
       <section className="legal-section">
@@ -515,9 +543,10 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           Hosting- und Kartendienstanbieter im technisch erforderlichen Umfang. Empfänger der Daten
           sind der Hosting-Anbieter Cloudflare sowie – je nach gewählter Kartenansicht – der
           Kartenanbieter OpenFreeMap, der Satellitenbild-Anbieter EOX sowie für das Schweizer
-          Luftbild swisstopo, jeweils im Rahmen der oben beschriebenen Zwecke. Eine Weitergabe an
-          sonstige Dritte, ein Verkauf von Daten oder eine Nutzung zu Werbezwecken findet nicht
-          statt.
+          Luftbild swisstopo, jeweils im Rahmen der oben beschriebenen Zwecke. Beim Einschalten des
+          Detektiv-Funks kommen die anderen Detektive deiner Runde (IP-Adresse und Ton) sowie der
+          STUN-Anbieter hinzu. Eine Weitergabe an sonstige Dritte, ein Verkauf von Daten oder eine
+          Nutzung zu Werbezwecken findet nicht statt.
         </p>
       </section>
 
@@ -530,7 +559,8 @@ function Datenschutz({ copied, onCopyEmail }: { copied: boolean; onCopyEmail: ()
           Standortverläufe werden nicht dauerhaft gespeichert. Der Spielmittelpunkt wird während der
           Lobby und Runde benötigt und bei Spielende oder beim Entfernen des leeren Raums aus dem
           gespeicherten Spielzustand gelöscht. Weitere Spieldaten und temporäre IDs werden beim
-          Schliessen und Aufräumen des Raums entfernt.
+          Schliessen und Aufräumen des Raums entfernt. Der Ton des Detektiv-Funks wird nicht
+          gespeichert; die Verbindung endet spätestens mit dem Spielende.
         </p>
       </section>
 
