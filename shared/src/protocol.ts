@@ -6,6 +6,16 @@ import type { Ruleset } from "./ruleset";
 
 /** Ping-Trick von X: einmal pro Runde, entweder eine falsche oder eine übersprungene Sichtung. */
 export type PingTrickMode = "FAKE" | "SKIP";
+/** Markierung der Detektive auf der Karte. X sieht sie nie. */
+export interface TeamMarker {
+  id: number;
+  pos: LatLng;
+  /** SUSPECT = Verdacht, CLEAR = hier ist X nicht. */
+  kind: "SUSPECT" | "CLEAR";
+  /** Name der Person, die markiert hat. */
+  by: string;
+  at: number;
+}
 
 export type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
 
@@ -42,6 +52,8 @@ export type ClientMessage =
   | { t: "surrender" }
   /** X schaltet den Ping-Trick für die nächste Sichtung scharf oder nimmt ihn zurück. */
   | { t: "setPingTrick"; mode: PingTrickMode | "CANCEL" }
+  | { t: "addMarker"; pos: LatLng; kind: TeamMarker["kind"] }
+  | { t: "removeMarker"; id: number }
   | { t: "confirmSafe" }
   /** Akku des eigenen Geräts ist niedrig (Prozent, nur Chromium-basierte Browser). */
   | { t: "batteryLow"; level: number }
@@ -208,6 +220,11 @@ export type ServerMessage =
       armed: PingTrickMode | null;
       /** Schon verbraucht (die Sichtung ist erfolgt). */
       used: PingTrickMode | null;
+    }
+  | {
+      /** Alle Team-Markierungen; geht nur an Detektive. */
+      t: "markers";
+      markers: TeamMarker[];
     }
   | {
       /** Von einer Person kommt seit einer Weile keine Position mehr an. */

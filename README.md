@@ -46,6 +46,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
 - **Ping-Trick:** X darf einmal pro Runde eine Sichtung fälschen oder überspringen. Der Host kann das
   abschalten.
+- **Team-Markierungen:** Detektive markieren Verdachtsorte und abgesuchte Stellen auf der Karte. X
+  sieht sie nicht.
 - **Alle sicher und Funkstille:** Kommt von jemandem länger keine Position an, werden alle
   gewarnt. Nach dem Spielende bestätigt jede Person, dass sie sicher ist.
 - **Akku-Warnung:** Wird bei jemandem der Akku knapp, erfahren es alle (nur in Chromium-basierten

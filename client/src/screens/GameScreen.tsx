@@ -6,6 +6,7 @@ import type {
   PingTrickMode,
   RevealEvent,
   Ruleset,
+  TeamMarker,
 } from "@fang-x/shared";
 import { metersToPlayAreaEdge } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -26,6 +27,9 @@ import type { GameResult, PlayerView } from "../lib/useGame";
 interface GameScreenProps {
   pingTrick: { armed: PingTrickMode | null; used: PingTrickMode | null };
   onPingTrick: (mode: PingTrickMode | "CANCEL") => void;
+  teamMarkers: TeamMarker[];
+  onAddTeamMarker: (pos: LatLng, kind: TeamMarker["kind"]) => void;
+  onRemoveTeamMarker: (id: number) => void;
   batteryWarning: { playerId: string; name: string; level: number; at: number } | null;
   onBatteryLow: (level: number) => void;
   code: string;
@@ -157,6 +161,9 @@ export function GameScreen({
   transitNotice,
   pingTrick,
   onPingTrick,
+  teamMarkers,
+  onAddTeamMarker,
+  onRemoveTeamMarker,
   inactivity,
   safe,
   onConfirmSafe,
@@ -182,6 +189,9 @@ export function GameScreen({
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSimHint, setShowSimHint] = useState(false);
   const [choosingObjective, setChoosingObjective] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [markingKind, setMarkingKind] = useState<TeamMarker["kind"] | null>(null);
   const [transitDialogOpen, setTransitDialogOpen] = useState(false);
   const [surrenderDialogOpen, setSurrenderDialogOpen] = useState(false);
   const [pingTrickDialogOpen, setPingTrickDialogOpen] = useState(false);
@@ -334,10 +344,39 @@ export function GameScreen({
     setSimulatedPosition(mapCenter ?? center);
   };
 
+  const startMarking = (kind: TeamMarker["kind"]) => {
+    setActionsOpen(false);
+    setMarkingKind(kind);
+  };
+
+  // Das Aktionen-Menü schliesst per Escape oder Tipp daneben.
+  useEffect(() => {
+    if (!actionsOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActionsOpen(false);
+    };
+    const onPointer = (event: PointerEvent) => {
+      if (!actionsRef.current?.contains(event.target as Node)) setActionsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [actionsOpen]);
+
+  const canMark = !isX && (phase === "RUNNING" || phase === "HEADSTART");
+
   const handleMapClick = (pos: LatLng) => {
     if (choosingObjective) {
       onSetObjective(pos);
       setChoosingObjective(false);
+      return;
+    }
+    if (markingKind) {
+      onAddTeamMarker(pos, markingKind);
+      setMarkingKind(null);
       return;
     }
     if (simulated || showSimHint) {
@@ -517,6 +556,8 @@ export function GameScreen({
           lastReveal={lastReveal}
           pingHistory={isX ? pingHistory : []}
           objective={isX ? objective : null}
+          teamMarkers={isX ? [] : teamMarkers}
+          onRemoveTeamMarker={onRemoveTeamMarker}
           startPoint={playAreaCenter ?? ruleset?.map?.startLocation ?? null}
           onMapClick={handleMapClick}
           onSatelliteChange={setSatelliteOn}
@@ -528,11 +569,94 @@ export function GameScreen({
               {t(`game.phase.${phase}`, { defaultValue: phase })}
             </span>
             {timeLeft !== null && <span className="map-timer">{formatDuration(timeLeft)}</span>}
-            <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
-              {isX ? t("game.youAreX") : t("game.youAreDetective")}
-            </span>
+            <div className="action-menu" ref={actionsRef}>
+              <button
+                type="button"
+                className="secondary action-menu-button"
+                aria-haspopup="menu"
+                aria-expanded={actionsOpen}
+                onClick={() => setActionsOpen((open) => !open)}
+              >
+                {t("game.actions.title")}
+              </button>
+              {actionsOpen && (
+                <div className="action-menu-list" role="menu">
+                  {canMark && (
+                    <>
+                      <button type="button" role="menuitem" onClick={() => startMarking("SUSPECT")}>
+                        {t("game.markers.suspect")}
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="secondary"
+                        onClick={() => startMarking("CLEAR")}
+                      >
+                        {t("game.markers.clear")}
+                      </button>
+                    </>
+                  )}
+                  {canChooseObjective && (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        setChoosingObjective(true);
+                      }}
+                    >
+                      {t("game.chooseObjective")}
+                    </button>
+                  )}
+                  {canPingTrick && (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        setPingTrickDialogOpen(true);
+                      }}
+                    >
+                      {pingTrick.armed
+                        ? t("game.pingTrick.armedButton", {
+                            mode: t(`game.pingTrick.mode.${pingTrick.armed}`),
+                          })
+                        : t("game.pingTrick.button")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="secondary"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      if (simulated) enableRealGps();
+                      else handleSimMode();
+                    }}
+                  >
+                    {simulated ? t("game.enableGps") : t("game.simulationMode")}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {(choosingObjective || markingKind) && (
+          <div className="pick-bar" role="status">
+            <span>{markingKind ? t("game.pickHint.marker") : t("game.pickHint.objective")}</span>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => {
+                setMarkingKind(null);
+                setChoosingObjective(false);
+              }}
+            >
+              {t("game.pickCancel")}
+            </button>
+          </div>
+        )}
 
         {showRevealTimer && (
           <div
@@ -676,6 +800,9 @@ export function GameScreen({
                   ? t("game.gps.active")
                   : t("game.gps.off")}
             </span>
+            <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
+              {isX ? t("game.youAreX") : t("game.youAreDetective")}
+            </span>
             {isSolo && <span className="solo-chip">{t("game.solo", { code })}</span>}
           </div>
 
@@ -754,38 +881,7 @@ export function GameScreen({
         </div>
 
         <div className="map-bottom-controls">
-          {canChooseObjective && !choosingObjective && (
-            <button onClick={() => setChoosingObjective(true)}>{t("game.chooseObjective")}</button>
-          )}
-          {choosingObjective && (
-            <button className="secondary" onClick={() => setChoosingObjective(false)}>
-              {t("game.cancelChoosing")}
-            </button>
-          )}
-          {!choosingObjective && !simulated && (
-            <button className="secondary" onClick={handleSimMode}>
-              {t("game.simulationMode")}
-            </button>
-          )}
-          {!choosingObjective && simulated && (
-            <button className="secondary" onClick={enableRealGps}>
-              {t("game.enableGps")}
-            </button>
-          )}
-          {canPingTrick && !choosingObjective && (
-            <button
-              type="button"
-              className="secondary"
-              onClick={() => setPingTrickDialogOpen(true)}
-            >
-              {pingTrick.armed
-                ? t("game.pingTrick.armedButton", {
-                    mode: t(`game.pingTrick.mode.${pingTrick.armed}`),
-                  })
-                : t("game.pingTrick.button")}
-            </button>
-          )}
-          {canSurrender && !choosingObjective && (
+          {canSurrender && (
             <button
               className="danger"
               type="button"

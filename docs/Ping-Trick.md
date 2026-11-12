@@ -10,7 +10,7 @@ gemeinsames Kontingent**: Entweder ein falscher Ping oder ein übersprungener Pi
 
 ## So funktioniert es
 
-1. X tippt unten in der Kartensteuerung auf **Ping-Trick**.
+1. X tippt oben auf der Karte auf **Aktionen** und wählt **Ping-Trick**.
 2. X wählt **Falscher Ping** oder **Ping überspringen**.
 3. Der Trick gilt für die **nächste** Sichtung. Bis dahin lässt er sich mit **Zurücknehmen** wieder
    abbrechen, dann ist er nicht verbraucht.

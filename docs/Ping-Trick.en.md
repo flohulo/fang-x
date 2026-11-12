@@ -10,7 +10,7 @@ either a fake ping or a skipped ping, not both.
 
 ## How it works
 
-1. X taps **Ping trick** at the bottom of the map controls.
+1. X taps **Actions** at the top of the map and chooses **Ping trick**.
 2. X chooses **Fake ping** or **Skip ping**.
 3. The trick applies to the **next** reveal. Until then it can be cancelled with **Take back**, and
    it is not used up.

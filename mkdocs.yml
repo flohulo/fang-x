@@ -48,6 +48,7 @@ nav:
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
       - Ping-Trick: Ping-Trick.md
+  - Team-Markierungen: Team-Markierungen.md
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
   - Akku-Warnung: Akku-Warnung.md
   - Spielende-Auswertung: Spielende-Auswertung.md
@@ -104,6 +105,7 @@ plugins:
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
             Ping-Trick: Ping trick
+            Team-Markierungen: Team markers
             Alle sicher und Funkstille: Everyone safe and radio silence
             Akku-Warnung: Low battery warning
             Spielende-Auswertung: Round summary

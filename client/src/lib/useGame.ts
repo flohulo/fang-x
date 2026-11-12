@@ -2,6 +2,7 @@ import type {
   ChatMessage,
   ClientMessage,
   PingTrickMode,
+  TeamMarker,
   GameStats,
   LatLng,
   MessageParams,
@@ -64,6 +65,7 @@ export function useGame() {
     armed: PingTrickMode | null;
     used: PingTrickMode | null;
   }>({ armed: null, used: null });
+  const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
   const [inactivity, setInactivity] = useState<{
     playerId: string;
     name: string;
@@ -199,6 +201,7 @@ export function useGame() {
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
             setPingTrick({ armed: null, used: null });
+            setTeamMarkers([]);
             setInactivity(null);
             setSafe([]);
             setBatteryWarning(null);
@@ -243,6 +246,9 @@ export function useGame() {
           break;
         case "pingTrick":
           setPingTrick({ armed: msg.armed, used: msg.used });
+          break;
+        case "markers":
+          setTeamMarkers(msg.markers);
           break;
         case "inactivity":
           setInactivity({
@@ -398,6 +404,14 @@ export function useGame() {
     send({ t: "setPingTrick", mode });
   };
 
+  const addTeamMarker = (pos: LatLng, kind: TeamMarker["kind"]) => {
+    send({ t: "addMarker", pos, kind });
+  };
+
+  const removeTeamMarker = (id: number) => {
+    send({ t: "removeMarker", id });
+  };
+
   const confirmSafe = () => {
     send({ t: "confirmSafe" });
   };
@@ -452,6 +466,7 @@ export function useGame() {
     transitStops,
     transitNotice,
     pingTrick,
+    teamMarkers,
     inactivity,
     safe,
     batteryWarning,
@@ -469,6 +484,8 @@ export function useGame() {
     reconnecting,
     join,
     requestPingTrick,
+    addTeamMarker,
+    removeTeamMarker,
     confirmSafe,
     sendBatteryLow,
     configure,

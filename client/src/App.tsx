@@ -519,6 +519,7 @@ export default function App() {
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
         pingTrick={game.pingTrick}
+        teamMarkers={game.teamMarkers}
         inactivity={game.inactivity}
         safe={game.safe}
         batteryWarning={game.batteryWarning}
@@ -533,6 +534,8 @@ export default function App() {
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
         onPingTrick={game.requestPingTrick}
+        onAddTeamMarker={game.addTeamMarker}
+        onRemoveTeamMarker={game.removeTeamMarker}
         onConfirmSafe={game.confirmSafe}
         onBatteryLow={game.sendBatteryLow}
         onReportCatch={game.reportCatch}

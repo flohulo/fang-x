@@ -240,7 +240,37 @@
     "playAreaDrawn": "Eigenes Spielfeld mit {{count}} Eckpunkten gezeichnet.",
     "playAreaDraw": "Spielfeld auf der Karte einzeichnen",
     "playAreaEdit": "Spielfeld bearbeiten",
-    "playAreaUseCircle": "Wieder Kreis verwenden"
+    "playAreaUseCircle": "Wieder Kreis verwenden",
+    "checklist": {
+      "title": "Checkliste vor dem Spiel",
+      "location": "Standortfreigabe erteilt",
+      "notifications": "Alarm und Benachrichtigungen erlaubt",
+      "notificationsHint": "Ohne sie verpasst du Sichtungen, wenn der Bildschirm aus ist.",
+      "install": "App auf dem Startbildschirm installiert",
+      "installHint": "Installiert läuft die App stabiler im Hintergrund.",
+      "installHintIos": "Tippe auf das Teilen-Symbol und dann auf Zum Home-Bildschirm.",
+      "screen": "Akku geladen, Bildschirm-Sperre großzügig eingestellt",
+      "screenHint": "GPS und Bildschirm verbrauchen während der Runde viel Strom.",
+      "status": {
+        "ok": "Erledigt: ",
+        "warn": "Achtung: ",
+        "info": "Hinweis: "
+      },
+      "checks": {
+        "noX": "Es ist noch kein X gewählt.",
+        "noDetective": "Es gibt keinen Detektiv, niemand jagt X.",
+        "disconnected": "{{count}} Mitspielende gerade nicht verbunden: {{names}}.",
+        "areaSmall": "Das Spielgebiet ist sehr klein (ca. {{meters}} m Radius).",
+        "areaLarge": "Das Spielgebiet ist sehr groß (ca. {{meters}} m Radius).",
+        "noHeadStart": "X hat keinen Vorsprung."
+      }
+    },
+    "startConfirm": {
+      "title": "Trotzdem starten?",
+      "text": "Vor dem Start sind dir folgende Punkte aufgefallen:",
+      "go": "Trotzdem starten",
+      "back": "Zurück"
+    }
   },
   "game": {
     "phase": {
@@ -276,6 +306,10 @@
         "FAKE": "Falscher Ping",
         "SKIP": "Überspringen"
       }
+    },
+    "markers": {
+      "suspect": "Verdacht markieren",
+      "clear": "Hier nicht markieren"
     },
     "inactivity": {
       "label": "Funkstille:",
@@ -360,7 +394,6 @@
       "street": "Karte: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Daten von <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Ziel auf Karte wählen",
-    "cancelChoosing": "Karte antippen · Abbrechen",
     "simulationMode": "Simulationsmodus",
     "enableGps": "GPS aktivieren",
     "emergency": "Notfall",
@@ -408,7 +441,15 @@
       "noRevealText": "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets.",
       "defaultTitle": "Spiel läuft.",
       "defaultText": "Halte dich bereit."
-    }
+    },
+    "actions": {
+      "title": "Aktionen"
+    },
+    "pickHint": {
+      "marker": "Tippe auf die Karte, um die Markierung zu setzen.",
+      "objective": "Tippe auf die Karte, um das Ziel zu setzen."
+    },
+    "pickCancel": "Abbrechen"
   },
   "map": {
     "satellite": "Satellit",
@@ -417,6 +458,10 @@
     "showStreetMap": "Strassenkarte anzeigen",
     "objective": "Missionsziel",
     "start": "Start",
+    "markerSuspect": "Verdacht",
+    "markerClear": "Hier nicht",
+    "markerPopup": "{{label}} von {{name}} um {{time}} Uhr",
+    "markerRemove": "Entfernen",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",
