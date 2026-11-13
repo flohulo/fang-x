@@ -2,7 +2,7 @@
 
 ## Einführung beim ersten Start
 
-Beim ersten Öffnen führt dich die App in drei Schritten durch den Einstieg: eine kurze
+Beim ersten Öffnen führt dich die App in vier Schritten durch den Einstieg: zuerst die Wahl der Sprache, dann eine kurze
 Spielübersicht, die Berechtigungen (Standort sowie Alarm und Benachrichtigungen) und die
 Installation als App auf dem Startbildschirm (PWA). Mit dem X oben rechts schliesst du die Einführung jederzeit; du kannst sie
 später im Menü unter **Hilfe > Einführung erneut ansehen** wieder öffnen. Auf iPhone und iPad

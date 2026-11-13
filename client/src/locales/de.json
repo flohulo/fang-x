@@ -501,6 +501,8 @@
   },
   "onboarding": {
     "progress": "Schritt {{step}} von {{total}}",
+    "languageTitle": "Sprache wählen",
+    "languageText": "In welcher Sprache möchtest du Fang X nutzen? Du kannst sie später im Menü ändern.",
     "welcomeTitle": "Willkommen bei Fang X",
     "welcomeText": "Fang X ist ein GPS-Fangspiel für draussen. So läuft es ab:",
     "welcomeCreate": "Eine Person erstellt ein Spiel und teilt den Code oder den Einladungslink.",

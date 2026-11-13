@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { isIos, useInstall } from "../lib/install";
 import { useLocationPermission } from "../lib/useLocationPermission";
 import type { AlertNotificationPermission } from "./AlertSettings";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { LocationGuide } from "./LocationAccess";
 
 export const ONBOARDING_STORAGE_KEY = "fangx:onboarding-done";
@@ -30,7 +31,7 @@ interface OnboardingProps {
   onFinish: () => void;
 }
 
-const STEP_COUNT = 3;
+const STEP_COUNT = 4;
 
 export function Onboarding({
   alertsEnabled,
@@ -80,6 +81,16 @@ export function Onboarding({
         {step === 0 && (
           <>
             <h2 id="onboarding-title" ref={headingRef} tabIndex={-1}>
+              {t("onboarding.languageTitle")}
+            </h2>
+            <p>{t("onboarding.languageText")}</p>
+            <LanguageSwitcher />
+          </>
+        )}
+
+        {step === 1 && (
+          <>
+            <h2 id="onboarding-title" ref={headingRef} tabIndex={-1}>
               {t("onboarding.welcomeTitle")}
             </h2>
             <p>{t("onboarding.welcomeText")}</p>
@@ -91,7 +102,7 @@ export function Onboarding({
           </>
         )}
 
-        {step === 1 && (
+        {step === 2 && (
           <>
             <h2 id="onboarding-title" ref={headingRef} tabIndex={-1}>
               {t("onboarding.permissionsTitle")}
@@ -138,7 +149,7 @@ export function Onboarding({
           </>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <>
             <h2 id="onboarding-title" ref={headingRef} tabIndex={-1}>
               {t("onboarding.installTitle")}
