@@ -154,6 +154,7 @@
       "PHOTO_CONFIRMATION": "Foto-Fang: X bestätigt den Fang",
       "RADIUS": "Automatischer Fang im Fangradius"
     },
+    "xCanTrick": "Ping-Trick für X: einmal pro Runde eine Sichtung fälschen oder überspringen",
     "xCanSurrender": "Notfall-Knopf für X: Spiel aufgeben und Standort teilen",
     "transitBudget": "ÖV-Budget aktivieren (pro Haltestelle)",
     "transitForX": "Öffentlichen Verkehr für X erlauben",
@@ -291,6 +292,22 @@
     "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
     "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
     "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "pingTrick": {
+      "button": "Ping-Trick",
+      "armedButton": "Ping-Trick: {{mode}}",
+      "title": "Ping-Trick",
+      "text": "Einmal pro Runde: Die nächste Sichtung zeigt einen falschen Ort oder fällt aus. Die Detektive erfahren nicht, welches von beiden passiert ist.",
+      "usedText": "Du hast den Ping-Trick in dieser Runde schon benutzt ({{mode}}).",
+      "armedText": "Scharf für die nächste Sichtung: {{mode}}",
+      "fake": "Falscher Ping",
+      "skip": "Ping überspringen",
+      "cancel": "Zurücknehmen",
+      "close": "Schliessen",
+      "mode": {
+        "FAKE": "Falscher Ping",
+        "SKIP": "Überspringen"
+      }
+    },
     "markers": {
       "suspect": "Verdacht markieren",
       "clear": "Hier nicht markieren"
@@ -473,6 +490,9 @@
     "OBJECTIVE_OUTSIDE_AREA": "Das Ziel muss innerhalb des Spielgebiets liegen.",
     "OBJECTIVE_TOO_CLOSE": "Das Ziel muss mindestens {{meters}} m entfernt sein.",
     "SURRENDER_X_ONLY": "Nur X kann das Spiel aufgeben.",
+    "PING_TRICK_USED": "Den Ping-Trick hast du in dieser Runde schon benutzt.",
+    "PING_TRICK_DISABLED": "Der Ping-Trick ist in dieser Runde nicht vorgesehen.",
+    "PING_TRICK_NO_SPOT": "Kein passender Ort für den falschen Ping gefunden. Es wurde echt gemeldet.",
     "SURRENDER_DISABLED": "Aufgeben ist in dieser Runde nicht vorgesehen.",
     "TRANSIT_EXHAUSTED_bus": "Das ÖV-Budget für Bus ist aufgebraucht.",
     "TRANSIT_EXHAUSTED_train": "Das ÖV-Budget für Zug ist aufgebraucht.",

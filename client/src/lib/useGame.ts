@@ -1,6 +1,7 @@
 import type {
   ChatMessage,
   ClientMessage,
+  PingTrickMode,
   TeamMarker,
   GameStats,
   LatLng,
@@ -60,6 +61,10 @@ export function useGame() {
     train: number;
     at: number;
   } | null>(null);
+  const [pingTrick, setPingTrick] = useState<{
+    armed: PingTrickMode | null;
+    used: PingTrickMode | null;
+  }>({ armed: null, used: null });
   const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
   const [inactivity, setInactivity] = useState<{
     playerId: string;
@@ -195,6 +200,7 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setPingTrick({ armed: null, used: null });
             setTeamMarkers([]);
             setInactivity(null);
             setSafe([]);
@@ -237,6 +243,9 @@ export function useGame() {
           break;
         case "catchPending":
           setCatchPending(msg.pending);
+          break;
+        case "pingTrick":
+          setPingTrick({ armed: msg.armed, used: msg.used });
           break;
         case "markers":
           setTeamMarkers(msg.markers);
@@ -391,6 +400,10 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const requestPingTrick = (mode: PingTrickMode | "CANCEL") => {
+    send({ t: "setPingTrick", mode });
+  };
+
   const addTeamMarker = (pos: LatLng, kind: TeamMarker["kind"]) => {
     send({ t: "addMarker", pos, kind });
   };
@@ -452,6 +465,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    pingTrick,
     teamMarkers,
     inactivity,
     safe,
@@ -469,6 +483,7 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    requestPingTrick,
     addTeamMarker,
     removeTeamMarker,
     confirmSafe,

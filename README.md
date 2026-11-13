@@ -44,6 +44,8 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
   Spielende gelöscht.
 - **Notfall-Knopf:** Muss X die Runde abbrechen, endet das Spiel nach einer Bestätigung. Die
   Detektive gewinnen und erhalten den exakten Standort von X samt Benachrichtigung.
+- **Ping-Trick:** X darf einmal pro Runde eine Sichtung fälschen oder überspringen. Der Host kann das
+  abschalten.
 - **Team-Markierungen:** Detektive markieren Verdachtsorte und abgesuchte Stellen auf der Karte. X
   sieht sie nicht.
 - **Alle sicher und Funkstille:** Kommt von jemandem länger keine Position an, werden alle

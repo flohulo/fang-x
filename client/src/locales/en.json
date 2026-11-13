@@ -154,6 +154,7 @@
       "PHOTO_CONFIRMATION": "Photo catch: X confirms the catch",
       "RADIUS": "Automatic catch within the catch radius"
     },
+    "xCanTrick": "Ping trick for X: fake or skip one reveal per round",
     "xCanSurrender": "Emergency button for X: give up the game and share location",
     "transitBudget": "Enable public transport budget (per stop)",
     "transitForX": "Allow public transport for X",
@@ -291,6 +292,22 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "pingTrick": {
+      "button": "Ping trick",
+      "armedButton": "Ping trick: {{mode}}",
+      "title": "Ping trick",
+      "text": "Once per round: the next reveal shows a wrong place or does not happen. Detectives will not know which of the two it was.",
+      "usedText": "You have already used the ping trick this round ({{mode}}).",
+      "armedText": "Armed for the next reveal: {{mode}}",
+      "fake": "Fake ping",
+      "skip": "Skip ping",
+      "cancel": "Take back",
+      "close": "Close",
+      "mode": {
+        "FAKE": "Fake ping",
+        "SKIP": "Skip"
+      }
+    },
     "markers": {
       "suspect": "Mark suspect",
       "clear": "Mark not here"
@@ -473,6 +490,9 @@
     "OBJECTIVE_OUTSIDE_AREA": "The target must be inside the play area.",
     "OBJECTIVE_TOO_CLOSE": "The target must be at least {{meters}} m away.",
     "SURRENDER_X_ONLY": "Only X can give up the game.",
+    "PING_TRICK_USED": "You have already used the ping trick this round.",
+    "PING_TRICK_DISABLED": "The ping trick is not allowed in this round.",
+    "PING_TRICK_NO_SPOT": "No suitable spot found for the fake ping. The real position was reported.",
     "SURRENDER_DISABLED": "Giving up is not allowed in this round.",
     "TRANSIT_EXHAUSTED_bus": "The transit budget for bus is used up.",
     "TRANSIT_EXHAUSTED_train": "The transit budget for train is used up.",

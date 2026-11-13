@@ -153,6 +153,7 @@
       "PHOTO_CONFIRMATION": "Foto-Fang: X bestätigt de Fang",
       "RADIUS": "Automatische Fang im Fangradius"
     },
+    "xCanTrick": "Ping-Trick für X: einisch pro Rundi e Sichtig fälsche oder überspringe",
     "xCanSurrender": "Notfall-Chnopf für X: Spiel ufgäh und Standort teile",
     "transitBudget": "ÖV-Budget aktivierä (pro Haltestell)",
     "transitForX": "Öffentliche Verchehr für X erlaube",
@@ -286,6 +287,22 @@
     "surrenderLive": "De exakt Live-Standort isch a d Detektivä übertreit worde.",
     "surrenderNoPosition": "Es Standort isch nöd verfüegbar gsi.",
     "openInOsm": "Standort uf OpenStreetMap öffnä ↗",
+    "pingTrick": {
+      "button": "Ping-Trick",
+      "armedButton": "Ping-Trick: {{mode}}",
+      "title": "Ping-Trick",
+      "text": "Einisch pro Rundi: D nächscht Sichtig zeigt en falsche Ort oder fallt us. D Detektiv wüssed nöd, wele vo beidne passiert isch.",
+      "usedText": "Du hesch de Ping-Trick i dere Rundi scho bruucht ({{mode}}).",
+      "armedText": "Scharf für die nächscht Sichtig: {{mode}}",
+      "fake": "Falsche Ping",
+      "skip": "Ping überspringe",
+      "cancel": "Zruggnäh",
+      "close": "Zuemache",
+      "mode": {
+        "FAKE": "Falsche Ping",
+        "SKIP": "Überspringe"
+      }
+    },
     "markers": {
       "suspect": "Verdacht markiere",
       "clear": "Da nöd markiere"
@@ -468,6 +485,9 @@
     "OBJECTIVE_OUTSIDE_AREA": "S Ziel muess innerhalb vom Spielgebiet liege.",
     "OBJECTIVE_TOO_CLOSE": "S Ziel muess mindestens {{meters}} m entfärnt si.",
     "SURRENDER_X_ONLY": "Nur X cha s Spiel ufgäh.",
+    "PING_TRICK_USED": "Du hesch de Ping-Trick i dere Rundi scho bruucht.",
+    "PING_TRICK_DISABLED": "De Ping-Trick isch i dere Rundi nöd vorgseh.",
+    "PING_TRICK_NO_SPOT": "Kei passende Ort für de falsch Ping gfunde. Es isch echt gmäldet worde.",
     "SURRENDER_DISABLED": "Ufgäh isch i dere Rundi nöd vorgseh.",
     "TRANSIT_EXHAUSTED_bus": "S ÖV-Budget für Bus isch ufbruucht.",
     "TRANSIT_EXHAUSTED_train": "S ÖV-Budget für Zug isch ufbruucht.",

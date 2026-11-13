@@ -31,6 +31,7 @@ Freien achten solltet.
 | :material-map: [Spielgebiet](Spielgebiet.md) | Der erlaubte Aktionsradius |
 | :material-flag-checkered: [Bonusmission für X](Bonusmission-fuer-X.md) | Zusatzziel für X |
 | :material-alert-octagon: [Notfall-Knopf](Notfall-Knopf.md) | Runde abbrechen und Standort teilen |
+| :material-drama-masks: [Ping-Trick](Ping-Trick.md) | X fälscht oder überspringt einmal eine Sichtung |
 | :material-map-marker-question: [Team-Markierungen](Team-Markierungen.md) | Orte auf der Karte für die Detektive markieren |
 | :material-shield-check: [Alle sicher und Funkstille](Alle-sicher-und-Funkstille.md) | Warnung bei Funkstille, Sicherheitsabfrage am Ende |
 | :material-battery-alert: [Akku-Warnung](Akku-Warnung.md) | Alle erfahren, wenn ein Akku fast leer ist |
