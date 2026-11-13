@@ -59,7 +59,9 @@ Karte ausprobieren.
 - **Detektive** sehen die Karte, die letzte Sichtung und – je nach Einstellung – die Standorte der
   anderen Detektive. Ein Fang ist je nach Regel automatisch im Fangradius oder per Foto-Fang
   möglich.
-- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht.
+- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht. Bei neuen Nachrichten
+  erscheint bei geschlossenem Chat ein Popup. Ist der Alarm aktiviert und die App im Hintergrund,
+  meldet sich zusätzlich eine Benachrichtigung.
 
 ## Spielende
 

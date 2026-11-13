@@ -37,6 +37,7 @@
     "enable": "Turn alert on"
   },
   "notifications": {
+    "chatTitle": "{{name}} in the chat",
     "surrenderTitle": "X gave up",
     "surrenderBody": "{{name}} gave up the game. The live location was shared.",
     "positionLiveTitle": "Warning: location is being shared",

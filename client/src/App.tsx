@@ -83,6 +83,21 @@ async function showPositionSharedNotification(at: number, index: number, live: b
   new Notification(title, options);
 }
 
+async function showChatNotification(name: string, text: string) {
+  const options: NotificationOptions = {
+    body: text,
+    icon: "/icon-192.png",
+    tag: "fang-x-chat",
+  };
+  const title = i18n.t("notifications.chatTitle", { name });
+  if ("serviceWorker" in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    await registration.showNotification(title, options);
+    return;
+  }
+  new Notification(title, options);
+}
+
 function readLegalPage(): LegalPage {
   const path = window.location.pathname.replace(/\/+$/, "").toLowerCase();
   if (path === "/impressum") return "impressum";
@@ -284,6 +299,27 @@ export default function App() {
       console.warn("Benachrichtigung zum Aufgeben konnte nicht angezeigt werden:", error);
     });
   }, [alertsEnabled, notificationPermission, game.gameResult, game.myId, game.players]);
+
+  const chatNotifiedRef = useRef<number | null | undefined>(undefined);
+  useEffect(() => {
+    const last =
+      game.chatMessages.length > 0 ? game.chatMessages[game.chatMessages.length - 1] : null;
+    const lastId = last?.id ?? null;
+    // Erster Durchlauf: vorhandenen Verlauf nicht erneut melden.
+    if (chatNotifiedRef.current === undefined || lastId === null) {
+      chatNotifiedRef.current = lastId;
+      return;
+    }
+    if (chatNotifiedRef.current === lastId || !last) return;
+    chatNotifiedRef.current = lastId;
+    if (last.playerId === game.myId) return;
+    if (!alertsEnabled || notificationPermission !== "granted") return;
+    if (document.visibilityState !== "hidden") return;
+    if (typeof navigator.vibrate === "function") navigator.vibrate([150, 80, 150]);
+    void showChatNotification(last.name, last.text).catch((error: unknown) => {
+      console.warn("Chat-Benachrichtigung konnte nicht angezeigt werden:", error);
+    });
+  }, [alertsEnabled, notificationPermission, game.chatMessages, game.myId]);
 
   // Einladungslink: /?code=ABC234
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);

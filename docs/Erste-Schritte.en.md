@@ -44,7 +44,9 @@ your location. Without GPS you can try out the game in **simulation mode** on th
 - **Detectives** see the map, the last reveal and – depending on the settings – the locations of
   the other detectives. Depending on the rule, a catch happens automatically within the catch
   radius or via a photo catch.
-- Everyone can write in the chat. The history is deleted after the game ends.
+- Everyone can write in the chat. The history is deleted after the game ends. New messages show a
+  popup while the chat is closed. If alerts are enabled and the app is in the background, you also
+  get a notification.
 
 ## End of the game
 
