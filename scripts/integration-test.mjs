@@ -13,6 +13,7 @@
 // 9. Detektiv bewegt sich zu X → Fang
 // 10. Spielende: Detektive gewinnen
 
+import { createHash } from "node:crypto";
 import WebSocket from "ws";
 
 const SERVER = "ws://localhost:8787";
@@ -31,16 +32,56 @@ function assert(condition, message) {
   }
 }
 
+// Menschen-Prüfung: Ist sie aktiv (HUMAN_CHECK_SECRET gesetzt), lösen wir die Aufgabe
+// wie der Browser. Sonst läuft alles ohne Ticket.
+function leadingZeroBits(buf) {
+  let bits = 0;
+  for (const byte of buf) {
+    if (byte === 0) {
+      bits += 8;
+      continue;
+    }
+    bits += Math.clz32(byte) - 24;
+    break;
+  }
+  return bits;
+}
+
+let humanTicket = null;
+let humanCheckActive = false;
+
+async function fetchTicket() {
+  const info = await (await fetch(`${HTTP}/api/challenge`)).json();
+  if (!info.enabled) return null;
+  humanCheckActive = true;
+  for (let counter = 0; ; counter++) {
+    const solution = counter.toString(36);
+    const digest = createHash("sha256").update(`${info.challenge}:${solution}`).digest();
+    if (leadingZeroBits(digest) < info.difficulty) continue;
+    const res = await fetch(`${HTTP}/api/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ challenge: info.challenge, solution }),
+    });
+    if (!res.ok) throw new Error(`Verify HTTP ${res.status}`);
+    return (await res.json()).ticket;
+  }
+}
+
 async function createGame() {
-  const res = await fetch(`${HTTP}/api/games`, { method: "POST" });
+  const res = await fetch(`${HTTP}/api/games`, {
+    method: "POST",
+    headers: humanTicket ? { "X-Human-Ticket": humanTicket } : {},
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const { code } = await res.json();
   return code;
 }
 
-function connect(code) {
+function connect(code, ticket = humanTicket) {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(`${SERVER}/room/${code}`);
+    const query = ticket ? `?ticket=${encodeURIComponent(ticket)}` : "";
+    const ws = new WebSocket(`${SERVER}/room/${code}${query}`);
     const messages = [];
     const waiters = [];
 
@@ -77,6 +118,31 @@ function connect(code) {
 
 async function run() {
   console.log("=== Integrationstest: Kompletter Spielablauf ===\n");
+
+  humanTicket = await fetchTicket();
+  if (humanCheckActive) {
+    assert(humanTicket !== null, "Menschen-Prüfung: Ticket nach gelöster Aufgabe erhalten");
+    const noTicket = await fetch(`${HTTP}/api/games`, { method: "POST" });
+    assert(noTicket.status === 403, "Menschen-Prüfung: Raum erstellen ohne Ticket wird abgelehnt");
+    const badTicket = await fetch(`${HTTP}/api/games`, {
+      method: "POST",
+      headers: { "X-Human-Ticket": "t.9999999999999.fehlerhaft" },
+    });
+    assert(badTicket.status === 403, "Menschen-Prüfung: gefälschtes Ticket wird abgelehnt");
+    const badSolution = await fetch(`${HTTP}/api/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ challenge: "c.1.2.3", solution: "0" }),
+    });
+    assert(badSolution.status === 400, "Menschen-Prüfung: falsche Lösung wird abgelehnt");
+    const ghost = new WebSocket(`${SERVER}/room/ABCDEF`);
+    const ghostStatus = await new Promise((resolve) => {
+      ghost.on("unexpected-response", (_req, res) => resolve(res.statusCode));
+      ghost.on("open", () => resolve(101));
+      ghost.on("error", () => {});
+    });
+    assert(ghostStatus === 403, "Menschen-Prüfung: WebSocket ohne Ticket wird abgelehnt");
+  }
 
   // 1. Spiel erstellen
   const code = await createGame();
@@ -787,6 +853,20 @@ async function run() {
   );
   noSurrenderX.ws.close();
   noSurrenderDetective.ws.close();
+
+  // 19. Missbrauch: wer die Verbindung mit ungültigem JSON flutet, wird getrennt
+  console.log("\n=== Spam-Schutz: Verbindung trennen ===");
+  const code9 = await createGame();
+  const spammer = await connect(code9);
+  spammer.ws.send(JSON.stringify({ t: "join", code: code9, name: "Spammer", wantsX: false }));
+  await spammer.waitFor((m) => m.t === "joined");
+  const spammerClosed = new Promise((resolve) => spammer.ws.on("close", (c) => resolve(c)));
+  for (let i = 0; i < 15; i++) spammer.ws.send("kein json");
+  const closeCode = await Promise.race([
+    spammerClosed,
+    new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
+  ]);
+  assert(closeCode === 4008, "Flut ungültiger Nachrichten trennt die Verbindung (Code 4008)");
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);

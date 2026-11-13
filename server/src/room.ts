@@ -31,6 +31,7 @@ import {
   type Role,
   type Ruleset,
   type ServerMessage,
+  WS_CLOSE_ABUSE,
   type TeamMarker,
 } from "@fang-x/shared";
 
@@ -73,6 +74,9 @@ const MESSAGES_PER_SECOND = 10;
 /** Chat zusätzlich drosseln: höchstens CHAT_BURST Nachrichten je CHAT_WINDOW_MS. */
 const CHAT_BURST = 5;
 const CHAT_WINDOW_MS = 5_000;
+/** Missbrauch: Verstöße zählen innerhalb eines Zeitfensters, ab der Schwelle wird getrennt. */
+const ABUSE_THRESHOLD = 20;
+const ABUSE_WINDOW_MS = 60_000;
 /** Tick-Abstand: 1 s, solange Live-Standort, Gebietsfrist oder Fang-Bestätigung laufen. */
 const TICK_FAST_MS = 1_000;
 const TICK_IDLE_MS = 5_000;
@@ -506,14 +510,47 @@ export class GameRoom {
     let tokensAt = Date.now();
     const chatTimes: number[] = [];
 
+    // Wer die Verbindung mit Müll flutet, wird getrennt. Ein einzelner Ausrutscher
+    // (etwa ein Chat-Limit) bleibt folgenlos, die Zähler verfallen nach einer Minute.
+    let dropped = false;
+    let strikes = 0;
+    let strikesSince = Date.now();
+    const strike = (weight: number): boolean => {
+      const now = Date.now();
+      if (now - strikesSince > ABUSE_WINDOW_MS) {
+        strikes = 0;
+        strikesSince = now;
+      }
+      strikes += weight;
+      if (strikes < ABUSE_THRESHOLD) return false;
+      // Nicht "closed" setzen: der Platz soll beim Trennen normal als offline gelten.
+      dropped = true;
+      this.sendTo(ws, {
+        t: "error",
+        message: "Verbindung wegen zu vieler fehlerhafter Anfragen getrennt.",
+        code: "ABUSE_DISCONNECT",
+      });
+      try {
+        ws.close(WS_CLOSE_ABUSE, "Missbrauch");
+      } catch {
+        // Verbindung war schon weg.
+      }
+      return true;
+    };
+
     ws.addEventListener("message", (event) => {
+      if (dropped) return;
       const now = Date.now();
       tokens = Math.min(MESSAGE_BURST, tokens + ((now - tokensAt) / 1000) * MESSAGES_PER_SECOND);
       tokensAt = now;
-      if (tokens < 1) return;
+      if (tokens < 1) {
+        strike(1);
+        return;
+      }
       tokens -= 1;
 
       if (typeof event.data !== "string" || event.data.length > MAX_MESSAGE_BYTES) {
+        if (strike(2)) return;
         this.sendTo(ws, { t: "error", message: "Nachricht zu groß.", code: "MESSAGE_TOO_LARGE" });
         return;
       }
@@ -522,6 +559,7 @@ export class GameRoom {
       try {
         msg = JSON.parse(event.data);
       } catch {
+        if (strike(2)) return;
         this.sendTo(ws, { t: "error", message: "Ungültiges JSON", code: "INVALID_JSON" });
         return;
       }
@@ -696,6 +734,7 @@ export class GameRoom {
           const cutoff = Date.now() - CHAT_WINDOW_MS;
           while (chatTimes.length > 0 && chatTimes[0] < cutoff) chatTimes.shift();
           if (chatTimes.length >= CHAT_BURST) {
+            if (strike(2)) break;
             this.sendTo(ws, {
               t: "error",
               message: "Bitte langsamer schreiben.",
