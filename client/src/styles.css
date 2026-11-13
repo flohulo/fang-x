@@ -576,6 +576,80 @@ label {
   gap: 8px;
 }
 
+.marker-popup p {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 0.85rem;
+}
+
+.marker-popup button {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+.action-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.action-menu-button {
+  width: auto;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.action-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 12;
+  display: grid;
+  gap: 6px;
+  min-width: 210px;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.97);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.action-menu-list button {
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.pick-bar {
+  position: absolute;
+  top: 116px;
+  left: 12px;
+  right: 76px;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  border-radius: var(--radius);
+  background: rgba(8, 47, 73, 0.95);
+  color: #bae6fd;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.pick-bar span {
+  flex: 1;
+}
+
+.pick-bar button {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
 .reveal-progress {
   position: absolute;
   top: 58px;
@@ -825,6 +899,61 @@ label {
   text-decoration: underline;
 }
 
+.result-stats {
+  margin: 16px 0 0;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.result-stats h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.result-stats dl {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 12px;
+}
+
+.result-stats dl > div,
+.result-stats-players li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-stats dt {
+  color: var(--text-dim);
+}
+
+.result-stats dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-stats-players {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-stats-players li {
+  align-items: center;
+}
+
+.result-stats-name {
+  flex: 1;
+}
+
+.result-stats-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
 .map-overlay {
   position: absolute;
   top: 0;
@@ -1028,6 +1157,74 @@ label {
   line-height: 1.2;
 }
 
+.inactivity-notice,
+.battery-notice {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: rgba(69, 26, 3, 0.95);
+  color: #fde68a;
+}
+
+.battery-notice {
+  top: 116px;
+}
+
+.inactivity-notice strong,
+.battery-notice strong {
+  color: #fef3c7;
+}
+
+.safety-check {
+  margin: 16px 0 0;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.safety-check h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.safety-check p {
+  margin: 0 0 8px;
+  color: var(--text-dim);
+}
+
+.safety-check ul {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.safety-check li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.safety-ok {
+  color: #4ade80;
+}
+
+.safety-open {
+  color: var(--text-dim);
+}
+
+.qr-box {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.qr-code {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  background: #fff;
+}
+
 .transit-dialog-backdrop {
   position: fixed;
   inset: 0;
@@ -1149,6 +1346,31 @@ label {
   color: #0f172a;
   font-size: 0.68rem;
   font-weight: 700;
+}
+
+.chat-toast {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: min(320px, calc(100vw - 24px));
+  padding: 10px 12px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.96);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  color: var(--text);
+  text-align: left;
+  transform: translateX(-50%);
+}
+
+.chat-toast span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-window {
@@ -2648,4 +2870,54 @@ label {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.checklist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.checklist-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.4;
+}
+
+.checklist-mark {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.checklist-ok .checklist-mark {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.checklist-warn .checklist-mark {
+  background: rgba(245, 158, 11, 0.25);
+}
+
+.checklist-hint {
+  display: block;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

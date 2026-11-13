@@ -4,7 +4,7 @@
 
 import i18n, { FALLBACK_LANGUAGE, SOURCE_LANGUAGE } from "../i18n";
 
-export const DOCS_BASE_URL = "https://flohulo.github.io/fang-x";
+export const DOCS_BASE_URL = "https://flohulo.github.io/fang-x/handbuch";
 
 /**
  * Sprachen, in denen das Handbuch gebaut wird (siehe `languages` in mkdocs.yml).

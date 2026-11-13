@@ -22,7 +22,28 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
   const [unread, setUnread] = useState(0);
   const previousCount = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
-  const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null;
+  const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+  const lastMessageId = lastMessage?.id ?? null;
+  const [toast, setToast] = useState<ChatMessage | null>(null);
+  const toastedId = useRef<number | null>(lastMessageId);
+
+  // Popup für neue Nachrichten anderer, solange der Chat geschlossen ist.
+  useEffect(() => {
+    if (lastMessage === null) {
+      toastedId.current = null;
+      return;
+    }
+    if (toastedId.current === lastMessage.id) return;
+    toastedId.current = lastMessage.id;
+    if (open || lastMessage.playerId === myId) return;
+    setToast(lastMessage);
+    const timer = window.setTimeout(() => setToast(null), 5000);
+    return () => window.clearTimeout(timer);
+  }, [lastMessage, open, myId]);
+
+  useEffect(() => {
+    if (open) setToast(null);
+  }, [open]);
 
   useEffect(() => {
     const previous = previousCount.current;
@@ -71,6 +92,13 @@ export function ChatPanel({ messages, myId, onSend }: ChatPanelProps) {
         </svg>
         {unread > 0 && !open && <span className="chat-unread">{unread > 9 ? "9+" : unread}</span>}
       </button>
+
+      {toast && !open && (
+        <button type="button" className="chat-toast" role="status" onClick={() => setOpen(true)}>
+          <strong style={{ color: toast.color }}>{toast.name}</strong>
+          <span>{toast.text}</span>
+        </button>
+      )}
 
       {open && (
         <section className="chat-window" id="game-chat-window" aria-label={t("chat.title")}>

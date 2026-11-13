@@ -19,6 +19,7 @@ import {
   type ClientMessage,
   DEFAULT_RULESET,
   distanceMeters,
+  type GameStats,
   isInsidePlayArea,
   jitterPoint,
   type LatLng,
@@ -31,6 +32,7 @@ import {
   type Ruleset,
   type ServerMessage,
   WS_CLOSE_ABUSE,
+  type TeamMarker,
 } from "@fang-x/shared";
 
 const PLAYER_COLORS = [
@@ -79,6 +81,22 @@ const ABUSE_WINDOW_MS = 60_000;
 const TICK_FAST_MS = 1_000;
 const TICK_IDLE_MS = 5_000;
 
+/** Team-Markierungen: höchstens so viele gleichzeitig, die ältesten fallen heraus. */
+const MAX_TEAM_MARKERS = 20;
+/**
+ * Inaktivität: Keine Positionsmeldung seit zwei Reveal-Intervallen, mindestens 5 und höchstens
+ * 30 Minuten. Bei Zufallsintervall gilt ein fester Wert.
+ */
+const INACTIVITY_MIN_MS = 5 * 60_000;
+const INACTIVITY_MAX_MS = 30 * 60_000;
+const INACTIVITY_RANDOM_MS = 10 * 60_000;
+/** Akku-Warnung: höchstens alle 10 Minuten je Person, nur bei plausiblem Wert bis 30 Prozent. */
+const BATTERY_WARN_COOLDOWN_MS = 10 * 60_000;
+const BATTERY_WARN_MAX_LEVEL = 30;
+/** Auswertung: GPS-Rauschen unter 5 m zählt nicht, Sprünge über 400 m werden ignoriert. */
+const STAT_MIN_STEP_METERS = 5;
+const STAT_MAX_STEP_METERS = 400;
+
 const STATE_KEY = "room";
 
 interface Player {
@@ -96,6 +114,14 @@ interface Player {
   disconnectedAt: number | null;
   position: LatLng | null;
   lastPositionAt: number;
+  /** Für diese Funkstille wurde bereits gewarnt (nur Arbeitsspeicher). */
+  inactivityNotified: boolean;
+  /** Zeitpunkt der letzten Akku-Warnung (nur Arbeitsspeicher). */
+  lastBatteryWarnAt: number;
+  /** Summe der zurückgelegten Strecke für die Auswertung (kein Verlauf). */
+  distanceMeters: number;
+  /** Zuletzt für die Strecke gewertete Position; nur im Arbeitsspeicher. */
+  statPos: LatLng | null;
 }
 
 type Phase = "LOBBY" | "COUNTDOWN" | "HEADSTART" | "RUNNING" | "ENDED";
@@ -127,6 +153,7 @@ interface RoomSnapshot {
     wantsX: boolean;
     color: string;
     token?: string | null;
+    distanceMeters?: number;
   }>;
   ruleset: Ruleset;
   phaseEndsAt: number | null;
@@ -142,6 +169,9 @@ interface RoomSnapshot {
   endDetail?: EndDetail | null;
   surrender?: SurrenderInfo | null;
   transitStops?: { bus: number; train: number };
+  safe?: string[];
+  closestApproachMeters?: number | null;
+  stats?: GameStats | null;
   catchPending?: boolean;
   nextPlayerId: number;
   updatedAt: number;
@@ -173,6 +203,12 @@ export class GameRoom {
   private endDetail: EndDetail | null = null;
   private surrenderInfo: SurrenderInfo | null = null;
   private transitStops = { bus: 0, train: 0 };
+  /** Nur im Arbeitsspeicher; wird weder gespeichert noch nach der Runde behalten. */
+  private teamMarkers: TeamMarker[] = [];
+  private nextMarkerId = 1;
+  private safe = new Set<string>();
+  private closestApproachMeters: number | null = null;
+  private endStats: GameStats | null = null;
   private chatMessages: ChatMessage[] = [];
   private nextChatMessageId = 1;
   private catchPending = false;
@@ -233,6 +269,7 @@ export class GameRoom {
         wantsX: p.wantsX,
         color: p.color,
         token: p.token,
+        distanceMeters: Math.round(p.distanceMeters),
       })),
       ruleset: this.ruleset,
       phaseEndsAt: this.phaseEndsAt,
@@ -254,6 +291,9 @@ export class GameRoom {
       endDetail: this.endDetail,
       surrender: this.surrenderInfo,
       transitStops: this.transitStops,
+      safe: [...this.safe],
+      closestApproachMeters: this.closestApproachMeters,
+      stats: this.endStats,
       catchPending: this.catchPending,
       nextPlayerId: this.nextPlayerId,
       updatedAt: Date.now(),
@@ -299,6 +339,9 @@ export class GameRoom {
     this.endDetail = snap.endDetail ?? null;
     this.surrenderInfo = snap.surrender ?? null;
     this.transitStops = snap.transitStops ?? { bus: 0, train: 0 };
+    this.safe = new Set(snap.safe ?? []);
+    this.closestApproachMeters = snap.closestApproachMeters ?? null;
+    this.endStats = snap.stats ?? null;
     this.catchPending = snap.catchPending ?? false;
     this.nextPlayerId = Math.max(1, snap.nextPlayerId);
     this.lastActiveAt = snap.updatedAt;
@@ -314,6 +357,10 @@ export class GameRoom {
         disconnectedAt: now,
         position: null,
         lastPositionAt: 0,
+        inactivityNotified: false,
+        lastBatteryWarnAt: 0,
+        distanceMeters: p.distanceMeters ?? 0,
+        statPos: null,
       });
     }
 
@@ -600,6 +647,7 @@ export class GameRoom {
           this.sendTo(ws, this.phaseMessage());
           this.sendTo(ws, this.revealTimerMessage());
           this.sendObjective(player);
+          this.sendMarkers(player);
           // Detektiv-Standorte nachliefern, soweit dieser Spieler sie sehen darf.
           for (const other of this.players.values()) {
             if (!other.position || !this.canSeeDetectivePosition(player, other)) continue;
@@ -617,8 +665,10 @@ export class GameRoom {
                 ? { reasonCode: this.endDetail.code, reasonParams: this.endDetail.params }
                 : {}),
               players: this.getPlayerInfos(),
+              ...(this.endStats ? { stats: this.endStats } : {}),
               ...(this.surrenderInfo ? { surrender: this.surrenderInfo } : {}),
             });
+            this.sendTo(ws, { t: "safety", safe: [...this.safe] });
           }
           this.persist();
           this.scheduleAlarm();
@@ -710,6 +760,25 @@ export class GameRoom {
           this.surrender(player);
           break;
         }
+        case "addMarker": {
+          this.addTeamMarker(player, msg.pos, msg.kind);
+          break;
+        }
+        case "removeMarker": {
+          this.removeTeamMarker(player, msg.id);
+          break;
+        }
+        case "confirmSafe": {
+          if (!player || this.phase !== "ENDED") return;
+          this.safe.add(player.id);
+          this.broadcast({ t: "safety", safe: [...this.safe] });
+          this.persist();
+          break;
+        }
+        case "batteryLow": {
+          this.warnBatteryLow(player, msg.level);
+          break;
+        }
         case "start": {
           if (!player?.isHost) return;
           if (this.phase !== "LOBBY") return;
@@ -738,6 +807,8 @@ export class GameRoom {
           if (!isValidPosition(msg.pos)) return;
           player.position = msg.pos;
           player.lastPositionAt = Date.now();
+          player.inactivityNotified = false;
+          this.trackStats(player, msg.pos);
           this.lastActiveAt = player.lastPositionAt;
           // Spielgebiet einmalig auf die Startposition von X festlegen, damit der
           // Kreis nicht mit X mitwandert.
@@ -800,6 +871,10 @@ export class GameRoom {
       disconnectedAt: null,
       position: null,
       lastPositionAt: 0,
+      inactivityNotified: false,
+      lastBatteryWarnAt: 0,
+      distanceMeters: 0,
+      statPos: null,
     };
     this.players.set(id, player);
     return player;
@@ -910,7 +985,15 @@ export class GameRoom {
     this.lastRevealAt = 0;
     this.nextRevealAt = null;
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.transitStops = { bus: 0, train: 0 };
+    this.safe.clear();
+    this.closestApproachMeters = null;
+    this.endStats = null;
+    for (const p of this.players.values()) {
+      p.distanceMeters = 0;
+      p.statPos = null;
+    }
     this.catchPending = false;
     this.broadcast({ t: "transitStops", ...this.transitStops });
     this.broadcast({ t: "catchPending", pending: false });
@@ -1310,6 +1393,8 @@ export class GameRoom {
       if (this.phase !== "RUNNING") return;
     }
 
+    this.checkInactivity(now);
+
     // Stale-Positions-Aufräumen (Datenminimierung: alte Standorte verwerfen)
     const cutoff = this.ruleset.movement.minUpdateSeconds * 3 * 1000;
     for (const p of this.players.values()) {
@@ -1322,10 +1407,107 @@ export class GameRoom {
     }
   }
 
+  /** Schwelle für die Inaktivitätswarnung, relativ zum Reveal-Intervall. */
+  private inactivityThresholdMs(): number {
+    const r = this.ruleset.reveal;
+    if (r.schedule === "RANDOM") return INACTIVITY_RANDOM_MS;
+    const intervalMinutes =
+      r.schedule === "DECREASING" ? r.decreaseFloorMinutes : r.intervalMinutes;
+    return Math.min(INACTIVITY_MAX_MS, Math.max(INACTIVITY_MIN_MS, intervalMinutes * 2 * 60_000));
+  }
+
+  /** Warnt alle einmal, wenn von einer verbundenen Person keine Position mehr ankommt. */
+  private checkInactivity(now: number) {
+    const threshold = this.inactivityThresholdMs();
+    for (const p of this.players.values()) {
+      if (!p.connected || p.inactivityNotified) continue;
+      const since = Math.max(p.lastPositionAt, this.gameStartedAt ?? 0);
+      if (since === 0 || now - since < threshold) continue;
+      p.inactivityNotified = true;
+      this.broadcast({
+        t: "inactivity",
+        playerId: p.id,
+        name: p.name,
+        minutes: Math.round((now - since) / 60_000),
+        at: now,
+      });
+    }
+  }
+
   private getGameCenter(): LatLng | null {
     // Zentrum = Standort von X beim Spielstart. Einmal festgelegt und dann fix,
     // damit das Spielgebiet nicht mit X mitwandert.
     return this.playAreaCenter;
+  }
+
+  private canUseMarkers(player: Player | null): player is Player {
+    return (
+      !!player &&
+      player.role !== "X" &&
+      player.role !== "HOST" &&
+      (this.phase === "HEADSTART" || this.phase === "RUNNING")
+    );
+  }
+
+  private addTeamMarker(player: Player | null, pos: LatLng, kind: TeamMarker["kind"]) {
+    if (!this.canUseMarkers(player)) return;
+    if (kind !== "SUSPECT" && kind !== "CLEAR") return;
+    if (!isValidPosition(pos)) return;
+    this.teamMarkers.push({
+      id: this.nextMarkerId++,
+      pos: { lat: pos.lat, lng: pos.lng },
+      kind,
+      by: player.name,
+      at: Date.now(),
+    });
+    if (this.teamMarkers.length > MAX_TEAM_MARKERS) {
+      this.teamMarkers.splice(0, this.teamMarkers.length - MAX_TEAM_MARKERS);
+    }
+    this.broadcastMarkers();
+  }
+
+  private removeTeamMarker(player: Player | null, id: unknown) {
+    if (!this.canUseMarkers(player) || typeof id !== "number") return;
+    const before = this.teamMarkers.length;
+    this.teamMarkers = this.teamMarkers.filter((m) => m.id !== id);
+    if (this.teamMarkers.length !== before) this.broadcastMarkers();
+  }
+
+  /** Markierungen sehen nur Detektive; X und der Host in der Lobby bekommen nichts. */
+  private sendMarkers(player: Player) {
+    if (player.role === "X" || this.teamMarkers.length === 0) return;
+    this.sendTo(player.ws, { t: "markers", markers: this.teamMarkers });
+  }
+
+  private broadcastMarkers() {
+    for (const p of this.players.values()) {
+      if (p.role === "X") continue;
+      this.sendTo(p.ws, { t: "markers", markers: this.teamMarkers });
+    }
+  }
+
+  private clearTeamMarkers() {
+    if (this.teamMarkers.length === 0) return;
+    this.teamMarkers = [];
+    this.broadcastMarkers();
+  }
+
+  /** Akku niedrig: alle erfahren es einmalig, damit niemand unbemerkt ausfällt. */
+  private warnBatteryLow(player: Player | null, level: unknown) {
+    if (!player || (this.phase !== "HEADSTART" && this.phase !== "RUNNING")) return;
+    if (typeof level !== "number" || !Number.isFinite(level)) return;
+    const percent = Math.round(level);
+    if (percent < 0 || percent > BATTERY_WARN_MAX_LEVEL) return;
+    const now = Date.now();
+    if (now - player.lastBatteryWarnAt < BATTERY_WARN_COOLDOWN_MS) return;
+    player.lastBatteryWarnAt = now;
+    this.broadcast({
+      t: "batteryLow",
+      playerId: player.id,
+      name: player.name,
+      level: percent,
+      at: now,
+    });
   }
 
   /** X gibt auf: Die Runde endet und der exakte Standort geht an die Detektive. */
@@ -1364,6 +1546,50 @@ export class GameRoom {
     );
   }
 
+  /** Zählt Strecke und geringsten Abstand mit — als reine Summen, ohne Verlauf. */
+  private trackStats(player: Player, pos: LatLng) {
+    if (this.phase !== "RUNNING") return;
+    if (player.statPos === null) {
+      player.statPos = pos;
+    } else {
+      const step = distanceMeters(player.statPos, pos);
+      if (step >= STAT_MIN_STEP_METERS) {
+        if (step <= STAT_MAX_STEP_METERS) player.distanceMeters += step;
+        player.statPos = pos;
+      }
+    }
+    const others = [...this.players.values()].filter(
+      (o) => o.position && (player.role === "X" ? o.role !== "X" : o.role === "X"),
+    );
+    for (const other of others) {
+      if (!other.position) continue;
+      const gap = Math.round(distanceMeters(pos, other.position));
+      if (this.closestApproachMeters === null || gap < this.closestApproachMeters) {
+        this.closestApproachMeters = gap;
+      }
+    }
+  }
+
+  private buildStats(): GameStats {
+    const now = Date.now();
+    const end = this.phaseEndsAt === null ? now : Math.min(now, this.phaseEndsAt);
+    const running = this.phase === "RUNNING" && this.gameStartedAt !== null;
+    return {
+      durationSeconds: running
+        ? Math.max(0, Math.round((end - (this.gameStartedAt ?? end)) / 1000))
+        : 0,
+      revealCount: this.lastRevealIndex,
+      closestApproachMeters: this.closestApproachMeters,
+      players: [...this.players.values()].map((p) => ({
+        playerId: p.id,
+        name: p.name,
+        color: p.color,
+        role: p.role,
+        distanceMeters: Math.round(p.distanceMeters),
+      })),
+    };
+  }
+
   private endGame(
     winner: "X" | "DETECTIVES",
     reason: string,
@@ -1371,6 +1597,7 @@ export class GameRoom {
     detail?: EndDetail,
   ) {
     this.surrenderInfo = surrender ?? null;
+    this.endStats = this.buildStats();
     this.phase = "ENDED";
     this.objective = null;
     this.winner = winner;
@@ -1389,6 +1616,7 @@ export class GameRoom {
       reason,
       ...(detail ? { reasonCode: detail.code, reasonParams: detail.params } : {}),
       players: this.getPlayerInfos(),
+      ...(this.endStats ? { stats: this.endStats } : {}),
       ...(surrender ? { surrender } : {}),
     });
     this.playAreaCenter = null;
@@ -1398,8 +1626,10 @@ export class GameRoom {
     };
     for (const player of this.players.values()) {
       player.position = null;
+      player.statPos = null;
     }
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.broadcastPhase();
     this.lastActiveAt = Date.now();
     this.persist();
@@ -1542,6 +1772,7 @@ export class GameRoom {
     this.lastRevealIndex = 0;
     this.lastRevealAt = 0;
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.stopTick();
   }
 

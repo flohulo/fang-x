@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.10.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.9.0...fang-x-v0.10.0) (2026-11-12)
+
+
+### Features
+
+* alle-sicher-abfrage und funkstille-warnung ergänzen ([#72](https://github.com/flohulo/fang-x/issues/72)) ([332b2ff](https://github.com/flohulo/fang-x/commit/332b2ffcc5ccb70f09de9127c1c45e17605486ce))
+* changelog nach app-update automatisch öffnen ([#80](https://github.com/flohulo/fang-x/issues/80)) ([1437437](https://github.com/flohulo/fang-x/commit/1437437c69ece544bfb5901d48788dea89d63d2f))
+* checkliste und warnungen vor dem spiel ([#70](https://github.com/flohulo/fang-x/issues/70)) ([0b61154](https://github.com/flohulo/fang-x/commit/0b6115459e0dce3267272cb4a00a7e8020fcde28))
+* team-markierungen für detektive ergänzen ([#75](https://github.com/flohulo/fang-x/issues/75)) ([c8b454e](https://github.com/flohulo/fang-x/commit/c8b454e2f12fb029a1297a5895fcf132ad6a1d48))
+
+## [0.9.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.8.0...fang-x-v0.9.0) (2026-11-10)
+
+
+### Features
+
+* akku-warnung an alle spielenden senden ([#74](https://github.com/flohulo/fang-x/issues/74)) ([55e4fb4](https://github.com/flohulo/fang-x/commit/55e4fb435ec55d86ca507fcc915c46c162d33320))
+* auswertung am spielende anzeigen ([#71](https://github.com/flohulo/fang-x/issues/71)) ([0aea121](https://github.com/flohulo/fang-x/commit/0aea1213e19d61c0ecbac0c4fd46858f7da3c2d2))
+* fehlerberichte über glitchtip ergänzen ([#78](https://github.com/flohulo/fang-x/issues/78)) ([d7ef4b4](https://github.com/flohulo/fang-x/commit/d7ef4b4086c3dd5c9c002852e09bff3015099f58))
+* qr-code für den beitritt in der lobby anzeigen ([#77](https://github.com/flohulo/fang-x/issues/77)) ([a40cdc3](https://github.com/flohulo/fang-x/commit/a40cdc3c4d8610f1df572e19cd65f095fb92534b))
+* spielfeld auf der karte einzeichnen ([#66](https://github.com/flohulo/fang-x/issues/66)) ([f8ebe5d](https://github.com/flohulo/fang-x/commit/f8ebe5d23c581889b461095c2a549681f54b1193))
+* webseite für das spiel ergänzen ([#73](https://github.com/flohulo/fang-x/issues/73)) ([fa1c0e2](https://github.com/flohulo/fang-x/commit/fa1c0e2a8c80e0632edeb5aa8460d373121f68f5))
+* webseite im app-menü verlinken ([#79](https://github.com/flohulo/fang-x/issues/79)) ([fe00357](https://github.com/flohulo/fang-x/commit/fe00357619e3c1efdb9271613b74abb6361a4fd2))
+
 ## [0.8.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.7.2...fang-x-v0.8.0) (2026-11-09)
 
 

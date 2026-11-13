@@ -307,6 +307,42 @@ async function run() {
   host.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
   await host.waitFor((m) => m.t === "yourPositionIsShared" && !m.shared);
 
+  // Team-Markierungen: nur Detektive sehen und setzen sie
+  det.ws.send(JSON.stringify({ t: "addMarker", pos: xPos, kind: "SUSPECT" }));
+  const markerList = await det.waitFor((m) => m.t === "markers" && m.markers.length === 1, 5000);
+  assert(
+    markerList.markers[0].kind === "SUSPECT" && markerList.markers[0].by === "Detektiv",
+    "Detektiv setzt eine Team-Markierung",
+  );
+  host.ws.send(JSON.stringify({ t: "addMarker", pos: xPos, kind: "CLEAR" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !host.messages.some((m) => m.t === "markers"),
+    "X sieht keine Team-Markierungen und kann keine setzen",
+  );
+  det.ws.send(JSON.stringify({ t: "removeMarker", id: markerList.markers[0].id }));
+  const emptied = await det.waitFor((m) => m.t === "markers" && m.markers.length === 0, 5000);
+  assert(emptied.markers.length === 0, "Team-Markierung lässt sich wieder entfernen");
+  // Akku-Warnung geht an alle und wird gedrosselt
+  host.ws.send(JSON.stringify({ t: "batteryLow", level: 12 }));
+  host.ws.send(JSON.stringify({ t: "batteryLow", level: 11 }));
+  const batteryNotice = await det.waitFor((m) => m.t === "batteryLow", 5000);
+  assert(
+    batteryNotice.level === 12 && batteryNotice.playerId === hostJoined.playerId,
+    "Akku-Warnung erreicht die anderen Spielenden",
+  );
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    det.messages.filter((m) => m.t === "batteryLow").length === 1,
+    "Akku-Warnung wird je Person gedrosselt",
+  );
+  det.ws.send(JSON.stringify({ t: "batteryLow", level: 90 }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    det.messages.filter((m) => m.t === "batteryLow").length === 1,
+    "Unplausibler Akkustand löst keine Warnung aus",
+  );
+
   // 9. Detektiv bewegt sich zu X → Fang
   console.log("\nDetektiv bewegt sich zu X...");
   det.ws.send(JSON.stringify({ t: "position", pos: objectiveTarget }));
@@ -318,6 +354,29 @@ async function run() {
   assert(
     typeof end.reasonCode === "string",
     `Spielende trägt einen Grund-Code (${end.reasonCode})`,
+  );
+  assert(
+    end.stats && Array.isArray(end.stats.players) && end.stats.players.length >= 2,
+    "Spielende enthält die Auswertung mit allen Spielenden",
+  );
+  assert(
+    typeof end.stats.closestApproachMeters === "number" && end.stats.closestApproachMeters <= 5,
+    `Auswertung nennt den knappsten Abstand (${end.stats.closestApproachMeters} m)`,
+  );
+  assert(
+    end.stats.players.every((p) => p.distanceMeters >= 0 && !("pos" in p) && !("track" in p)),
+    "Auswertung enthält nur Summen, keine Standorte",
+  );
+
+  // Alle sicher? Nach Spielende kann jede Person bestätigen.
+  det.ws.send(JSON.stringify({ t: "confirmSafe" }));
+  const safety = await host.waitFor(
+    (m) => m.t === "safety" && m.safe.includes(detJoined.playerId),
+    5000,
+  );
+  assert(
+    !safety.safe.includes(hostJoined.playerId),
+    "Sicherheitsabfrage zeigt nur die Personen, die bestätigt haben",
   );
 
   // Chat ist nach dem Spielende gesperrt

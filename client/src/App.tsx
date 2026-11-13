@@ -13,6 +13,7 @@ import { parseInviteCode } from "./lib/invite";
 import { formatServerError } from "./lib/serverMessages";
 import { ensureHumanTicket, fetchWithTicket } from "./lib/humanCheck";
 import { clearSession, loadSession, saveSession } from "./lib/session";
+import { markChangelogAfterUpdate } from "./lib/updateChangelog";
 import { useGame } from "./lib/useGame";
 import { GameScreen } from "./screens/GameScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -83,6 +84,21 @@ async function showPositionSharedNotification(at: number, index: number, live: b
   new Notification(title, options);
 }
 
+async function showChatNotification(name: string, text: string) {
+  const options: NotificationOptions = {
+    body: text,
+    icon: "/icon-192.png",
+    tag: "fang-x-chat",
+  };
+  const title = i18n.t("notifications.chatTitle", { name });
+  if ("serviceWorker" in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    await registration.showNotification(title, options);
+    return;
+  }
+  new Notification(title, options);
+}
+
 function readLegalPage(): LegalPage {
   const path = window.location.pathname.replace(/\/+$/, "").toLowerCase();
   if (path === "/impressum") return "impressum";
@@ -141,7 +157,13 @@ function PwaUpdatePrompt() {
       >
         <h2 id="pwa-update-title">{t("pwa.updateTitle")}</h2>
         <p id="pwa-update-description">{t("pwa.updateText")}</p>
-        <button type="button" onClick={() => void updateServiceWorker(true)}>
+        <button
+          type="button"
+          onClick={() => {
+            markChangelogAfterUpdate();
+            void updateServiceWorker(true);
+          }}
+        >
           {t("pwa.reload")}
         </button>
         <button className="secondary" type="button" onClick={() => setNeedRefresh(false)}>
@@ -283,6 +305,27 @@ export default function App() {
       console.warn("Benachrichtigung zum Aufgeben konnte nicht angezeigt werden:", error);
     });
   }, [alertsEnabled, notificationPermission, game.gameResult, game.myId, game.players]);
+
+  const chatNotifiedRef = useRef<number | null | undefined>(undefined);
+  useEffect(() => {
+    const last =
+      game.chatMessages.length > 0 ? game.chatMessages[game.chatMessages.length - 1] : null;
+    const lastId = last?.id ?? null;
+    // Erster Durchlauf: vorhandenen Verlauf nicht erneut melden.
+    if (chatNotifiedRef.current === undefined || lastId === null) {
+      chatNotifiedRef.current = lastId;
+      return;
+    }
+    if (chatNotifiedRef.current === lastId || !last) return;
+    chatNotifiedRef.current = lastId;
+    if (last.playerId === game.myId) return;
+    if (!alertsEnabled || notificationPermission !== "granted") return;
+    if (document.visibilityState !== "hidden") return;
+    if (typeof navigator.vibrate === "function") navigator.vibrate([150, 80, 150]);
+    void showChatNotification(last.name, last.text).catch((error: unknown) => {
+      console.warn("Chat-Benachrichtigung konnte nicht angezeigt werden:", error);
+    });
+  }, [alertsEnabled, notificationPermission, game.chatMessages, game.myId]);
 
   // Einladungslink: /?code=ABC234
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);
@@ -517,6 +560,10 @@ export default function App() {
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
+        teamMarkers={game.teamMarkers}
+        inactivity={game.inactivity}
+        safe={game.safe}
+        batteryWarning={game.batteryWarning}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
         catchPending={game.catchPending}
@@ -527,6 +574,10 @@ export default function App() {
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
+        onAddTeamMarker={game.addTeamMarker}
+        onRemoveTeamMarker={game.removeTeamMarker}
+        onConfirmSafe={game.confirmSafe}
+        onBatteryLow={game.sendBatteryLow}
         onReportCatch={game.reportCatch}
         onResolveCatch={game.resolveCatch}
         onSurrender={game.surrender}

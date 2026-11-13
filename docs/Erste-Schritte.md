@@ -13,11 +13,24 @@ daran. Ist der Standortzugriff blockiert, zeigt die App eine Anleitung, wie du i
 Einstellungen wieder freigibst. In der Lobby kann der Host das Spiel erst starten, wenn der
 Standort erlaubt ist; zum Ausprobieren gibt es **Ohne Standort fortfahren (Simulationsmodus)**.
 
+## Checkliste vor dem Spiel
+
+In der Lobby zeigt eine Checkliste jeder Person, ob das Gerät bereit ist: Standortfreigabe,
+Alarm und Benachrichtigungen, Installation als App sowie ein Hinweis auf Akku und
+Bildschirm-Sperre. Dazu warnt sie vor Problemen bei Gruppe und Einstellungen, zum Beispiel
+getrennten Mitspielenden, fehlendem Detektiv, sehr kleinem oder sehr großem Spielgebiet und
+fehlendem Vorsprung. Gibt es Warnungen, fragt die App den Host beim Start noch einmal nach;
+ohne X lässt sich das Spiel weiterhin nicht starten.
+
 ## Spiel erstellen
 
 Eine Person erstellt auf der Startseite ein neues Spiel. Sie wird Host und spielt standardmäßig
-als X. Den sechsstelligen **Spiel-Code** teilt sie mit der Gruppe – über den Einladungslink oder
-indem alle den Code eingeben und beitreten.
+als X. Den sechsstelligen **Spiel-Code** teilt sie mit der Gruppe – über den Einladungslink, über
+den **QR-Code** oder indem alle den Code eingeben und beitreten.
+
+!!! tip ":material-qrcode: QR-Code für alle vor Ort"
+    Tippe in der Lobby auf **QR-Code anzeigen**. Die anderen scannen ihn mit der Handykamera und
+    landen direkt im Spiel. Der QR-Code enthält denselben Link wie **Einladung teilen**.
 
 ## Rolle wählen
 
@@ -46,7 +59,9 @@ Karte ausprobieren.
 - **Detektive** sehen die Karte, die letzte Sichtung und – je nach Einstellung – die Standorte der
   anderen Detektive. Ein Fang ist je nach Regel automatisch im Fangradius oder per Foto-Fang
   möglich.
-- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht.
+- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht. Bei neuen Nachrichten
+  erscheint bei geschlossenem Chat ein Popup. Ist der Alarm aktiviert und die App im Hintergrund,
+  meldet sich zusätzlich eine Benachrichtigung.
 
 ## Spielende
 
@@ -66,3 +81,11 @@ Benachrichtigung.
 
 Schon während des Countdowns ("Start in …") siehst du deinen eigenen Standort auf der Karte. Dein
 Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet.
+
+## App-Updates
+
+Steht eine neue Version bereit, fragt dich die App, ob sie neu geladen werden soll. Nach **Neu
+laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerungen. Du kommst
+über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
+aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
+Startseite.

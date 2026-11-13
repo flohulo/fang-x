@@ -16,6 +16,7 @@
     "settings": "Settings",
     "moreLinks": "More pages",
     "docs": "Manual",
+    "website": "Website",
     "changelog": "Changelog",
     "contributors": "Contributors",
     "privacy": "Privacy",
@@ -36,6 +37,7 @@
     "enable": "Turn alert on"
   },
   "notifications": {
+    "chatTitle": "{{name}} in the chat",
     "surrenderTitle": "X gave up",
     "surrenderBody": "{{name}} gave up the game. The live location was shared.",
     "positionLiveTitle": "Warning: location is being shared",
@@ -123,6 +125,11 @@
     "codeLabel": "Game code",
     "shareInvite": "Share invitation",
     "linkCopied": "Link copied ✓",
+    "showQr": "Show QR code",
+    "hideQr": "Hide QR code",
+    "qrAlt": "QR code to join game {{code}}",
+    "qrHint": "Others scan the code with their camera and join right away.",
+    "qrFailed": "The QR code could not be created. Share the link or the code.",
     "copyCode": "Copy code only",
     "codeCopied": "Code copied ✓",
     "myPlayer": "My player",
@@ -233,7 +240,37 @@
     "playAreaDrawn": "Custom play area with {{count}} corner points drawn.",
     "playAreaDraw": "Draw play area on the map",
     "playAreaEdit": "Edit play area",
-    "playAreaUseCircle": "Use circle again"
+    "playAreaUseCircle": "Use circle again",
+    "checklist": {
+      "title": "Pre-game checklist",
+      "location": "Location access granted",
+      "notifications": "Alerts and notifications allowed",
+      "notificationsHint": "Without them you miss reveals while the screen is off.",
+      "install": "App installed on the home screen",
+      "installHint": "Installed, the app runs more reliably in the background.",
+      "installHintIos": "Tap the share icon, then Add to Home Screen.",
+      "screen": "Battery charged, screen lock set generously",
+      "screenHint": "GPS and screen use a lot of power during a round.",
+      "status": {
+        "ok": "Done: ",
+        "warn": "Warning: ",
+        "info": "Note: "
+      },
+      "checks": {
+        "noX": "No X has been chosen yet.",
+        "noDetective": "There is no detective, nobody is chasing X.",
+        "disconnected": "{{count}} players currently not connected: {{names}}.",
+        "areaSmall": "The play area is very small (about {{meters}} m radius).",
+        "areaLarge": "The play area is very large (about {{meters}} m radius).",
+        "noHeadStart": "X has no head start."
+      }
+    },
+    "startConfirm": {
+      "title": "Start anyway?",
+      "text": "These points came up before the start:",
+      "go": "Start anyway",
+      "back": "Back"
+    }
   },
   "game": {
     "phase": {
@@ -254,6 +291,38 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "markers": {
+      "suspect": "Mark suspect",
+      "clear": "Mark not here"
+    },
+    "inactivity": {
+      "label": "Radio silence:",
+      "other": "No position has come in from {{name}} for {{minutes}} minutes. Check in with {{name}}.",
+      "self": "No position has come in from you for {{minutes}} minutes. Check your GPS and connection.",
+      "dismiss": "Dismiss notice"
+    },
+    "safety": {
+      "title": "Is everyone safe?",
+      "hint": "Confirm that you are fine so the group knows everything is all right.",
+      "confirmed": "safe",
+      "open": "open",
+      "confirm": "I am safe",
+      "done": "Confirmed"
+    },
+    "battery": {
+      "label": "Battery:",
+      "other": "{{name}}'s battery is at {{level}}%. Their position may drop out soon.",
+      "self": "Your battery is at {{level}}%. Charge your device so your position does not drop out.",
+      "dismiss": "Dismiss notice"
+    },
+    "stats": {
+      "title": "Round summary",
+      "duration": "Play time",
+      "reveals": "Reveals",
+      "closest": "Closest approach",
+      "farthest": "Walked the farthest",
+      "roleX": "X"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",
@@ -309,7 +378,6 @@
       "street": "Map: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Data from <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Choose target on map",
-    "cancelChoosing": "Tap the map · Cancel",
     "simulationMode": "Simulation mode",
     "enableGps": "Enable GPS",
     "emergency": "Emergency",
@@ -357,7 +425,15 @@
       "noRevealText": "Wait for the first reveal and stay near the area.",
       "defaultTitle": "Game running.",
       "defaultText": "Stay ready."
-    }
+    },
+    "actions": {
+      "title": "Actions"
+    },
+    "pickHint": {
+      "marker": "Tap the map to place the marker.",
+      "objective": "Tap the map to set the target."
+    },
+    "pickCancel": "Cancel"
   },
   "map": {
     "satellite": "Satellite",
@@ -366,6 +442,10 @@
     "showStreetMap": "Show street map",
     "objective": "Mission target",
     "start": "Start",
+    "markerSuspect": "Suspect",
+    "markerClear": "Not here",
+    "markerPopup": "{{label}} by {{name}} at {{time}}",
+    "markerRemove": "Remove",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} at {{time}}",
     "startPoint": "Starting point",

@@ -1,10 +1,23 @@
 # Getting started
 
+## Pre-game checklist
+
+In the lobby a checklist shows everyone whether their device is ready: location access,
+alerts and notifications, installation as an app, and a reminder about battery and screen
+lock. It also warns about problems with the group and settings, for example disconnected
+players, no detective, a very small or very large play area, and no head start. If there are
+warnings, the app asks the host to confirm when starting; without an X the game still cannot
+be started.
+
 ## Creating a game
 
 One person creates a new game on the start page. They become the host and play as X by default.
-They share the six-character **game code** with the group – via the invitation link, or by
-everyone entering the code and joining.
+They share the six-character **game code** with the group – via the invitation link, via the
+**QR code**, or by everyone entering the code and joining.
+
+!!! tip ":material-qrcode: QR code for everyone on site"
+    Tap **Show QR code** in the lobby. The others scan it with their phone camera and land directly
+    in the game. The QR code contains the same link as **Share invitation**.
 
 ## Choosing a role
 
@@ -31,7 +44,9 @@ your location. Without GPS you can try out the game in **simulation mode** on th
 - **Detectives** see the map, the last reveal and – depending on the settings – the locations of
   the other detectives. Depending on the rule, a catch happens automatically within the catch
   radius or via a photo catch.
-- Everyone can write in the chat. The history is deleted after the game ends.
+- Everyone can write in the chat. The history is deleted after the game ends. New messages show a
+  popup while the chat is closed. If alerts are enabled and the app is in the background, you also
+  get a notification.
 
 ## End of the game
 
@@ -46,3 +61,10 @@ shows the result and you can export the round's settings as a JSON file.
 If X has to call off the round, there is the [emergency button](Notfall-Knopf.md): after a
 confirmation the game ends, the detectives win and receive X's exact location along with a
 notification.
+
+## App updates
+
+When a new version is available, the app asks whether to reload. After **Reload** the version
+history (changelog) opens automatically so you can see what is new. The back link takes you to
+the home screen at any time, where a running game is resumed. You can also find the changelog in
+the menu and via the version number on the home screen.

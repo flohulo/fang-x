@@ -1,4 +1,12 @@
-import type { ChatMessage, LatLng, ObjectiveState, RevealEvent, Ruleset } from "@fang-x/shared";
+import type {
+  ChatMessage,
+  GameStats,
+  LatLng,
+  ObjectiveState,
+  RevealEvent,
+  Ruleset,
+  TeamMarker,
+} from "@fang-x/shared";
 import { metersToPlayAreaEdge } from "@fang-x/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
@@ -11,10 +19,16 @@ import {
   settingsExportFileName,
 } from "../lib/settingsExport";
 import { formatEndReason } from "../lib/serverMessages";
+import { useBatteryWarning } from "../lib/useBatteryWarning";
 import { useGeolocation } from "../lib/useGeolocation";
 import type { GameResult, PlayerView } from "../lib/useGame";
 
 interface GameScreenProps {
+  teamMarkers: TeamMarker[];
+  onAddTeamMarker: (pos: LatLng, kind: TeamMarker["kind"]) => void;
+  onRemoveTeamMarker: (id: number) => void;
+  batteryWarning: { playerId: string; name: string; level: number; at: number } | null;
+  onBatteryLow: (level: number) => void;
   code: string;
   phase: string;
   pingHistory: RevealEvent[];
@@ -26,6 +40,9 @@ interface GameScreenProps {
   lastReveal: RevealEvent | null;
   objective: ObjectiveState | null;
   transitStops: { bus: number; train: number };
+  inactivity: { playerId: string; name: string; minutes: number; at: number } | null;
+  safe: string[];
+  onConfirmSafe: () => void;
   transitNotice: {
     mode: "bus" | "train";
     count: number;
@@ -77,6 +94,55 @@ function formatDuration(ms: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function formatDistance(meters: number): string {
+  if (meters < 1000) return `${Math.round(meters)} m`;
+  return `${(meters / 1000).toFixed(1)} km`;
+}
+
+function ResultStats({ stats, t }: { stats: GameStats; t: TFunction }) {
+  const walked = [...stats.players].sort((a, b) => b.distanceMeters - a.distanceMeters);
+  const farthest = walked[0]?.distanceMeters ? walked[0] : null;
+  return (
+    <section className="result-stats" aria-label={t("game.stats.title")}>
+      <h3>{t("game.stats.title")}</h3>
+      <dl>
+        <div>
+          <dt>{t("game.stats.duration")}</dt>
+          <dd>{formatDuration(stats.durationSeconds * 1000)}</dd>
+        </div>
+        <div>
+          <dt>{t("game.stats.reveals")}</dt>
+          <dd>{stats.revealCount}</dd>
+        </div>
+        {stats.closestApproachMeters !== null && (
+          <div>
+            <dt>{t("game.stats.closest")}</dt>
+            <dd>{formatDistance(stats.closestApproachMeters)}</dd>
+          </div>
+        )}
+        {farthest && (
+          <div>
+            <dt>{t("game.stats.farthest")}</dt>
+            <dd>{farthest.name}</dd>
+          </div>
+        )}
+      </dl>
+      <ul className="result-stats-players">
+        {walked.map((p) => (
+          <li key={p.playerId}>
+            <span className="result-stats-dot" style={{ background: p.color }} aria-hidden="true" />
+            <span className="result-stats-name">
+              {p.name}
+              {p.role === "X" ? ` (${t("game.stats.roleX")})` : ""}
+            </span>
+            <span>{formatDistance(p.distanceMeters)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function GameScreen({
   code,
   phase,
@@ -90,6 +156,14 @@ export function GameScreen({
   objective,
   transitStops,
   transitNotice,
+  teamMarkers,
+  onAddTeamMarker,
+  onRemoveTeamMarker,
+  inactivity,
+  safe,
+  onConfirmSafe,
+  batteryWarning,
+  onBatteryLow,
   revealTimer,
   chatMessages,
   catchPending,
@@ -110,11 +184,16 @@ export function GameScreen({
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [showSimHint, setShowSimHint] = useState(false);
   const [choosingObjective, setChoosingObjective] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [markingKind, setMarkingKind] = useState<TeamMarker["kind"] | null>(null);
   const [transitDialogOpen, setTransitDialogOpen] = useState(false);
   const [surrenderDialogOpen, setSurrenderDialogOpen] = useState(false);
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
+  const [dismissedInactivityAt, setDismissedInactivityAt] = useState<number | null>(null);
+  const [dismissedBatteryAt, setDismissedBatteryAt] = useState<number | null>(null);
   const [clockNow, setClockNow] = useState(() => Date.now());
   const [satelliteOn, setSatelliteOn] = useState(false);
   const [settingsExported, setSettingsExported] = useState(false);
@@ -170,6 +249,25 @@ export function GameScreen({
   const transitRemaining = transitMode === "bus" ? busRemaining : trainRemaining;
   const visibleTransitNotice =
     transitNotice && transitNotice.at !== dismissedTransitNoticeAt ? transitNotice : null;
+
+  const visibleInactivity =
+    inactivity && inactivity.at !== dismissedInactivityAt ? inactivity : null;
+
+  useEffect(() => {
+    if (!inactivity) return;
+    const timer = window.setTimeout(() => setDismissedInactivityAt(inactivity.at), 30_000);
+    return () => window.clearTimeout(timer);
+  }, [inactivity]);
+  useBatteryWarning(phase === "HEADSTART" || phase === "RUNNING", onBatteryLow);
+
+  const visibleBattery =
+    batteryWarning && batteryWarning.at !== dismissedBatteryAt ? batteryWarning : null;
+
+  useEffect(() => {
+    if (!batteryWarning) return;
+    const timer = window.setTimeout(() => setDismissedBatteryAt(batteryWarning.at), 30_000);
+    return () => window.clearTimeout(timer);
+  }, [batteryWarning]);
 
   useEffect(() => {
     if (!transitNotice) return;
@@ -240,10 +338,39 @@ export function GameScreen({
     setSimulatedPosition(mapCenter ?? center);
   };
 
+  const startMarking = (kind: TeamMarker["kind"]) => {
+    setActionsOpen(false);
+    setMarkingKind(kind);
+  };
+
+  // Das Aktionen-Menü schliesst per Escape oder Tipp daneben.
+  useEffect(() => {
+    if (!actionsOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActionsOpen(false);
+    };
+    const onPointer = (event: PointerEvent) => {
+      if (!actionsRef.current?.contains(event.target as Node)) setActionsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [actionsOpen]);
+
+  const canMark = !isX && (phase === "RUNNING" || phase === "HEADSTART");
+
   const handleMapClick = (pos: LatLng) => {
     if (choosingObjective) {
       onSetObjective(pos);
       setChoosingObjective(false);
+      return;
+    }
+    if (markingKind) {
+      onAddTeamMarker(pos, markingKind);
+      setMarkingKind(null);
       return;
     }
     if (simulated || showSimHint) {
@@ -362,6 +489,30 @@ export function GameScreen({
               params: gameResult.reasonParams,
             })}
           </p>
+          {gameResult.stats && <ResultStats stats={gameResult.stats} t={t} />}
+          <section className="safety-check" aria-label={t("game.safety.title")}>
+            <h3>{t("game.safety.title")}</h3>
+            <p>{t("game.safety.hint")}</p>
+            <ul>
+              {players.map((p) => (
+                <li key={p.id}>
+                  <span>{p.name}</span>
+                  <span className={safe.includes(p.id) ? "safety-ok" : "safety-open"}>
+                    {safe.includes(p.id) ? t("game.safety.confirmed") : t("game.safety.open")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={onConfirmSafe}
+              disabled={myId !== null && safe.includes(myId)}
+            >
+              {myId !== null && safe.includes(myId)
+                ? t("game.safety.done")
+                : t("game.safety.confirm")}
+            </button>
+          </section>
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             {t("game.backToStart")}
           </button>
@@ -396,6 +547,8 @@ export function GameScreen({
           lastReveal={lastReveal}
           pingHistory={isX ? pingHistory : []}
           objective={isX ? objective : null}
+          teamMarkers={isX ? [] : teamMarkers}
+          onRemoveTeamMarker={onRemoveTeamMarker}
           startPoint={playAreaCenter ?? ruleset?.map?.startLocation ?? null}
           onMapClick={handleMapClick}
           onSatelliteChange={setSatelliteOn}
@@ -407,11 +560,78 @@ export function GameScreen({
               {t(`game.phase.${phase}`, { defaultValue: phase })}
             </span>
             {timeLeft !== null && <span className="map-timer">{formatDuration(timeLeft)}</span>}
-            <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
-              {isX ? t("game.youAreX") : t("game.youAreDetective")}
-            </span>
+            <div className="action-menu" ref={actionsRef}>
+              <button
+                type="button"
+                className="secondary action-menu-button"
+                aria-haspopup="menu"
+                aria-expanded={actionsOpen}
+                onClick={() => setActionsOpen((open) => !open)}
+              >
+                {t("game.actions.title")}
+              </button>
+              {actionsOpen && (
+                <div className="action-menu-list" role="menu">
+                  {canMark && (
+                    <>
+                      <button type="button" role="menuitem" onClick={() => startMarking("SUSPECT")}>
+                        {t("game.markers.suspect")}
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="secondary"
+                        onClick={() => startMarking("CLEAR")}
+                      >
+                        {t("game.markers.clear")}
+                      </button>
+                    </>
+                  )}
+                  {canChooseObjective && (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        setChoosingObjective(true);
+                      }}
+                    >
+                      {t("game.chooseObjective")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="secondary"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      if (simulated) enableRealGps();
+                      else handleSimMode();
+                    }}
+                  >
+                    {simulated ? t("game.enableGps") : t("game.simulationMode")}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {(choosingObjective || markingKind) && (
+          <div className="pick-bar" role="status">
+            <span>{markingKind ? t("game.pickHint.marker") : t("game.pickHint.objective")}</span>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => {
+                setMarkingKind(null);
+                setChoosingObjective(false);
+              }}
+            >
+              {t("game.pickCancel")}
+            </button>
+          </div>
+        )}
 
         {showRevealTimer && (
           <div
@@ -485,6 +705,50 @@ export function GameScreen({
           </div>
         )}
 
+        {visibleInactivity && (
+          <div className="transit-notice inactivity-notice" role="alert">
+            <span>
+              <strong>{t("game.inactivity.label")}</strong>{" "}
+              {visibleInactivity.playerId === myId
+                ? t("game.inactivity.self", { minutes: visibleInactivity.minutes })
+                : t("game.inactivity.other", {
+                    name: visibleInactivity.name,
+                    minutes: visibleInactivity.minutes,
+                  })}
+            </span>
+            <button
+              type="button"
+              className="transit-notice-close"
+              aria-label={t("game.inactivity.dismiss")}
+              onClick={() => setDismissedInactivityAt(visibleInactivity.at)}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {visibleBattery && (
+          <div className="transit-notice battery-notice" role="alert">
+            <span>
+              <strong>{t("game.battery.label")}</strong>{" "}
+              {visibleBattery.playerId === myId
+                ? t("game.battery.self", { level: visibleBattery.level })
+                : t("game.battery.other", {
+                    name: visibleBattery.name,
+                    level: visibleBattery.level,
+                  })}
+            </span>
+            <button
+              type="button"
+              className="transit-notice-close"
+              aria-label={t("game.battery.dismiss")}
+              onClick={() => setDismissedBatteryAt(visibleBattery.at)}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {error && !simulated && (
           <div className="alert-banner" style={{ bottom: 200 }}>
             {t("game.gpsError", { error })}
@@ -510,6 +774,9 @@ export function GameScreen({
                 : position
                   ? t("game.gps.active")
                   : t("game.gps.off")}
+            </span>
+            <span className={`role-chip${isX ? " is-x" : " is-det"}`}>
+              {isX ? t("game.youAreX") : t("game.youAreDetective")}
             </span>
             {isSolo && <span className="solo-chip">{t("game.solo", { code })}</span>}
           </div>
@@ -589,25 +856,7 @@ export function GameScreen({
         </div>
 
         <div className="map-bottom-controls">
-          {canChooseObjective && !choosingObjective && (
-            <button onClick={() => setChoosingObjective(true)}>{t("game.chooseObjective")}</button>
-          )}
-          {choosingObjective && (
-            <button className="secondary" onClick={() => setChoosingObjective(false)}>
-              {t("game.cancelChoosing")}
-            </button>
-          )}
-          {!choosingObjective && !simulated && (
-            <button className="secondary" onClick={handleSimMode}>
-              {t("game.simulationMode")}
-            </button>
-          )}
-          {!choosingObjective && simulated && (
-            <button className="secondary" onClick={enableRealGps}>
-              {t("game.enableGps")}
-            </button>
-          )}
-          {canSurrender && !choosingObjective && (
+          {canSurrender && (
             <button
               className="danger"
               type="button"

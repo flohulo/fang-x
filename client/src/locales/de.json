@@ -16,6 +16,7 @@
     "settings": "Einstellungen",
     "moreLinks": "Weitere Seiten",
     "docs": "Handbuch",
+    "website": "Webseite",
     "changelog": "Changelog",
     "contributors": "Mitarbeiter",
     "privacy": "Datenschutz",
@@ -36,6 +37,7 @@
     "enable": "Alarm aktivieren"
   },
   "notifications": {
+    "chatTitle": "{{name}} im Chat",
     "surrenderTitle": "X hat aufgegeben",
     "surrenderBody": "{{name}} hat das Spiel aufgegeben. Der Live-Standort wurde geteilt.",
     "positionLiveTitle": "Achtung: Standort wird geteilt",
@@ -123,6 +125,11 @@
     "codeLabel": "Spiel-Code",
     "shareInvite": "Einladung teilen",
     "linkCopied": "Link kopiert ✓",
+    "showQr": "QR-Code anzeigen",
+    "hideQr": "QR-Code ausblenden",
+    "qrAlt": "QR-Code für den Beitritt zum Spiel {{code}}",
+    "qrHint": "Andere scannen den Code mit der Kamera und treten direkt bei.",
+    "qrFailed": "Der QR-Code konnte nicht erzeugt werden. Teile den Link oder den Code.",
     "copyCode": "Nur Code kopieren",
     "codeCopied": "Code kopiert ✓",
     "myPlayer": "Mein Spieler",
@@ -233,7 +240,37 @@
     "playAreaDrawn": "Eigenes Spielfeld mit {{count}} Eckpunkten gezeichnet.",
     "playAreaDraw": "Spielfeld auf der Karte einzeichnen",
     "playAreaEdit": "Spielfeld bearbeiten",
-    "playAreaUseCircle": "Wieder Kreis verwenden"
+    "playAreaUseCircle": "Wieder Kreis verwenden",
+    "checklist": {
+      "title": "Checkliste vor dem Spiel",
+      "location": "Standortfreigabe erteilt",
+      "notifications": "Alarm und Benachrichtigungen erlaubt",
+      "notificationsHint": "Ohne sie verpasst du Sichtungen, wenn der Bildschirm aus ist.",
+      "install": "App auf dem Startbildschirm installiert",
+      "installHint": "Installiert läuft die App stabiler im Hintergrund.",
+      "installHintIos": "Tippe auf das Teilen-Symbol und dann auf Zum Home-Bildschirm.",
+      "screen": "Akku geladen, Bildschirm-Sperre großzügig eingestellt",
+      "screenHint": "GPS und Bildschirm verbrauchen während der Runde viel Strom.",
+      "status": {
+        "ok": "Erledigt: ",
+        "warn": "Achtung: ",
+        "info": "Hinweis: "
+      },
+      "checks": {
+        "noX": "Es ist noch kein X gewählt.",
+        "noDetective": "Es gibt keinen Detektiv, niemand jagt X.",
+        "disconnected": "{{count}} Mitspielende gerade nicht verbunden: {{names}}.",
+        "areaSmall": "Das Spielgebiet ist sehr klein (ca. {{meters}} m Radius).",
+        "areaLarge": "Das Spielgebiet ist sehr groß (ca. {{meters}} m Radius).",
+        "noHeadStart": "X hat keinen Vorsprung."
+      }
+    },
+    "startConfirm": {
+      "title": "Trotzdem starten?",
+      "text": "Vor dem Start sind dir folgende Punkte aufgefallen:",
+      "go": "Trotzdem starten",
+      "back": "Zurück"
+    }
   },
   "game": {
     "phase": {
@@ -254,6 +291,38 @@
     "surrenderLive": "Der exakte Live-Standort wurde an die Detektive übertragen.",
     "surrenderNoPosition": "Ein Standort war nicht verfügbar.",
     "openInOsm": "Standort auf OpenStreetMap öffnen ↗",
+    "markers": {
+      "suspect": "Verdacht markieren",
+      "clear": "Hier nicht markieren"
+    },
+    "inactivity": {
+      "label": "Funkstille:",
+      "other": "Von {{name}} kommt seit {{minutes}} Minuten keine Position an. Meldet euch kurz bei {{name}}.",
+      "self": "Von dir kommt seit {{minutes}} Minuten keine Position an. Prüfe GPS und Verbindung.",
+      "dismiss": "Hinweis schliessen"
+    },
+    "safety": {
+      "title": "Alle sicher?",
+      "hint": "Bestätige kurz, dass du gut angekommen bist, damit die Gruppe weiss, dass alles in Ordnung ist.",
+      "confirmed": "sicher",
+      "open": "offen",
+      "confirm": "Ich bin sicher",
+      "done": "Bestätigt"
+    },
+    "battery": {
+      "label": "Akku:",
+      "other": "Der Akku von {{name}} ist bei {{level}} %. Gleich könnte die Position ausfallen.",
+      "self": "Dein Akku ist bei {{level}} %. Lade das Gerät, damit deine Position nicht ausfällt.",
+      "dismiss": "Hinweis schliessen"
+    },
+    "stats": {
+      "title": "Auswertung",
+      "duration": "Spielzeit",
+      "reveals": "Sichtungen",
+      "closest": "Knappster Abstand",
+      "farthest": "Am weitesten gelaufen",
+      "roleX": "X"
+    },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",
     "settingsExported": "Einstellungen exportiert ✓",
@@ -309,7 +378,6 @@
       "street": "Karte: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Daten von <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Ziel auf Karte wählen",
-    "cancelChoosing": "Karte antippen · Abbrechen",
     "simulationMode": "Simulationsmodus",
     "enableGps": "GPS aktivieren",
     "emergency": "Notfall",
@@ -357,7 +425,15 @@
       "noRevealText": "Warte auf den ersten Reveal und halte dich in der Nähe des Gebiets.",
       "defaultTitle": "Spiel läuft.",
       "defaultText": "Halte dich bereit."
-    }
+    },
+    "actions": {
+      "title": "Aktionen"
+    },
+    "pickHint": {
+      "marker": "Tippe auf die Karte, um die Markierung zu setzen.",
+      "objective": "Tippe auf die Karte, um das Ziel zu setzen."
+    },
+    "pickCancel": "Abbrechen"
   },
   "map": {
     "satellite": "Satellit",
@@ -366,6 +442,10 @@
     "showStreetMap": "Strassenkarte anzeigen",
     "objective": "Missionsziel",
     "start": "Start",
+    "markerSuspect": "Verdacht",
+    "markerClear": "Hier nicht",
+    "markerPopup": "{{label}} von {{name}} um {{time}} Uhr",
+    "markerRemove": "Entfernen",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} um {{time}} Uhr",
     "startPoint": "Startpunkt",

@@ -1,8 +1,9 @@
 import { LocationAccess } from "../components/LocationAccess";
 import { PlayAreaEditor } from "../components/PlayAreaEditor";
+import { PreGameChecklist, PreGameChecklistItems } from "../components/PreGameChecklist";
 import { useLocationPermission } from "../lib/useLocationPermission";
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
-import { DEFAULT_RULESET } from "@fang-x/shared";
+import { DEFAULT_RULESET, evaluatePreGameChecks } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { docsUrl } from "../lib/docs";
@@ -35,11 +36,15 @@ export function LobbyScreen({
   const { t } = useTranslation();
   const [localRuleset, setLocalRuleset] = useState<Ruleset>(ruleset ?? DEFAULT_RULESET);
   const [copied, setCopied] = useState<null | "link" | "code">(null);
+  const [showQr, setShowQr] = useState(false);
+  const [qrImage, setQrImage] = useState<string | null>(null);
+  const [qrFailed, setQrFailed] = useState(false);
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
   const location = useLocationPermission();
   const [skipLocation, setSkipLocation] = useState(false);
   const [startLocationError, setStartLocationError] = useState<string | null>(null);
   const [drawingArea, setDrawingArea] = useState(false);
+  const [confirmingStart, setConfirmingStart] = useState(false);
 
   useEffect(() => {
     if (!activeInfoKey) return;
@@ -93,6 +98,30 @@ export function LobbyScreen({
     );
   };
 
+  // Der QR-Code wird erst beim ersten Öffnen erzeugt und die Bibliothek erst dann geladen.
+  useEffect(() => {
+    if (!showQr) return;
+    let cancelled = false;
+    setQrFailed(false);
+    import("qrcode")
+      .then(({ default: QRCode }) =>
+        QRCode.toDataURL(inviteUrl(code, window.location.origin), {
+          margin: 2,
+          width: 256,
+          errorCorrectionLevel: "M",
+        }),
+      )
+      .then((url) => {
+        if (!cancelled) setQrImage(url);
+      })
+      .catch(() => {
+        if (!cancelled) setQrFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showQr, code]);
+
   const flashCopied = (what: "link" | "code") => {
     setCopied(what);
     window.setTimeout(() => setCopied(null), 2000);
@@ -131,6 +160,12 @@ export function LobbyScreen({
   const others = players.filter((p) => p.id !== myId);
   const locationOk = location.state === "granted" || skipLocation;
   const canStart = hasX && locationOk;
+  const checks = evaluatePreGameChecks(localRuleset, players);
+  const startWarnings = checks.filter((check) => check.severity === "warning");
+  const handleStartClick = () => {
+    if (startWarnings.length > 0) setConfirmingStart(true);
+    else onStart();
+  };
 
   return (
     <div className="screen">
@@ -155,6 +190,32 @@ export function LobbyScreen({
         <button className="secondary" style={{ marginTop: 8 }} onClick={copyCode}>
           {copied === "code" ? t("lobby.codeCopied") : t("lobby.copyCode")}
         </button>
+        <button
+          className="secondary"
+          style={{ marginTop: 8 }}
+          aria-expanded={showQr}
+          onClick={() => setShowQr((current) => !current)}
+        >
+          {showQr ? t("lobby.hideQr") : t("lobby.showQr")}
+        </button>
+        {showQr && (
+          <div className="qr-box">
+            {qrFailed ? (
+              <p role="alert">{t("lobby.qrFailed")}</p>
+            ) : qrImage ? (
+              <>
+                <img
+                  className="qr-code"
+                  src={qrImage}
+                  width={256}
+                  height={256}
+                  alt={t("lobby.qrAlt", { code })}
+                />
+                <p className="config-hint">{t("lobby.qrHint")}</p>
+              </>
+            ) : null}
+          </div>
+        )}
       </div>
 
       <div className="card">
@@ -196,6 +257,12 @@ export function LobbyScreen({
       </div>
 
       <LocationAccess state={location.state} busy={location.busy} onRequest={location.request} />
+
+      <PreGameChecklist
+        locationState={location.state}
+        locationSkipped={skipLocation}
+        checks={checks}
+      />
 
       {youAreHost && (
         <div className="card">
@@ -739,7 +806,39 @@ export function LobbyScreen({
             </a>
           </div>
 
-          <button onClick={onStart} disabled={!canStart} style={{ marginTop: 16 }}>
+          {confirmingStart && canStart && (
+            <div className="card" role="alertdialog" aria-labelledby="start-confirm-title">
+              <h3 id="start-confirm-title">{t("lobby.startConfirm.title")}</h3>
+              <p className="card-text">{t("lobby.startConfirm.text")}</p>
+              <PreGameChecklistItems
+                items={startWarnings.map((check) => ({
+                  id: check.id,
+                  status: "warn" as const,
+                  label: t(`lobby.checklist.checks.${check.id}`, check.params),
+                }))}
+              />
+              <button
+                type="button"
+                style={{ marginTop: 12 }}
+                onClick={() => {
+                  setConfirmingStart(false);
+                  onStart();
+                }}
+              >
+                {t("lobby.startConfirm.go")}
+              </button>
+              <button
+                className="secondary"
+                type="button"
+                style={{ marginTop: 8 }}
+                onClick={() => setConfirmingStart(false)}
+              >
+                {t("lobby.startConfirm.back")}
+              </button>
+            </div>
+          )}
+
+          <button onClick={handleStartClick} disabled={!canStart} style={{ marginTop: 16 }}>
             {!hasX ? t("lobby.needX") : !locationOk ? t("lobby.needLocation") : t("lobby.start")}
           </button>
           {hasX && !locationOk && (

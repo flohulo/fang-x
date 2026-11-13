@@ -1,6 +1,8 @@
 import type {
   ChatMessage,
   ClientMessage,
+  TeamMarker,
+  GameStats,
   LatLng,
   MessageParams,
   ObjectiveState,
@@ -24,6 +26,7 @@ export interface GameResult {
   reasonCode?: string;
   reasonParams?: MessageParams;
   surrender?: { playerId: string; name: string; pos: LatLng | null; at: number };
+  stats?: GameStats;
 }
 
 interface Session {
@@ -57,6 +60,20 @@ export function useGame() {
     count: number;
     bus: number;
     train: number;
+    at: number;
+  } | null>(null);
+  const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
+  const [inactivity, setInactivity] = useState<{
+    playerId: string;
+    name: string;
+    minutes: number;
+    at: number;
+  } | null>(null);
+  const [safe, setSafe] = useState<string[]>([]);
+  const [batteryWarning, setBatteryWarning] = useState<{
+    playerId: string;
+    name: string;
+    level: number;
     at: number;
   } | null>(null);
   const [catchPending, setCatchPending] = useState(false);
@@ -186,6 +203,10 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setTeamMarkers([]);
+            setInactivity(null);
+            setSafe([]);
+            setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
           } else if (msg.reveals && msg.reveals.length > 0) {
@@ -225,6 +246,28 @@ export function useGame() {
         case "catchPending":
           setCatchPending(msg.pending);
           break;
+        case "markers":
+          setTeamMarkers(msg.markers);
+          break;
+        case "inactivity":
+          setInactivity({
+            playerId: msg.playerId,
+            name: msg.name,
+            minutes: msg.minutes,
+            at: msg.at,
+          });
+          break;
+        case "safety":
+          setSafe(msg.safe);
+          break;
+        case "batteryLow":
+          setBatteryWarning({
+            playerId: msg.playerId,
+            name: msg.name,
+            level: msg.level,
+            at: msg.at,
+          });
+          break;
         case "playerPosition":
           setPlayers((current) =>
             current.map((player) =>
@@ -263,6 +306,7 @@ export function useGame() {
             reasonCode: msg.reasonCode,
             reasonParams: msg.reasonParams,
             surrender: msg.surrender,
+            stats: msg.stats,
           });
           setPlayers(msg.players);
           setRevealTimer(null);
@@ -361,6 +405,22 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const addTeamMarker = (pos: LatLng, kind: TeamMarker["kind"]) => {
+    send({ t: "addMarker", pos, kind });
+  };
+
+  const removeTeamMarker = (id: number) => {
+    send({ t: "removeMarker", id });
+  };
+
+  const confirmSafe = () => {
+    send({ t: "confirmSafe" });
+  };
+
+  const sendBatteryLow = (level: number) => {
+    send({ t: "batteryLow", level });
+  };
+
   const sendPosition = (pos: LatLng) => {
     send({ t: "position", pos });
   };
@@ -406,6 +466,10 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    teamMarkers,
+    inactivity,
+    safe,
+    batteryWarning,
     revealTimer,
     chatMessages,
     catchPending,
@@ -419,6 +483,10 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    addTeamMarker,
+    removeTeamMarker,
+    confirmSafe,
+    sendBatteryLow,
     configure,
     setRole,
     start,
