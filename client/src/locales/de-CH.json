@@ -496,6 +496,8 @@
   },
   "onboarding": {
     "progress": "Schritt {{step}} vo {{total}}",
+    "languageTitle": "Sprach wähle",
+    "languageText": "I welere Sprach wetsch du Fang X bruuche? Du chasch si spöter im Menü ändere.",
     "welcomeTitle": "Willkomme bi Fang X",
     "welcomeText": "Fang X isch es GPS-Fangspiel für dusse. So lauft s ab:",
     "welcomeCreate": "Eine erstellt es Spiel und teilt de Code oder de Iladigslink.",

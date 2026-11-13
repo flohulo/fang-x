@@ -501,6 +501,8 @@
   },
   "onboarding": {
     "progress": "Step {{step}} of {{total}}",
+    "languageTitle": "Choose your language",
+    "languageText": "Which language do you want to use Fang X in? You can change it later in the menu.",
     "welcomeTitle": "Welcome to Fang X",
     "welcomeText": "Fang X is an outdoor GPS chase game. Here is how it works:",
     "welcomeCreate": "One person creates a game and shares the code or the invite link.",
