@@ -12,7 +12,7 @@
   "dependencies": {
     "@fang-x/shared": "*",
     "@sentry/browser": "^11.11.0",
-    "i18next": "^26.7.1",
+    "i18next": "^27.1.1",
     "i18next-browser-languagedetector": "^8.3.0",
     "maplibre-gl": "^6.16.0",
     "qrcode": "^1.5.4",
