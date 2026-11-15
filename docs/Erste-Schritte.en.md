@@ -18,6 +18,8 @@ They share the six-character **game code** with the group – via the invitation
 !!! tip ":material-qrcode: QR code for everyone on site"
     Tap **Show QR code** in the lobby. The others scan it with their phone camera and land directly
     in the game. The QR code contains the same link as **Share invitation**.
+    If Fang X is already installed as an app, the link preferably opens the installed app
+    (depending on operating system and browser).
 
 ## Choosing a role
 
