@@ -9,6 +9,8 @@
 Mit dem Sprechfunk sprechen die Detektive miteinander, ohne dass X etwas hört. Der Chat bleibt
 davon unberührt: Er ist weiterhin für alle sichtbar.
 
+Wie ihr euch am Funk verhaltet, steht unter [Funkdisziplin und Funksprache](Funkdisziplin.md).
+
 ## Aktivieren
 
 Der Host schaltet den Sprechfunk in der Spielvorbereitung ein: **Sprechfunk für Detektive
