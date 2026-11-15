@@ -90,7 +90,8 @@ Lokal einschalten geht mit `npx wrangler dev --var HUMAN_CHECK_SECRET:irgendein-
 
 Wenn der Betreiber ein [GlitchTip](https://glitchtip.com/)-Projekt eingerichtet hat, werden
 Programmfehler dorthin gemeldet. Vor dem Senden werden Standortdaten, Nutzerdaten, Header,
-Cookies, Breadcrumbs und Spielcodes entfernt. Ohne eingerichtetes Projekt wird nichts gesendet.
+Cookies, Breadcrumbs, Spielcodes, Reconnect-Tokens und Tickets entfernt; die aufgerufene Adresse
+wird ohne Query-Teil übermittelt. Ohne eingerichtetes Projekt wird nichts gesendet.
 
 ### Kartendaten
 
