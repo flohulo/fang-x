@@ -853,9 +853,9 @@ export class GameRoom {
       PLAYER_COLORS.find((c) => !usedColors.has(c)) ??
       PLAYER_COLORS[this.players.size % PLAYER_COLORS.length];
 
-    // Wer allein (bzw. als Einziger verbunden) ist, wird Host. So übernimmt
-    // nach einem Verbindungsabbruch jemand anderes die Leitung.
-    const isHost = this.connectedCount() === 0;
+    // Host wird nur, wer einen Raum ohne Host betritt. Ist der Host bloss kurz getrennt,
+    // behält er die Rolle; erst wenn seine Frist abläuft, gibt removePlayer sie weiter.
+    const isHost = ![...this.players.values()].some((p) => p.isHost);
     const role: Role = isHost ? "HOST" : wantsX ? "X" : "DETECTIVE";
 
     const player: Player = {
