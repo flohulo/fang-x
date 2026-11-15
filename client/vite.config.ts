@@ -46,7 +46,7 @@ function securityHeaders(glitchtipOrigin: string | null): Plugin {
     "  Strict-Transport-Security: max-age=31536000; includeSubDomains",
     "  X-Content-Type-Options: nosniff",
     "  Referrer-Policy: strict-origin-when-cross-origin",
-    "  Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=(), usb=()",
+    "  Permissions-Policy: geolocation=(self), microphone=(self), camera=(), payment=(), usb=()",
     "  X-Frame-Options: DENY",
     `  Content-Security-Policy: ${csp}`,
     "",
