@@ -2,7 +2,7 @@
 
 ## Einführung beim ersten Start
 
-Beim ersten Öffnen führt dich die App in drei Schritten durch den Einstieg: eine kurze
+Beim ersten Öffnen führt dich die App in vier Schritten durch den Einstieg: zuerst die Wahl der Sprache, dann eine kurze
 Spielübersicht, die Berechtigungen (Standort sowie Alarm und Benachrichtigungen) und die
 Installation als App auf dem Startbildschirm (PWA). Mit dem X oben rechts schliesst du die Einführung jederzeit; du kannst sie
 später im Menü unter **Hilfe > Einführung erneut ansehen** wieder öffnen. Auf iPhone und iPad
@@ -12,6 +12,15 @@ Solange die App nicht installiert ist, erinnert dich auf Start- und Lobby-Seite 
 daran. Ist der Standortzugriff blockiert, zeigt die App eine Anleitung, wie du ihn in den
 Einstellungen wieder freigibst. In der Lobby kann der Host das Spiel erst starten, wenn der
 Standort erlaubt ist; zum Ausprobieren gibt es **Ohne Standort fortfahren (Simulationsmodus)**.
+
+## Checkliste vor dem Spiel
+
+In der Lobby zeigt eine Checkliste jeder Person, ob das Gerät bereit ist: Standortfreigabe,
+Alarm und Benachrichtigungen, Installation als App sowie ein Hinweis auf Akku und
+Bildschirm-Sperre. Dazu warnt sie vor Problemen bei Gruppe und Einstellungen, zum Beispiel
+getrennten Mitspielenden, fehlendem Detektiv, sehr kleinem oder sehr großem Spielgebiet und
+fehlendem Vorsprung. Gibt es Warnungen, fragt die App den Host beim Start noch einmal nach;
+ohne X lässt sich das Spiel weiterhin nicht starten.
 
 ## Spiel erstellen
 
@@ -50,7 +59,9 @@ Karte ausprobieren.
 - **Detektive** sehen die Karte, die letzte Sichtung und – je nach Einstellung – die Standorte der
   anderen Detektive. Ein Fang ist je nach Regel automatisch im Fangradius oder per Foto-Fang
   möglich.
-- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht.
+- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht. Bei neuen Nachrichten
+  erscheint bei geschlossenem Chat ein Popup. Ist der Alarm aktiviert und die App im Hintergrund,
+  meldet sich zusätzlich eine Benachrichtigung.
 - Detektive können sich per [Funk](Detektiv-Funk.md) unterhalten, ohne dass X mithört.
 
 ## Spielende

@@ -37,6 +37,7 @@
     "enable": "Turn alert on"
   },
   "notifications": {
+    "chatTitle": "{{name}} in the chat",
     "surrenderTitle": "X gave up",
     "surrenderBody": "{{name}} gave up the game. The live location was shared.",
     "positionLiveTitle": "Warning: location is being shared",
@@ -257,7 +258,37 @@
     "playAreaDrawn": "Custom play area with {{count}} corner points drawn.",
     "playAreaDraw": "Draw play area on the map",
     "playAreaEdit": "Edit play area",
-    "playAreaUseCircle": "Use circle again"
+    "playAreaUseCircle": "Use circle again",
+    "checklist": {
+      "title": "Pre-game checklist",
+      "location": "Location access granted",
+      "notifications": "Alerts and notifications allowed",
+      "notificationsHint": "Without them you miss reveals while the screen is off.",
+      "install": "App installed on the home screen",
+      "installHint": "Installed, the app runs more reliably in the background.",
+      "installHintIos": "Tap the share icon, then Add to Home Screen.",
+      "screen": "Battery charged, screen lock set generously",
+      "screenHint": "GPS and screen use a lot of power during a round.",
+      "status": {
+        "ok": "Done: ",
+        "warn": "Warning: ",
+        "info": "Note: "
+      },
+      "checks": {
+        "noX": "No X has been chosen yet.",
+        "noDetective": "There is no detective, nobody is chasing X.",
+        "disconnected": "{{count}} players currently not connected: {{names}}.",
+        "areaSmall": "The play area is very small (about {{meters}} m radius).",
+        "areaLarge": "The play area is very large (about {{meters}} m radius).",
+        "noHeadStart": "X has no head start."
+      }
+    },
+    "startConfirm": {
+      "title": "Start anyway?",
+      "text": "These points came up before the start:",
+      "go": "Start anyway",
+      "back": "Back"
+    }
   },
   "game": {
     "phase": {
@@ -278,6 +309,10 @@
     "surrenderLive": "The exact live location was transmitted to the detectives.",
     "surrenderNoPosition": "No location was available.",
     "openInOsm": "Open location on OpenStreetMap ↗",
+    "markers": {
+      "suspect": "Mark suspect",
+      "clear": "Mark not here"
+    },
     "inactivity": {
       "label": "Radio silence:",
       "other": "No position has come in from {{name}} for {{minutes}} minutes. Check in with {{name}}.",
@@ -361,7 +396,6 @@
       "street": "Map: © <ofm>OpenFreeMap</ofm> · © OpenMapTiles · Data from <osm>OpenStreetMap</osm>"
     },
     "chooseObjective": "Choose target on map",
-    "cancelChoosing": "Tap the map · Cancel",
     "simulationMode": "Simulation mode",
     "enableGps": "Enable GPS",
     "emergency": "Emergency",
@@ -409,7 +443,15 @@
       "noRevealText": "Wait for the first reveal and stay near the area.",
       "defaultTitle": "Game running.",
       "defaultText": "Stay ready."
-    }
+    },
+    "actions": {
+      "title": "Actions"
+    },
+    "pickHint": {
+      "marker": "Tap the map to place the marker.",
+      "objective": "Tap the map to set the target."
+    },
+    "pickCancel": "Cancel"
   },
   "map": {
     "satellite": "Satellite",
@@ -418,6 +460,10 @@
     "showStreetMap": "Show street map",
     "objective": "Mission target",
     "start": "Start",
+    "markerSuspect": "Suspect",
+    "markerClear": "Not here",
+    "markerPopup": "{{label}} by {{name}} at {{time}}",
+    "markerRemove": "Remove",
     "pingLabel": "Ping {{index}}",
     "pingPopup": "Ping {{index}} at {{time}}",
     "startPoint": "Starting point",
@@ -434,6 +480,8 @@
     "LOBBY_ONLY": "Settings can only be changed in the lobby.",
     "INVALID_START_POINT": "The starting point is invalid.",
     "CHAT_RATE_LIMIT": "Please write more slowly.",
+    "HUMAN_CHECK_REQUIRED": "Please confirm that you are human first. Reload the page and try again.",
+    "ABUSE_DISCONNECT": "The connection was closed because of too many invalid requests. Reload the page to rejoin.",
     "NEED_X": "At least one X is needed to start.",
     "REVEAL_DEFERRED": "Location ping postponed: X's GPS is currently unavailable.",
     "OUT_OF_BOUNDS_WARNING": "You are outside the play area – return immediately.",
@@ -471,6 +519,8 @@
   },
   "onboarding": {
     "progress": "Step {{step}} of {{total}}",
+    "languageTitle": "Choose your language",
+    "languageText": "Which language do you want to use Fang X in? You can change it later in the menu.",
     "welcomeTitle": "Welcome to Fang X",
     "welcomeText": "Fang X is an outdoor GPS chase game. Here is how it works:",
     "welcomeCreate": "One person creates a game and shares the code or the invite link.",

@@ -11,7 +11,7 @@ import {
 import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { useEffect, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { LatLng, ObjectiveState, RevealEvent } from "@fang-x/shared";
+import type { LatLng, ObjectiveState, RevealEvent, TeamMarker } from "@fang-x/shared";
 import { circlePolygon } from "@fang-x/shared";
 import type { Feature, Polygon } from "geojson";
 import i18n from "../i18n";
@@ -217,6 +217,9 @@ interface MapViewProps {
   /** Bisherige Pings von X (nur für X selbst) — nummerierte Marker mit Radius. */
   pingHistory?: RevealEvent[];
   objective: ObjectiveState | null;
+  /** Markierungen der Detektive; X bekommt keine. */
+  teamMarkers?: TeamMarker[];
+  onRemoveTeamMarker?: (id: number) => void;
   /** Treffpunkt/Startpunkt des Spiels — bleibt dauerhaft sichtbar. */
   startPoint: LatLng | null;
   onMapClick?: (pos: LatLng) => void;
@@ -231,6 +234,8 @@ export function MapView({
   lastReveal,
   pingHistory = [],
   objective,
+  teamMarkers = [],
+  onRemoveTeamMarker,
   startPoint,
   onMapClick,
   onSatelliteChange,
@@ -241,6 +246,9 @@ export function MapView({
   const objectiveMarkerRef = useRef<Marker | null>(null);
   const startMarkerRef = useRef<Marker | null>(null);
   const pingMarkersRef = useRef<Marker[]>([]);
+  const teamMarkersRef = useRef<Marker[]>([]);
+  const onRemoveTeamMarkerRef = useRef(onRemoveTeamMarker);
+  onRemoveTeamMarkerRef.current = onRemoveTeamMarker;
   const onMapClickRef = useRef(onMapClick);
   onMapClickRef.current = onMapClick;
   const onSatelliteChangeRef = useRef(onSatelliteChange);
@@ -425,6 +433,48 @@ export function MapView({
         .addTo(map);
     });
   }, [pingHistory]);
+
+  // Markierungen der Detektive
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    for (const marker of teamMarkersRef.current) marker.remove();
+    teamMarkersRef.current = teamMarkers.map((entry) => {
+      const suspect = entry.kind === "SUSPECT";
+      const label = i18n.t(suspect ? "map.markerSuspect" : "map.markerClear");
+      const el = document.createElement("div");
+      el.textContent = suspect ? "?" : "×";
+      el.setAttribute("aria-label", label);
+      el.style.width = "24px";
+      el.style.height = "24px";
+      el.style.display = "grid";
+      el.style.placeItems = "center";
+      el.style.borderRadius = "6px";
+      el.style.border = "2px solid white";
+      el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
+      el.style.background = suspect ? "#f59e0b" : "#64748b";
+      el.style.color = "white";
+      el.style.fontSize = "16px";
+      el.style.fontWeight = "700";
+      const time = new Date(entry.at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const content = document.createElement("div");
+      content.className = "marker-popup";
+      const text = document.createElement("p");
+      text.textContent = i18n.t("map.markerPopup", { label, name: entry.by, time });
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = i18n.t("map.markerRemove");
+      remove.addEventListener("click", () => onRemoveTeamMarkerRef.current?.(entry.id));
+      content.append(text, remove);
+      return new Marker({ element: el })
+        .setLngLat([entry.pos.lng, entry.pos.lat])
+        .setPopup(new Popup({ closeButton: false }).setDOMContent(content))
+        .addTo(map);
+    });
+  }, [teamMarkers]);
 
   // Spieler-Marker aktualisieren
   useEffect(() => {

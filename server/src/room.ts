@@ -34,6 +34,8 @@ import {
   type RtcSignal,
   type Ruleset,
   type ServerMessage,
+  WS_CLOSE_ABUSE,
+  type TeamMarker,
 } from "@fang-x/shared";
 
 const PLAYER_COLORS = [
@@ -75,10 +77,15 @@ const MESSAGES_PER_SECOND = 10;
 /** Chat zusätzlich drosseln: höchstens CHAT_BURST Nachrichten je CHAT_WINDOW_MS. */
 const CHAT_BURST = 5;
 const CHAT_WINDOW_MS = 5_000;
+/** Missbrauch: Verstöße zählen innerhalb eines Zeitfensters, ab der Schwelle wird getrennt. */
+const ABUSE_THRESHOLD = 20;
+const ABUSE_WINDOW_MS = 60_000;
 /** Tick-Abstand: 1 s, solange Live-Standort, Gebietsfrist oder Fang-Bestätigung laufen. */
 const TICK_FAST_MS = 1_000;
 const TICK_IDLE_MS = 5_000;
 
+/** Team-Markierungen: höchstens so viele gleichzeitig, die ältesten fallen heraus. */
+const MAX_TEAM_MARKERS = 20;
 /**
  * Inaktivität: Keine Positionsmeldung seit zwei Reveal-Intervallen, mindestens 5 und höchstens
  * 30 Minuten. Bei Zufallsintervall gilt ein fester Wert.
@@ -199,6 +206,9 @@ export class GameRoom {
   private endDetail: EndDetail | null = null;
   private surrenderInfo: SurrenderInfo | null = null;
   private transitStops = { bus: 0, train: 0 };
+  /** Nur im Arbeitsspeicher; wird weder gespeichert noch nach der Runde behalten. */
+  private teamMarkers: TeamMarker[] = [];
+  private nextMarkerId = 1;
   private safe = new Set<string>();
   private closestApproachMeters: number | null = null;
   private endStats: GameStats | null = null;
@@ -505,14 +515,47 @@ export class GameRoom {
     let tokensAt = Date.now();
     const chatTimes: number[] = [];
 
+    // Wer die Verbindung mit Müll flutet, wird getrennt. Ein einzelner Ausrutscher
+    // (etwa ein Chat-Limit) bleibt folgenlos, die Zähler verfallen nach einer Minute.
+    let dropped = false;
+    let strikes = 0;
+    let strikesSince = Date.now();
+    const strike = (weight: number): boolean => {
+      const now = Date.now();
+      if (now - strikesSince > ABUSE_WINDOW_MS) {
+        strikes = 0;
+        strikesSince = now;
+      }
+      strikes += weight;
+      if (strikes < ABUSE_THRESHOLD) return false;
+      // Nicht "closed" setzen: der Platz soll beim Trennen normal als offline gelten.
+      dropped = true;
+      this.sendTo(ws, {
+        t: "error",
+        message: "Verbindung wegen zu vieler fehlerhafter Anfragen getrennt.",
+        code: "ABUSE_DISCONNECT",
+      });
+      try {
+        ws.close(WS_CLOSE_ABUSE, "Missbrauch");
+      } catch {
+        // Verbindung war schon weg.
+      }
+      return true;
+    };
+
     ws.addEventListener("message", (event) => {
+      if (dropped) return;
       const now = Date.now();
       tokens = Math.min(MESSAGE_BURST, tokens + ((now - tokensAt) / 1000) * MESSAGES_PER_SECOND);
       tokensAt = now;
-      if (tokens < 1) return;
+      if (tokens < 1) {
+        strike(1);
+        return;
+      }
       tokens -= 1;
 
       if (typeof event.data !== "string" || event.data.length > MAX_MESSAGE_BYTES) {
+        if (strike(2)) return;
         this.sendTo(ws, { t: "error", message: "Nachricht zu groß.", code: "MESSAGE_TOO_LARGE" });
         return;
       }
@@ -521,6 +564,7 @@ export class GameRoom {
       try {
         msg = JSON.parse(event.data);
       } catch {
+        if (strike(2)) return;
         this.sendTo(ws, { t: "error", message: "Ungültiges JSON", code: "INVALID_JSON" });
         return;
       }
@@ -609,6 +653,7 @@ export class GameRoom {
           this.sendTo(ws, this.phaseMessage());
           this.sendTo(ws, this.revealTimerMessage());
           this.sendObjective(player);
+          this.sendMarkers(player);
           // Detektiv-Standorte nachliefern, soweit dieser Spieler sie sehen darf.
           for (const other of this.players.values()) {
             if (!other.position || !this.canSeeDetectivePosition(player, other)) continue;
@@ -695,6 +740,7 @@ export class GameRoom {
           const cutoff = Date.now() - CHAT_WINDOW_MS;
           while (chatTimes.length > 0 && chatTimes[0] < cutoff) chatTimes.shift();
           if (chatTimes.length >= CHAT_BURST) {
+            if (strike(2)) break;
             this.sendTo(ws, {
               t: "error",
               message: "Bitte langsamer schreiben.",
@@ -722,6 +768,14 @@ export class GameRoom {
         }
         case "surrender": {
           this.surrender(player);
+          break;
+        }
+        case "addMarker": {
+          this.addTeamMarker(player, msg.pos, msg.kind);
+          break;
+        }
+        case "removeMarker": {
+          this.removeTeamMarker(player, msg.id);
           break;
         }
         case "confirmSafe": {
@@ -941,6 +995,7 @@ export class GameRoom {
     this.lastRevealAt = 0;
     this.nextRevealAt = null;
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.transitStops = { bus: 0, train: 0 };
     this.safe.clear();
     this.closestApproachMeters = null;
@@ -1395,6 +1450,58 @@ export class GameRoom {
     return this.playAreaCenter;
   }
 
+  private canUseMarkers(player: Player | null): player is Player {
+    return (
+      !!player &&
+      player.role !== "X" &&
+      player.role !== "HOST" &&
+      (this.phase === "HEADSTART" || this.phase === "RUNNING")
+    );
+  }
+
+  private addTeamMarker(player: Player | null, pos: LatLng, kind: TeamMarker["kind"]) {
+    if (!this.canUseMarkers(player)) return;
+    if (kind !== "SUSPECT" && kind !== "CLEAR") return;
+    if (!isValidPosition(pos)) return;
+    this.teamMarkers.push({
+      id: this.nextMarkerId++,
+      pos: { lat: pos.lat, lng: pos.lng },
+      kind,
+      by: player.name,
+      at: Date.now(),
+    });
+    if (this.teamMarkers.length > MAX_TEAM_MARKERS) {
+      this.teamMarkers.splice(0, this.teamMarkers.length - MAX_TEAM_MARKERS);
+    }
+    this.broadcastMarkers();
+  }
+
+  private removeTeamMarker(player: Player | null, id: unknown) {
+    if (!this.canUseMarkers(player) || typeof id !== "number") return;
+    const before = this.teamMarkers.length;
+    this.teamMarkers = this.teamMarkers.filter((m) => m.id !== id);
+    if (this.teamMarkers.length !== before) this.broadcastMarkers();
+  }
+
+  /** Markierungen sehen nur Detektive; X und der Host in der Lobby bekommen nichts. */
+  private sendMarkers(player: Player) {
+    if (player.role === "X" || this.teamMarkers.length === 0) return;
+    this.sendTo(player.ws, { t: "markers", markers: this.teamMarkers });
+  }
+
+  private broadcastMarkers() {
+    for (const p of this.players.values()) {
+      if (p.role === "X") continue;
+      this.sendTo(p.ws, { t: "markers", markers: this.teamMarkers });
+    }
+  }
+
+  private clearTeamMarkers() {
+    if (this.teamMarkers.length === 0) return;
+    this.teamMarkers = [];
+    this.broadcastMarkers();
+  }
+
   /** Akku niedrig: alle erfahren es einmalig, damit niemand unbemerkt ausfällt. */
   private warnBatteryLow(player: Player | null, level: unknown) {
     if (!player || (this.phase !== "HEADSTART" && this.phase !== "RUNNING")) return;
@@ -1532,6 +1639,7 @@ export class GameRoom {
       player.statPos = null;
     }
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.broadcastPhase();
     this.lastActiveAt = Date.now();
     this.persist();
@@ -1696,6 +1804,7 @@ export class GameRoom {
     this.lastRevealIndex = 0;
     this.lastRevealAt = 0;
     this.xPositions.length = 0;
+    this.clearTeamMarkers();
     this.stopTick();
   }
 

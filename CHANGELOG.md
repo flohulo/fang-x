@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.9.0...fang-x-v0.10.0) (2026-11-12)
+
+
+### Features
+
+* alle-sicher-abfrage und funkstille-warnung ergänzen ([#72](https://github.com/flohulo/fang-x/issues/72)) ([332b2ff](https://github.com/flohulo/fang-x/commit/332b2ffcc5ccb70f09de9127c1c45e17605486ce))
+* changelog nach app-update automatisch öffnen ([#80](https://github.com/flohulo/fang-x/issues/80)) ([1437437](https://github.com/flohulo/fang-x/commit/1437437c69ece544bfb5901d48788dea89d63d2f))
+* checkliste und warnungen vor dem spiel ([#70](https://github.com/flohulo/fang-x/issues/70)) ([0b61154](https://github.com/flohulo/fang-x/commit/0b6115459e0dce3267272cb4a00a7e8020fcde28))
+* team-markierungen für detektive ergänzen ([#75](https://github.com/flohulo/fang-x/issues/75)) ([c8b454e](https://github.com/flohulo/fang-x/commit/c8b454e2f12fb029a1297a5895fcf132ad6a1d48))
+
 ## [0.9.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.8.0...fang-x-v0.9.0) (2026-11-10)
 
 

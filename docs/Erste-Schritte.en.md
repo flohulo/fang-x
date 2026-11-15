@@ -1,5 +1,14 @@
 # Getting started
 
+## Pre-game checklist
+
+In the lobby a checklist shows everyone whether their device is ready: location access,
+alerts and notifications, installation as an app, and a reminder about battery and screen
+lock. It also warns about problems with the group and settings, for example disconnected
+players, no detective, a very small or very large play area, and no head start. If there are
+warnings, the app asks the host to confirm when starting; without an X the game still cannot
+be started.
+
 ## Creating a game
 
 One person creates a new game on the start page. They become the host and play as X by default.
@@ -35,7 +44,9 @@ your location. Without GPS you can try out the game in **simulation mode** on th
 - **Detectives** see the map, the last reveal and – depending on the settings – the locations of
   the other detectives. Depending on the rule, a catch happens automatically within the catch
   radius or via a photo catch.
-- Everyone can write in the chat. The history is deleted after the game ends.
+- Everyone can write in the chat. The history is deleted after the game ends. New messages show a
+  popup while the chat is closed. If alerts are enabled and the app is in the background, you also
+  get a notification.
 - Detectives can talk over the [radio](Detektiv-Funk.md) without X listening in.
 
 ## End of the game
