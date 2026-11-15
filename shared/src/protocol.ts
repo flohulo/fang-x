@@ -24,7 +24,7 @@ export type MessageParams = Record<string, string | number>;
 
 // --- Sprachfunk (WebRTC) ---
 
-/** Signalisierung für den Detektiv-Funk. Der Server leitet sie nur zwischen Detektiven weiter. */
+/** Signalisierung für den Sprechfunk der Detektive. Der Server leitet sie nur zwischen Detektiven weiter. */
 export type RtcSignal =
   | { kind: "hello"; reply: boolean }
   | { kind: "offer"; sdp: string }
@@ -71,7 +71,7 @@ export type ClientMessage =
       count?: number;
     }
   | { t: "chat"; text: string }
-  /** Funk-Signal an einen Detektiv (`to`) oder, ohne `to`, an alle anderen Detektive. */
+  /** Sprechfunk-Signal an einen Detektiv (`to`) oder, ohne `to`, an alle anderen Detektive. */
   | { t: "rtc"; to?: string; signal: RtcSignal }
   | { t: "reportCatch" }
   | { t: "resolveCatch"; caught: boolean }
@@ -161,7 +161,7 @@ export type ServerMessage =
       chat: ChatMessage[];
       catchPending: boolean;
       youAreHost: boolean;
-      /** ICE-Server (STUN/TURN) für den Detektiv-Funk. */
+      /** ICE-Server (STUN/TURN) für den Sprechfunk. */
       iceServers?: RtcIceServer[];
     }
   | { t: "players"; players: PlayerInfo[] }

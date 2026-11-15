@@ -62,7 +62,8 @@ Karte ausprobieren.
 - Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht. Bei neuen Nachrichten
   erscheint bei geschlossenem Chat ein Popup. Ist der Alarm aktiviert und die App im Hintergrund,
   meldet sich zusätzlich eine Benachrichtigung.
-- Detektive können sich per [Funk](Detektiv-Funk.md) unterhalten, ohne dass X mithört.
+- Detektive können sich per [Sprechfunk](Sprechfunk.md) unterhalten, ohne dass X mithört. Der Host
+  schaltet ihn in den Einstellungen ein.
 
 ## Spielende
 

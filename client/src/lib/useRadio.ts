@@ -23,7 +23,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2_000;
 
 /**
- * Detektiv-Funk: Push-to-talk über WebRTC, direkt zwischen den Detektiven (Mesh).
+ * Sprechfunk der Detektive: Push-to-talk über WebRTC, direkt zwischen den Detektiven (Mesh).
  * Der Server leitet nur die Signalisierung weiter. Wer zuerst "kleiner" ist (ID),
  * schickt das Angebot, damit sich beide nie gleichzeitig anbieten.
  */

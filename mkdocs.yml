@@ -47,7 +47,7 @@ nav:
       - Spielgebiet: Spielgebiet.md
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
-  - Detektiv-Funk: Detektiv-Funk.md
+  - Sprechfunk: Sprechfunk.md
   - Team-Markierungen: Team-Markierungen.md
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
   - Akku-Warnung: Akku-Warnung.md
@@ -104,7 +104,7 @@ plugins:
             Spielgebiet: Play area
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
-            Detektiv-Funk: Detective radio
+            Sprechfunk: Voice radio
             Team-Markierungen: Team markers
             Alle sicher und Funkstille: Everyone safe and radio silence
             Akku-Warnung: Low battery warning

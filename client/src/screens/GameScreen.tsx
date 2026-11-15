@@ -879,7 +879,7 @@ export function GameScreen({
         </div>
 
         <ChatPanel messages={chatMessages} myId={myId} onSend={onSendChat} />
-        {!isX && (phase === "HEADSTART" || phase === "RUNNING") && (
+        {!isX && !!ruleset?.radio.enabled && (phase === "HEADSTART" || phase === "RUNNING") && (
           <RadioPanel
             myId={myId}
             players={players}

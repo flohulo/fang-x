@@ -47,7 +47,8 @@ your location. Without GPS you can try out the game in **simulation mode** on th
 - Everyone can write in the chat. The history is deleted after the game ends. New messages show a
   popup while the chat is closed. If alerts are enabled and the app is in the background, you also
   get a notification.
-- Detectives can talk over the [radio](Detektiv-Funk.md) without X listening in.
+- Detectives can talk over the [voice radio](Sprechfunk.md) without X listening in. The host turns
+  it on in the settings.
 
 ## End of the game
 

@@ -2,7 +2,9 @@ import type { RtcIceServer, RtcSignal } from "@fang-x/shared";
 import { type KeyboardEvent, type PointerEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { PlayerView, RtcHandler } from "../lib/useGame";
+import { useMicrophonePermission } from "../lib/useMicrophonePermission";
 import { useRadio } from "../lib/useRadio";
+import { MicrophoneGuide } from "./MicrophoneAccess";
 
 interface RadioPanelProps {
   myId: string | null;
@@ -12,7 +14,7 @@ interface RadioPanelProps {
   onSubscribeRtc: (handler: RtcHandler) => () => void;
 }
 
-/** Detektiv-Funk: Push-to-talk, nur für Detektive und nur während der Runde. */
+/** Sprechfunk: Push-to-talk, nur für Detektive, nur während der Runde und nur wenn der Host ihn aktiviert hat. */
 export function RadioPanel({
   myId,
   players,
@@ -29,6 +31,11 @@ export function RadioPanel({
     sendRtc: onSendRtc,
     subscribeRtc: onSubscribeRtc,
   });
+
+  const microphone = useMicrophonePermission();
+  // Blockiert, wenn der Browser es meldet oder die Anfrage gerade abgelehnt wurde.
+  const blocked = microphone.state === "denied" || radio.error === "denied";
+  const unsupported = microphone.state === "unsupported" || radio.error === "unsupported";
 
   const others = players.filter((p) => p.id !== myId && p.role !== "X");
   const nameOf = (id: string) => players.find((p) => p.id === id)?.name ?? "";
@@ -85,15 +92,19 @@ export function RadioPanel({
           {!radio.active ? (
             <>
               <p className="radio-text">{t("radio.intro")}</p>
-              {radio.error && (
+              {unsupported ? (
                 <p className="radio-error" role="alert">
-                  {t(`radio.error.${radio.error}`)}
+                  {t("radio.error.unsupported")}
                 </p>
+              ) : blocked ? (
+                <MicrophoneGuide busy={false} onRetry={() => void radio.start()} />
+              ) : (
+                <button type="button" onClick={() => void radio.start()}>
+                  {t("radio.start")}
+                </button>
               )}
-              <button type="button" onClick={() => void radio.start()}>
-                {t("radio.start")}
-              </button>
               <small className="chat-hint">{t("radio.privacy")}</small>
+              <small className="chat-hint">{t("radio.output")}</small>
             </>
           ) : (
             <>

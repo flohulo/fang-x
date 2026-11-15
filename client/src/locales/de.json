@@ -112,21 +112,21 @@
     "hint": "Chat der laufenden Runde – nach Spielende wird er gelöscht."
   },
   "radio": {
-    "title": "Funk",
-    "open": "Funk öffnen",
-    "close": "Funk schließen",
+    "title": "Sprechfunk",
+    "open": "Sprechfunk öffnen",
+    "close": "Sprechfunk schliessen",
     "onlyDetectives": "Nur für Detektive",
-    "intro": "Sprich per Knopfdruck mit den anderen Detektiven. X hört nichts mit.",
-    "start": "Funk einschalten",
-    "stop": "Funk ausschalten",
+    "intro": "Sprich per Knopfdruck mit den anderen Detektiven. X hört nichts mit. Beim Einschalten fragt dein Browser nach dem Mikrofon.",
+    "start": "Sprechfunk einschalten",
+    "stop": "Sprechfunk ausschalten",
     "hold": "Zum Sprechen gedrückt halten",
     "transmitting": "Du sendest …",
     "speaking": "Es spricht: {{names}}",
     "linked": "Verbunden mit {{linked}} von {{total}} Detektiven",
     "privacy": "Der Ton läuft direkt zwischen den Geräten der Detektive. Zum Verbindungsaufbau sehen sich die Geräte gegenseitig ihre IP-Adressen und fragen einen STUN-Server (standardmäßig von Cloudflare) danach. Es wird nichts aufgezeichnet.",
+    "output": "Der Ton kommt über den Ausgang, den dein Gerät gerade nutzt: Lautsprecher, Kopfhörer oder Bluetooth. Die App wählt ihn nicht selbst.",
     "error": {
-      "unsupported": "Dein Browser unterstützt keinen Funk.",
-      "denied": "Ohne Zugriff auf das Mikrofon kannst du den Funk nicht nutzen. Erlaube ihn in den Browser-Einstellungen."
+      "unsupported": "Dein Browser oder dein Gerät unterstützt den Sprechfunk nicht. Es fehlt das Mikrofon oder die Verbindungstechnik (WebRTC)."
     }
   },
   "lobby": {
@@ -161,6 +161,7 @@
     "rolesFromLobby": "Die Rollen ergeben sich direkt aus den Mitspielern in der Lobby.",
     "detectivesWait": "Detektive warten während des Vorsprungs und senden keinen Standort",
     "detectivesShareLive": "Detektive teilen während des Spiels gegenseitig ihren Live-Standort",
+    "radio": "Sprechfunk für Detektive aktivieren (Mikrofon nötig)",
     "xSeesDetectives": "X sieht Detektive",
     "xSees": {
       "ALWAYS": "Immer – Live-Standort der Detektive",
@@ -262,6 +263,8 @@
     "checklist": {
       "title": "Checkliste vor dem Spiel",
       "location": "Standortfreigabe erteilt",
+      "microphone": "Mikrofon für den Sprechfunk erlaubt",
+      "microphoneHint": "Ohne Mikrofon kannst du im Sprechfunk nicht sprechen. Erlaube es hier in der Lobby, dann fragt der Browser nicht mitten im Spiel.",
       "notifications": "Alarm und Benachrichtigungen erlaubt",
       "notificationsHint": "Ohne sie verpasst du Sichtungen, wenn der Bildschirm aus ist.",
       "install": "App auf dem Startbildschirm installiert",
@@ -554,6 +557,20 @@
     "android2": "Setze die Berechtigung \"Standort\" auf \"Zulassen\".",
     "ios1": "Öffne Einstellungen > Datenschutz & Sicherheit > Ortungsdienste und schalte sie ein.",
     "ios2": "Wähle dort Safari-Websites (oder Fang X, falls installiert) und stelle \"Beim Verwenden der App\" ein.",
+    "reload": "Kehre zu Fang X zurück und tippe auf \"Erneut prüfen\".",
+    "retry": "Erneut prüfen"
+  },
+  "microphoneAccess": {
+    "title": "Mikrofon für den Sprechfunk",
+    "text": "Der Host hat den Sprechfunk aktiviert. Erlaube das Mikrofon jetzt, damit du in der Runde nicht danach gefragt wirst. Es ist nur offen, solange du den Sprechknopf hältst.",
+    "allow": "Mikrofon erlauben",
+    "unsupported": "Dieses Gerät oder diese Verbindung unterstützt keinen Sprechfunk. Du kannst trotzdem mitspielen und im Chat schreiben."
+  },
+  "microphoneGuide": {
+    "intro": "Der Mikrofonzugriff ist blockiert. So gibst du ihn wieder frei:",
+    "android1": "Tippe in der Adressleiste auf das Symbol neben der Adresse (Schloss) und öffne die Website-Einstellungen.",
+    "android2": "Setze die Berechtigung \"Mikrofon\" auf \"Zulassen\".",
+    "ios": "Öffne Einstellungen > Safari > Mikrofon und wähle \"Fragen\" oder \"Erlauben\".",
     "reload": "Kehre zu Fang X zurück und tippe auf \"Erneut prüfen\".",
     "retry": "Erneut prüfen"
   },

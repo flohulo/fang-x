@@ -1726,12 +1726,13 @@ export class GameRoom {
   }
 
   /**
-   * Leitet Funk-Signale nur zwischen Detektiven weiter, solange die Runde läuft.
+   * Leitet Sprechfunk-Signale nur zwischen Detektiven weiter, solange die Runde läuft und der Host
+   * den Sprechfunk aktiviert hat.
    * X bekommt nie ein Signal und kann keines senden. Inhalte (SDP, Kandidaten)
    * werden nicht geloggt, weil sie IP-Adressen enthalten.
    */
   private relayRtc(player: Player | null, to: unknown, signal: unknown) {
-    if (!player || player.role === "X") return;
+    if (!player || player.role === "X" || !this.ruleset.radio.enabled) return;
     if (this.phase !== "HEADSTART" && this.phase !== "RUNNING") return;
     const clean = sanitizeRtcSignal(signal);
     if (!clean) return;
