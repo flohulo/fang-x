@@ -48,6 +48,7 @@ nav:
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
   - Sprechfunk: Sprechfunk.md
+  - Funkdisziplin: Funkdisziplin.md
   - Team-Markierungen: Team-Markierungen.md
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
   - Akku-Warnung: Akku-Warnung.md
@@ -105,6 +106,7 @@ plugins:
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
             Sprechfunk: Voice radio
+            Funkdisziplin: Radio discipline
             Team-Markierungen: Team markers
             Alle sicher und Funkstille: Everyone safe and radio silence
             Akku-Warnung: Low battery warning

@@ -32,6 +32,7 @@ playing outdoors.
 | :material-flag-checkered: [Bonus mission for X](Bonusmission-fuer-X.md) | An extra goal for X |
 | :material-alert-octagon: [Emergency button](Notfall-Knopf.md) | Ending the round and sharing the location |
 | :material-microphone: [Voice radio](Sprechfunk.md) | Voice radio between detectives |
+| :material-radio-handheld: [Radio discipline](Funkdisziplin.md) | How to use the radio: rules and radio language |
 
 ## Playing safely
 

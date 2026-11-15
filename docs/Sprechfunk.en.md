@@ -9,6 +9,8 @@
 With the voice radio, detectives talk to each other without X hearing anything. The chat is not
 affected: it is still visible to everyone.
 
+How to behave on the radio is described in [Radio discipline and radio language](Funkdisziplin.md).
+
 ## Turning it on
 
 The host turns the voice radio on in the lobby: **Enable voice radio for detectives**. It is off by
