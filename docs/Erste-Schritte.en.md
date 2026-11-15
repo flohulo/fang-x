@@ -68,3 +68,9 @@ When a new version is available, the app asks whether to reload. After **Reload*
 history (changelog) opens automatically so you can see what is new. The back link takes you to
 the home screen at any time, where a running game is resumed. You can also find the changelog in
 the menu and via the version number on the home screen.
+
+## Status and news
+
+The [status page](https://flohulo.github.io/fang-x-status/) shows whether the server is running,
+whether there is a known outage and what is new. You can also find it in the menu under
+**Help > Status and news**.

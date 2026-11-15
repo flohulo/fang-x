@@ -89,3 +89,9 @@ laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerun
 über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
 aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
 Startseite.
+
+## Status und Neuigkeiten
+
+Ob der Server gerade läuft, ob eine Störung bekannt ist und was es Neues gibt, siehst du auf der
+[Statusseite](https://flohulo.github.io/fang-x-status/). Du findest sie auch im Menü unter
+**Hilfe > Status und Neuigkeiten**.
