@@ -98,6 +98,10 @@ export interface Ruleset {
   objective: {
     enabled: boolean;
   };
+  /** Sprechfunk (Push-to-talk) zwischen den Detektiven. */
+  radio: {
+    enabled: boolean;
+  };
   privacy: {
     locationRetention: "DELETE_AFTER_GAME" | "KEEP_24H" | "KEEP_7D";
     replayEnabled: boolean;
@@ -179,6 +183,9 @@ export const DEFAULT_RULESET: Ruleset = {
     detectiveOutOfBoundsPenalty: "NONE",
   },
   objective: {
+    enabled: false,
+  },
+  radio: {
     enabled: false,
   },
   privacy: {
@@ -443,6 +450,9 @@ export function mergeRuleset(partial?: unknown): Ruleset {
     },
     objective: {
       enabled: bool(p.objective?.enabled, d.objective.enabled),
+    },
+    radio: {
+      enabled: bool(p.radio?.enabled, d.radio.enabled),
     },
     privacy: {
       locationRetention: oneOf(

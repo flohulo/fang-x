@@ -118,6 +118,12 @@ Der Notfall-Knopf erscheint für X während Vorsprung und Laufzeit in der Karten
 
 X setzt das Ziel auf der Karte. Es muss innerhalb des Spielgebiets und mindestens 25–100 m vom aktuellen X-Standort entfernt liegen (abhängig von der Gebietsgröße). X sollte nur einen sicheren, öffentlichen und erreichbaren Ort wählen. Zielkoordinaten werden nicht in der Durable-Object-Persistenz gespeichert; nach einem Serverneustart wird ein noch offenes Ziel erneut wählbar.
 
+### 3.4a Sprechfunk
+
+| Key | Typ | Default | Bedeutung |
+|---|---|---|---|
+| `radio.enabled` | bool | false | Sprechfunk (Push-to-talk, WebRTC) zwischen den Detektiven. X hört und sieht ihn nicht. Der Server leitet nur die Signalisierung weiter und nur, wenn die Option aktiv ist. |
+
 ### 3.5 Bewegung & Verkehrsmittel
 
 Das Original erlaubt Wahl zwischen „zu Fuß" und „Bus & Bahn" — wir parametrisieren es:

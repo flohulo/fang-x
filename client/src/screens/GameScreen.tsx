@@ -4,6 +4,8 @@ import type {
   LatLng,
   ObjectiveState,
   RevealEvent,
+  RtcIceServer,
+  RtcSignal,
   Ruleset,
   TeamMarker,
 } from "@fang-x/shared";
@@ -12,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { ChatPanel } from "../components/ChatPanel";
+import { RadioPanel } from "../components/RadioPanel";
 import { MapView } from "../components/MapView";
 import {
   buildSettingsExport,
@@ -21,7 +24,7 @@ import {
 import { formatEndReason } from "../lib/serverMessages";
 import { useBatteryWarning } from "../lib/useBatteryWarning";
 import { useGeolocation } from "../lib/useGeolocation";
-import type { GameResult, PlayerView } from "../lib/useGame";
+import type { GameResult, PlayerView, RtcHandler } from "../lib/useGame";
 
 interface GameScreenProps {
   teamMarkers: TeamMarker[];
@@ -56,6 +59,7 @@ interface GameScreenProps {
     indeterminate: boolean;
   } | null;
   chatMessages: ChatMessage[];
+  iceServers: RtcIceServer[];
   catchPending: boolean;
   serverError: string | null;
   yourPositionIsShared: boolean;
@@ -64,6 +68,8 @@ interface GameScreenProps {
   onSetObjective: (target: LatLng) => void;
   onUseTransitStop: (mode: "bus" | "train", count: number) => void;
   onSendChat: (text: string) => void;
+  onSendRtc: (signal: RtcSignal, to?: string) => void;
+  onSubscribeRtc: (handler: RtcHandler) => () => void;
   onReportCatch: () => void;
   onResolveCatch: (caught: boolean) => void;
   onSurrender: () => void;
@@ -166,6 +172,7 @@ export function GameScreen({
   onBatteryLow,
   revealTimer,
   chatMessages,
+  iceServers,
   catchPending,
   serverError,
   yourPositionIsShared,
@@ -174,6 +181,8 @@ export function GameScreen({
   onSetObjective,
   onUseTransitStop,
   onSendChat,
+  onSendRtc,
+  onSubscribeRtc,
   onReportCatch,
   onResolveCatch,
   onSurrender,
@@ -870,6 +879,15 @@ export function GameScreen({
         </div>
 
         <ChatPanel messages={chatMessages} myId={myId} onSend={onSendChat} />
+        {!isX && !!ruleset?.radio.enabled && (phase === "HEADSTART" || phase === "RUNNING") && (
+          <RadioPanel
+            myId={myId}
+            players={players}
+            iceServers={iceServers}
+            onSendRtc={onSendRtc}
+            onSubscribeRtc={onSubscribeRtc}
+          />
+        )}
 
         {surrenderDialogOpen && (
           <div
