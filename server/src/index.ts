@@ -20,6 +20,8 @@ export interface Env {
   GAME_ROOM: DurableObjectNamespace;
   RATE_LIMIT: DurableObjectNamespace;
   ASSETS: Fetcher;
+  /** Optional: JSON-Liste von ICE-Servern (STUN/TURN) für den Sprechfunk der Detektive. */
+  ICE_SERVERS?: string;
   /** Signaturschlüssel der Menschen-Prüfung (wrangler secret). Ohne ihn ist sie aus. */
   HUMAN_CHECK_SECRET?: string;
   // Optional: DSN des GlitchTip-Projekts. Ohne DSN ist die Fehlerberichterstattung aus.

@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://flohulo.github.io/fang-x/handbuch/">Handbuch</a> ·
+  <a href="https://flohulo.github.io/fang-x-status/">Status</a> ·
   <a href="#so-funktionierts">So funktioniert's</a> ·
   <a href="#datenschutz-und-sicher-spielen">Datenschutz</a> ·
   <a href="#lokal-ausprobieren">Lokal ausprobieren</a> ·
@@ -158,7 +159,11 @@ Weitere Hinweise zum Entwickeln und Mitwirken stehen in
 Die Webseite zum Spiel (Quelle: [`website/`](website/)) liegt unter
 <https://flohulo.github.io/fang-x/>. Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
 <https://flohulo.github.io/fang-x/handbuch/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
-aus den Seiten in [`docs/`](docs/) gebaut:
+aus den Seiten in [`docs/`](docs/) gebaut. Ob der Server läuft und was es Neues gibt, zeigt die Statusseite
+<https://flohulo.github.io/fang-x-status/> (Quelle: [`flohulo/fang-x-status`](https://github.com/flohulo/fang-x-status),
+betrieben mit [Upptime](https://upptime.js.org/)).
+
+So baust du das Handbuch lokal:
 
 ```bash
 pip install -r requirements-docs.txt

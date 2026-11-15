@@ -22,6 +22,7 @@ JSON-Datei exportiert werden.
 | Spielgebiet | 700 Meter | [Spielgebiet](Spielgebiet.md) |
 | Bonusmission für X | aus | [Bonusmission für X](Bonusmission-fuer-X.md) |
 | Notfall-Knopf für X | an | [Notfall-Knopf](Notfall-Knopf.md) |
+| Sprechfunk für Detektive | aus | [Sprechfunk](Sprechfunk.md) |
 
 ## Weitere Einstellungen
 
