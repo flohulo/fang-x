@@ -31,6 +31,8 @@ den **QR-Code** oder indem alle den Code eingeben und beitreten.
 !!! tip ":material-qrcode: QR-Code für alle vor Ort"
     Tippe in der Lobby auf **QR-Code anzeigen**. Die anderen scannen ihn mit der Handykamera und
     landen direkt im Spiel. Der QR-Code enthält denselben Link wie **Einladung teilen**.
+    Ist Fang X bereits als App installiert, öffnet der Link bevorzugt die installierte App (je nach
+    Betriebssystem und Browser).
 
 ## Rolle wählen
 
