@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.11.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.10.0...fang-x-v0.11.0) (2026-11-15)
+
+
+### Features
+
+* einladungslinks in der installierten pwa öffnen ([#94](https://github.com/flohulo/fang-x/issues/94)) ([1d7b107](https://github.com/flohulo/fang-x/commit/1d7b10731eca39322adf67f7a10f24c879c64a21))
+* popup und benachrichtigung bei neuen chatnachrichten ([#82](https://github.com/flohulo/fang-x/issues/82)) ([fb10f3a](https://github.com/flohulo/fang-x/commit/fb10f3a443116a66ce72a194272902aa952eaf07))
+* spam-schutz mit menschen-prüfung und verbindungstrennung ([#69](https://github.com/flohulo/fang-x/issues/69)) ([bbfdc4b](https://github.com/flohulo/fang-x/commit/bbfdc4b8d954045a906b0108e381c71448dd53b3))
+* sprachauswahl als ersten schritt der einführung ([#84](https://github.com/flohulo/fang-x/issues/84)) ([de3eaf6](https://github.com/flohulo/fang-x/commit/de3eaf6d38c55b639a92dce1989c63d0eb723276))
+* sprechfunk für detektive per webrtc ergänzen ([#68](https://github.com/flohulo/fang-x/issues/68)) ([c6a271b](https://github.com/flohulo/fang-x/commit/c6a271b2d8de7526c21995c26d424e0fb5c9c33e))
+
 ## [0.10.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.9.0...fang-x-v0.10.0) (2026-11-12)
 
 
