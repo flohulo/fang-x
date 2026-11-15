@@ -111,6 +111,24 @@
     "send": "Send",
     "hint": "Chat of the current round – it is deleted when the game ends."
   },
+  "radio": {
+    "title": "Voice radio",
+    "open": "Open voice radio",
+    "close": "Close voice radio",
+    "onlyDetectives": "Detectives only",
+    "intro": "Talk to the other detectives at the push of a button. X cannot hear anything. Your browser asks for the microphone when you turn it on.",
+    "start": "Turn voice radio on",
+    "stop": "Turn voice radio off",
+    "hold": "Hold to talk",
+    "transmitting": "You are transmitting …",
+    "speaking": "Speaking: {{names}}",
+    "linked": "Connected to {{linked}} of {{total}} detectives",
+    "privacy": "Audio goes directly between the detectives' devices. To connect, the devices see each other's IP addresses and ask a STUN server (Cloudflare by default). Nothing is recorded.",
+    "output": "Audio plays through the output your device is currently using: speaker, headphones or Bluetooth. The app does not choose it.",
+    "error": {
+      "unsupported": "Your browser or device does not support the voice radio. The microphone or the connection technology (WebRTC) is missing."
+    }
+  },
   "lobby": {
     "title": "Game setup",
     "waiting": {
@@ -143,6 +161,7 @@
     "rolesFromLobby": "Roles follow directly from the players in the lobby.",
     "detectivesWait": "Detectives wait during the head start and do not send a location",
     "detectivesShareLive": "Detectives share their live location with each other during the game",
+    "radio": "Enable voice radio for detectives (microphone needed)",
     "xSeesDetectives": "X sees detectives",
     "xSees": {
       "ALWAYS": "Always – live location of the detectives",
@@ -244,6 +263,8 @@
     "checklist": {
       "title": "Pre-game checklist",
       "location": "Location access granted",
+      "microphone": "Microphone allowed for the voice radio",
+      "microphoneHint": "Without a microphone you cannot talk on the voice radio. Allow it here in the lobby so the browser does not ask in the middle of the game.",
       "notifications": "Alerts and notifications allowed",
       "notificationsHint": "Without them you miss reveals while the screen is off.",
       "install": "App installed on the home screen",
@@ -537,6 +558,20 @@
     "ios1": "Open Settings > Privacy & Security > Location Services and turn it on.",
     "ios2": "Choose Safari Websites there (or Fang X if installed) and select \"While Using the App\".",
     "reload": "Return to Fang X and tap \"Check again\".",
+    "retry": "Check again"
+  },
+  "microphoneAccess": {
+    "title": "Microphone for the voice radio",
+    "text": "The host turned on the voice radio. Allow the microphone now so you are not asked during the round. It is only open while you hold the talk button.",
+    "allow": "Allow microphone",
+    "unsupported": "This device or connection does not support the voice radio. You can still play and write in the chat."
+  },
+  "microphoneGuide": {
+    "intro": "Microphone access is blocked. Here is how to allow it again:",
+    "android1": "Tap the icon next to the address in the address bar (lock) and open the site settings.",
+    "android2": "Set the \"Microphone\" permission to \"Allow\".",
+    "ios": "Open Settings > Safari > Microphone and choose \"Ask\" or \"Allow\".",
+    "reload": "Come back to Fang X and tap \"Check again\".",
     "retry": "Check again"
   },
   "installBanner": {
