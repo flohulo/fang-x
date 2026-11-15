@@ -115,3 +115,6 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/flohulo/fang-x
       name: Fang X auf GitHub
+    - icon: material/heart-pulse
+      link: https://flohulo.github.io/fang-x-status/
+      name: Status und Neuigkeiten
