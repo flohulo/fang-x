@@ -24,6 +24,7 @@ import {
   jitterPoint,
   type LatLng,
   mergeRuleset,
+  normalizePlayerName,
   type ObjectiveState,
   type PlayerInfo,
   playAreaRadiusEstimate,
@@ -860,7 +861,7 @@ export class GameRoom {
 
     const player: Player = {
       id,
-      name: (typeof name === "string" ? name : "").trim().slice(0, 20) || "Spieler",
+      name: normalizePlayerName(name),
       role,
       isHost,
       wantsX,
