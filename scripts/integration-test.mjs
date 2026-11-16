@@ -50,22 +50,28 @@ function leadingZeroBits(buf) {
 let humanTicket = null;
 let humanCheckActive = false;
 
-async function fetchTicket() {
-  const info = await (await fetch(`${HTTP}/api/challenge`)).json();
-  if (!info.enabled) return null;
-  humanCheckActive = true;
+function solveChallenge(challenge, difficulty) {
   for (let counter = 0; ; counter++) {
     const solution = counter.toString(36);
-    const digest = createHash("sha256").update(`${info.challenge}:${solution}`).digest();
-    if (leadingZeroBits(digest) < info.difficulty) continue;
-    const res = await fetch(`${HTTP}/api/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ challenge: info.challenge, solution }),
-    });
-    if (!res.ok) throw new Error(`Verify HTTP ${res.status}`);
-    return (await res.json()).ticket;
+    const digest = createHash("sha256").update(`${challenge}:${solution}`).digest();
+    if (leadingZeroBits(digest) >= difficulty) return solution;
   }
+}
+
+// ip: simuliert eine Client-Adresse über CF-Connecting-IP (lokal reicht wrangler ihn durch).
+async function fetchTicket(ip) {
+  const ipHeader = ip ? { "CF-Connecting-IP": ip } : {};
+  const info = await (await fetch(`${HTTP}/api/challenge`, { headers: ipHeader })).json();
+  if (!info.enabled) return null;
+  humanCheckActive = true;
+  const solution = solveChallenge(info.challenge, info.difficulty);
+  const res = await fetch(`${HTTP}/api/verify`, {
+    method: "POST",
+    headers: { ...ipHeader, "Content-Type": "application/json" },
+    body: JSON.stringify({ challenge: info.challenge, solution }),
+  });
+  if (!res.ok) throw new Error(`Verify HTTP ${res.status}`);
+  return (await res.json()).ticket;
 }
 
 async function createGame() {
@@ -142,6 +148,44 @@ async function run() {
       ghost.on("error", () => {});
     });
     assert(ghostStatus === 403, "Menschen-Prüfung: WebSocket ohne Ticket wird abgelehnt");
+
+    // Tickets und Aufgaben gelten nur für die Adresse, für die sie ausgestellt wurden.
+    const lookupStatus = async (ip, ticket) =>
+      (
+        await fetch(`${HTTP}/api/games/ABCDEF`, {
+          headers: { "CF-Connecting-IP": ip, "X-Human-Ticket": ticket },
+        })
+      ).status;
+    const ipTicket = await fetchTicket("198.51.100.1");
+    assert(
+      (await lookupStatus("198.51.100.1", ipTicket)) === 200,
+      "Menschen-Prüfung: Ticket gilt für die eigene Adresse",
+    );
+    assert(
+      (await lookupStatus("198.51.100.2", ipTicket)) === 403,
+      "Menschen-Prüfung: Ticket gilt nicht für eine andere Adresse",
+    );
+    const v6Ticket = await fetchTicket("2001:db8:1:2:aaaa::1");
+    assert(
+      (await lookupStatus("2001:db8:1:2:bbbb::7", v6Ticket)) === 200 &&
+        (await lookupStatus("2001:db8:1:3::1", v6Ticket)) === 403,
+      "Menschen-Prüfung: Bei IPv6 zählt das /64-Netz",
+    );
+    const foreignInfo = await (
+      await fetch(`${HTTP}/api/challenge`, { headers: { "CF-Connecting-IP": "198.51.100.3" } })
+    ).json();
+    const foreignRedeem = await fetch(`${HTTP}/api/verify`, {
+      method: "POST",
+      headers: { "CF-Connecting-IP": "198.51.100.4", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        challenge: foreignInfo.challenge,
+        solution: solveChallenge(foreignInfo.challenge, foreignInfo.difficulty),
+      }),
+    });
+    assert(
+      foreignRedeem.status === 400,
+      "Menschen-Prüfung: Aufgabe lässt sich nicht von einer anderen Adresse einlösen",
+    );
   }
 
   // 1. Spiel erstellen

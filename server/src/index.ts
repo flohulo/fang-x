@@ -3,6 +3,7 @@
 // Die eigentliche Spiellogik lebt in der GameRoom-Durable-Object.
 
 import {
+  clientIp,
   createChallenge,
   humanCheckEnabled,
   redeemChallenge,
@@ -66,7 +67,7 @@ function generateCode(): string {
 function clientKey(request: Request): string {
   // Cloudflare setzt CF-Connecting-IP an der Edge. Lokal (wrangler dev) fehlt
   // der Header — dann greift ein gemeinsamer Schlüssel.
-  return request.headers.get("CF-Connecting-IP") ?? "lokal";
+  return clientIp(request);
 }
 
 async function checkRateLimit(
@@ -129,7 +130,7 @@ const handler = {
       return Response.json(
         {
           enabled: true,
-          challenge: await createChallenge(env),
+          challenge: await createChallenge(env, clientIp(request)),
           difficulty: HUMAN_CHECK_DIFFICULTY_BITS,
         },
         { headers: NO_STORE },
@@ -146,7 +147,7 @@ const handler = {
         challenge?: unknown;
         solution?: unknown;
       } | null;
-      const ticket = await redeemChallenge(env, body?.challenge, body?.solution);
+      const ticket = await redeemChallenge(env, body?.challenge, body?.solution, clientIp(request));
       if (!ticket) {
         return Response.json(
           { error: "Die Prüfung ist fehlgeschlagen. Bitte versuche es erneut." },
