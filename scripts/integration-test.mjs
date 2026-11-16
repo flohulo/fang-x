@@ -907,6 +907,26 @@ async function run() {
   noSurrenderX.ws.close();
   noSurrenderDetective.ws.close();
 
+  // 18b. Spielernamen werden bereinigt (Steuer- und Formatzeichen, Länge)
+  console.log("\n=== Spielernamen ===");
+  const codeName = await createGame();
+  const named = await connect(codeName);
+  named.ws.send(
+    JSON.stringify({
+      t: "join",
+      code: codeName,
+      name: "  Bo\u200Bb\u202E\nder Baumeister mit langem Namen ",
+      wantsX: false,
+    }),
+  );
+  const namedJoined = await named.waitFor((m) => m.t === "joined");
+  const cleanName = namedJoined.players.find((p) => p.id === namedJoined.playerId)?.name;
+  assert(
+    cleanName === "Bob der Baumeister m",
+    `Name ohne unsichtbare Zeichen und auf 20 Zeichen gekürzt: ${cleanName}`,
+  );
+  named.ws.close();
+
   // 19. Missbrauch: wer die Verbindung mit ungültigem JSON flutet, wird getrennt
   console.log("\n=== Spam-Schutz: Verbindung trennen ===");
   const code9 = await createGame();

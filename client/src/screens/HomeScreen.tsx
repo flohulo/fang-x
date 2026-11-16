@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { normalizeCodeInput } from "../lib/invite";
+import { PLAYER_NAME_MAX_LENGTH } from "@fang-x/shared";
 
 const NAME_STORAGE_KEY = "fangx:name";
-const MAX_NAME_LENGTH = 24;
 
 interface HomeScreenProps {
   /** Aus einem Einladungslink (?code=…) übernommener Code */
@@ -64,7 +64,7 @@ export function HomeScreen({
           type="text"
           placeholder={t("home.namePlaceholder")}
           value={name}
-          maxLength={MAX_NAME_LENGTH}
+          maxLength={PLAYER_NAME_MAX_LENGTH}
           autoComplete="nickname"
           onChange={(e) => setName(e.target.value)}
         />
