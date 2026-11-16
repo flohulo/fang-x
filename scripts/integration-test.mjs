@@ -188,6 +188,34 @@ async function run() {
     );
   }
 
+  // 0b. Ratenbegrenzung pro Adresse (CF-Connecting-IP; lokal ohne Header ist sie aus)
+  // Tickets sind an die Adresse gebunden: pro simulierter Adresse ein eigenes holen.
+  const ipTickets = new Map();
+  const createFrom = async (ip) => {
+    if (!ipTickets.has(ip)) ipTickets.set(ip, await fetchTicket(ip));
+    const ticket = ipTickets.get(ip);
+    return (
+      await fetch(`${HTTP}/api/games`, {
+        method: "POST",
+        headers: {
+          "CF-Connecting-IP": ip,
+          ...(ticket ? { "X-Human-Ticket": ticket } : {}),
+        },
+      })
+    ).status;
+  };
+  const limitIp = `198.51.100.${10 + Math.floor(Math.random() * 200)}`;
+  const createStatuses = [];
+  for (let i = 0; i < 4; i++) createStatuses.push(await createFrom(limitIp));
+  assert(
+    createStatuses.slice(0, 3).every((status) => status === 200) && createStatuses[3] === 429,
+    `Ratenbegrenzung: viertes Spiel pro Minute wird abgelehnt (${createStatuses.join(", ")})`,
+  );
+  assert(
+    (await createFrom("203.0.113.77")) === 200,
+    "Ratenbegrenzung: andere Adressen sind nicht betroffen",
+  );
+
   // 1. Spiel erstellen
   const code = await createGame();
   assert(code && code.length === 6, `Spiel-Code erstellt: ${code}`);

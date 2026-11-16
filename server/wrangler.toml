@@ -16,9 +16,27 @@ not_found_handling = "single-page-application"
 name = "GAME_ROOM"
 class_name = "GameRoom"
 
-[[durable_objects.bindings]]
-name = "RATE_LIMIT"
-class_name = "RateLimiter"
+# Ratenbegrenzung pro IP-Adresse, gezählt an der Edge (kein Durable Object).
+# Workers erlaubt als Zeitfenster nur 10 oder 60 Sekunden.
+[[ratelimits]]
+name = "CREATE_LIMIT"
+namespace_id = "1001"
+simple = { limit = 3, period = 60 }
+
+[[ratelimits]]
+name = "LOOKUP_LIMIT"
+namespace_id = "1002"
+simple = { limit = 60, period = 60 }
+
+[[ratelimits]]
+name = "VERIFY_LIMIT"
+namespace_id = "1003"
+simple = { limit = 10, period = 60 }
+
+[[ratelimits]]
+name = "JOIN_LIMIT"
+namespace_id = "1004"
+simple = { limit = 20, period = 60 }
 
 [[migrations]]
 tag = "v1"
@@ -27,3 +45,8 @@ new_sqlite_classes = ["GameRoom"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["RateLimiter"]
+
+# Der frühere Ratenbegrenzer als Durable Object ist durch [[ratelimits]] ersetzt.
+[[migrations]]
+tag = "v3"
+deleted_classes = ["RateLimiter"]
