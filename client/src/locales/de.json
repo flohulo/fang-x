@@ -479,6 +479,7 @@
     "MESSAGE_TOO_LARGE": "Nachricht zu gross.",
     "INVALID_JSON": "Ungültiges JSON",
     "NO_GAME": "Dieses Spiel gibt es nicht (mehr).",
+    "GAME_ENDED": "Diese Runde ist beendet. Starte ein neues Spiel.",
     "ROOM_FULL": "Dieser Raum ist voll (max. {{max}} Spieler).",
     "HOST_ONLY": "Nur der Host kann konfigurieren.",
     "LOBBY_ONLY": "Konfiguration nur in der Lobby.",

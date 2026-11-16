@@ -24,3 +24,8 @@ deshalb ein Richtwert und keine exakte Messung.
 
 Ist das Spiel beendet, bleibt die Auswertung wie das Ergebnis erhalten, bis der Raum geschlossen
 wird. Wer die Seite neu lädt, sieht sie weiterhin.
+
+Neue Spielende können einem beendeten Spiel nicht beitreten, solange Mitspielende der Runde noch
+zurückkehren dürfen (bis zu 30 Minuten nach dem Verbindungsabbruch). Sie sehen die Meldung „Diese
+Runde ist beendet“ und starten am besten ein neues Spiel. Erst wenn alle den Raum verlassen haben,
+beginnt er wieder mit einer leeren Lobby.

@@ -452,6 +452,7 @@
     "MESSAGE_TOO_LARGE": "Nachricht z gross.",
     "INVALID_JSON": "Ungültigs JSON",
     "NO_GAME": "Das Spiel gits nöd (meh).",
+    "GAME_ENDED": "Die Rundi isch fertig. Start es neus Spiel.",
     "ROOM_FULL": "De Ruum isch voll (max. {{max}} Spieler).",
     "HOST_ONLY": "Nur de Host cha konfiguriere.",
     "LOBBY_ONLY": "Konfiguration nur i de Lobby.",

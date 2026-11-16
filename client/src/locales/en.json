@@ -479,6 +479,7 @@
     "MESSAGE_TOO_LARGE": "Message too large.",
     "INVALID_JSON": "Invalid JSON",
     "NO_GAME": "This game does not exist (any more).",
+    "GAME_ENDED": "This round has ended. Start a new game.",
     "ROOM_FULL": "This room is full (max. {{max}} players).",
     "HOST_ONLY": "Only the host can change the settings.",
     "LOBBY_ONLY": "Settings can only be changed in the lobby.",
