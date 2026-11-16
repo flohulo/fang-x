@@ -15,7 +15,7 @@ import type {
 } from "@fang-x/shared";
 import { HUMAN_TICKET_PARAM, WS_CLOSE_ABUSE } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
-import { cachedHumanTicket, ensureHumanTicket } from "./humanCheck";
+import { cachedHumanTicket, ensureHumanTicket, fetchWithTicket } from "./humanCheck";
 import type { ServerError } from "./serverMessages";
 import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
 
@@ -101,6 +101,8 @@ export function useGame() {
   const intentionalRef = useRef(false);
   const retryTimerRef = useRef<number | null>(null);
   const attemptRef = useRef(0);
+  /** Der letzte Verbindungsaufbau wurde schon beim Handshake abgelehnt (z. B. Ticket ungültig). */
+  const handshakeFailedRef = useRef(false);
   const connectRef = useRef<(session: Session) => void>(() => {});
   const rtcHandlersRef = useRef(new Set<RtcHandler>());
 
@@ -128,8 +130,13 @@ export function useGame() {
     retryTimerRef.current = window.setTimeout(() => {
       retryTimerRef.current = null;
       if (intentionalRef.current) return;
-      // Ticket vorab erneuern, falls es inzwischen abgelaufen ist.
-      void ensureHumanTicket().then(() => {
+      // Ticket vorab erneuern, falls es inzwischen abgelaufen ist. Scheiterte schon der
+      // Handshake, prüft eine Raumabfrage das Ticket; ist es ungültig (z. B. nach einem
+      // Netzwechsel mit neuer IP-Adresse), holt fetchWithTicket ein neues.
+      const refresh = handshakeFailedRef.current
+        ? fetchWithTicket(`/api/games/${encodeURIComponent(session.code)}`).catch(() => null)
+        : ensureHumanTicket();
+      void refresh.then(() => {
         if (intentionalRef.current || sessionRef.current !== session) return;
         connectRef.current(session);
       });
@@ -145,7 +152,11 @@ export function useGame() {
     const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}${query}`);
     wsRef.current = ws;
 
+    let opened = false;
+
     ws.onopen = () => {
+      opened = true;
+      handshakeFailedRef.current = false;
       attemptRef.current = 0;
       setConnected(true);
       setReconnecting(false);
@@ -342,6 +353,7 @@ export function useGame() {
       if (wsRef.current !== ws) return;
       wsRef.current = null;
       setConnected(false);
+      handshakeFailedRef.current = !opened;
       if (intentionalRef.current) return;
       // Der Server hat wegen Missbrauchs getrennt: nicht sofort wieder verbinden.
       if (event.code === WS_CLOSE_ABUSE) {

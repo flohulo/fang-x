@@ -73,7 +73,9 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
 
 Beim Öffnen der Seite löst der Browser unsichtbar eine kleine Rechenaufgabe (Proof-of-Work).
 Der Server stellt dafür ein signiertes Ticket aus, das für das Erstellen, Abfragen und Beitreten
-von Räumen nötig ist. Es gibt keine Cookies, keine Konten und keinen externen Dienst. Zusätzlich
+von Räumen nötig ist. Aufgabe und Ticket gelten nur für die IP-Adresse (bei IPv6 das /64-Netz),
+für die sie ausgestellt wurden; wechselt das Gerät das Netz, löst der Browser unbemerkt eine neue
+Aufgabe. Die Rechnung läuft in einem Web Worker und blockiert die Seite nicht. Es gibt keine Cookies, keine Konten und keinen externen Dienst. Zusätzlich
 gelten Limits pro IP-Adresse (Raum erstellen, Raum abfragen, Beitritt). Wer eine Verbindung mit
 fehlerhaften Nachrichten oder Chat-Spam flutet, wird getrennt. Spielverbindungen, die ein
 Browser von einer fremden Webseite aus öffnet, lehnt der Server anhand des `Origin`-Headers ab.

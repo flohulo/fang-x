@@ -1,7 +1,8 @@
 // Menschen-Prüfung im Browser: löst die Rechenaufgabe des Servers (Proof-of-Work)
 // und hält das Ticket vor. Läuft beim Öffnen der Seite unsichtbar im Hintergrund.
 
-import { HUMAN_CHECK_ERROR_CODE, HUMAN_TICKET_HEADER, leadingZeroBits } from "@fang-x/shared";
+import { HUMAN_CHECK_ERROR_CODE, HUMAN_TICKET_HEADER } from "@fang-x/shared";
+import { solveProofOfWork } from "./proofOfWork";
 
 const STORAGE_KEY = "fangx:human-ticket";
 /** Ticket vorsorglich erneuern, wenn es in weniger als 10 Minuten abläuft. */
@@ -39,15 +40,28 @@ function store(value: StoredTicket | null) {
   }
 }
 
-async function solve(challenge: string, difficulty: number): Promise<string> {
-  const encoder = new TextEncoder();
-  for (let counter = 0; ; counter++) {
-    const solution = counter.toString(36);
-    const digest = new Uint8Array(
-      await crypto.subtle.digest("SHA-256", encoder.encode(`${challenge}:${solution}`)),
-    );
-    if (leadingZeroBits(digest) >= difficulty) return solution;
-  }
+// Löst die Aufgabe in einem Web Worker; ohne Worker-Unterstützung im Hauptthread.
+function solve(challenge: string, difficulty: number): Promise<string> {
+  if (typeof Worker === "undefined") return solveProofOfWork(challenge, difficulty);
+  return new Promise((resolve, reject) => {
+    let worker: Worker;
+    try {
+      worker = new Worker(new URL("./powWorker.ts", import.meta.url), { type: "module" });
+    } catch {
+      resolve(solveProofOfWork(challenge, difficulty));
+      return;
+    }
+    worker.onmessage = (event: MessageEvent<{ solution?: string; error?: string }>) => {
+      worker.terminate();
+      if (event.data.solution) resolve(event.data.solution);
+      else reject(new Error(event.data.error ?? "Rechenaufgabe fehlgeschlagen"));
+    };
+    worker.onerror = () => {
+      worker.terminate();
+      resolve(solveProofOfWork(challenge, difficulty));
+    };
+    worker.postMessage({ challenge, difficulty });
+  });
 }
 
 async function requestTicket(): Promise<string | null> {

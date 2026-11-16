@@ -4,6 +4,11 @@
 // Browser und tauscht die Lösung gegen ein signiertes Ticket (/api/verify).
 // Das Ticket ist für Raum erstellen, Raum abfragen und Beitreten nötig.
 // Es gibt keine Cookies, keine Konten und keinen externen Dienst.
+//
+// Aufgabe und Ticket sind an die IP-Adresse gebunden (bei IPv6 an das /64-Netz, weil
+// Telefone ihre Adresse darin häufig wechseln). Ein gelöstes Ticket lässt sich so nicht
+// an andere Rechner weitergeben, und eine Aufgabe mehrfach einzulösen bringt nur Tickets
+// für dieselbe Adresse. Darum braucht es keine Liste verbrauchter Aufgaben.
 
 import {
   HUMAN_CHECK_DIFFICULTY_BITS,
@@ -51,10 +56,35 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** Neue Aufgabe: "<zeit>.<zufall>.<signatur>". */
-export async function createChallenge(env: HumanCheckEnv): Promise<string> {
+/** IP-Adresse der Anfrage. Lokal (wrangler dev) fehlt der Header von Cloudflare. */
+export function clientIp(request: Request): string {
+  return request.headers.get("CF-Connecting-IP") ?? "lokal";
+}
+
+/** IPv6 auf das /64-Netz kürzen, IPv4 unverändert lassen. */
+export function ipScope(ip: string): string {
+  if (!ip.includes(":")) return ip;
+  const [head, tail = ""] = ip.toLowerCase().split("::");
+  const left = head ? head.split(":") : [];
+  const right = tail ? tail.split(":") : [];
+  const groups = ip.includes("::")
+    ? [...left, ...Array(Math.max(0, 8 - left.length - right.length)).fill("0"), ...right]
+    : left;
+  return `${groups
+    .slice(0, 4)
+    .map((g) => g.replace(/^0+(?=.)/, ""))
+    .join(":")}::/64`;
+}
+
+/** Kurzes, nicht umkehrbares Kennzeichen der Adresse (kein Klartext im Ticket). */
+async function ipTag(env: HumanCheckEnv, ip: string): Promise<string> {
+  return (await sign(env.HUMAN_CHECK_SECRET!, `ip.${ipScope(ip)}`)).slice(0, 16);
+}
+
+/** Neue Aufgabe: "c.<zeit>.<zufall>.<ip-kennzeichen>.<signatur>". */
+export async function createChallenge(env: HumanCheckEnv, ip: string): Promise<string> {
   const nonce = toHex(crypto.getRandomValues(new Uint8Array(12)));
-  const body = `c.${Date.now()}.${nonce}`;
+  const body = `c.${Date.now()}.${nonce}.${await ipTag(env, ip)}`;
   return `${body}.${await sign(env.HUMAN_CHECK_SECRET!, body)}`;
 }
 
@@ -63,37 +93,45 @@ export async function redeemChallenge(
   env: HumanCheckEnv,
   challenge: unknown,
   solution: unknown,
+  ip: string,
 ): Promise<string | null> {
   if (typeof challenge !== "string" || typeof solution !== "string") return null;
   if (challenge.length > 200 || solution.length > 40) return null;
 
   const parts = challenge.split(".");
-  if (parts.length !== 4 || parts[0] !== "c") return null;
+  if (parts.length !== 5 || parts[0] !== "c") return null;
   const issuedAt = Number(parts[1]);
   const age = Date.now() - issuedAt;
   if (!Number.isFinite(issuedAt) || age < 0 || age > CHALLENGE_TTL_MS) return null;
 
-  const expected = await sign(env.HUMAN_CHECK_SECRET!, parts.slice(0, 3).join("."));
-  if (!safeEqual(expected, parts[3])) return null;
+  const tag = await ipTag(env, ip);
+  if (!safeEqual(tag, parts[3])) return null;
+  const expected = await sign(env.HUMAN_CHECK_SECRET!, parts.slice(0, 4).join("."));
+  if (!safeEqual(expected, parts[4])) return null;
 
   const digest = new Uint8Array(
     await crypto.subtle.digest("SHA-256", encoder.encode(`${challenge}:${solution}`)),
   );
   if (leadingZeroBits(digest) < HUMAN_CHECK_DIFFICULTY_BITS) return null;
 
-  const body = `t.${Date.now() + TICKET_TTL_MS}`;
+  const body = `t.${Date.now() + TICKET_TTL_MS}.${tag}`;
   return `${body}.${await sign(env.HUMAN_CHECK_SECRET!, body)}`;
 }
 
-export async function isValidTicket(env: HumanCheckEnv, ticket: string | null): Promise<boolean> {
+export async function isValidTicket(
+  env: HumanCheckEnv,
+  ticket: string | null,
+  ip: string,
+): Promise<boolean> {
   if (!humanCheckEnabled(env)) return true;
   if (!ticket || ticket.length > 200) return false;
   const parts = ticket.split(".");
-  if (parts.length !== 3 || parts[0] !== "t") return false;
+  if (parts.length !== 4 || parts[0] !== "t") return false;
   const expiresAt = Number(parts[1]);
   if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return false;
-  const expected = await sign(env.HUMAN_CHECK_SECRET!, `t.${parts[1]}`);
-  return safeEqual(expected, parts[2]);
+  if (!safeEqual(await ipTag(env, ip), parts[2])) return false;
+  const expected = await sign(env.HUMAN_CHECK_SECRET!, `t.${parts[1]}.${parts[2]}`);
+  return safeEqual(expected, parts[3]);
 }
 
 /** Liefert eine 403-Antwort, wenn das Ticket fehlt oder ungültig ist, sonst null. */
@@ -104,7 +142,7 @@ export async function requireTicket(
   const url = new URL(request.url);
   const ticket =
     request.headers.get(HUMAN_TICKET_HEADER) ?? url.searchParams.get(HUMAN_TICKET_PARAM);
-  if (await isValidTicket(env, ticket)) return null;
+  if (await isValidTicket(env, ticket, clientIp(request))) return null;
   return Response.json(
     { error: "Bitte bestätige zuerst, dass du ein Mensch bist.", code: HUMAN_CHECK_ERROR_CODE },
     { status: 403, headers: { "Cache-Control": "no-store" } },
