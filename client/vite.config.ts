@@ -24,7 +24,11 @@ export default defineConfig({
         theme_color: "#0f172a",
         background_color: "#0f172a",
         display: "standalone",
+        id: "/",
+        scope: "/",
         start_url: "/",
+        // Links in den Scope (z. B. aus dem QR-Code) bevorzugt in der installierten App öffnen.
+        handle_links: "preferred",
         icons: [
           {
             src: "/icon-192.png",

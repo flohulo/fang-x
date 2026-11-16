@@ -566,6 +566,7 @@ export default function App() {
         batteryWarning={game.batteryWarning}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
+        iceServers={game.iceServers}
         catchPending={game.catchPending}
         serverError={gameErrorText}
         yourPositionIsShared={game.yourPositionIsShared}
@@ -574,6 +575,8 @@ export default function App() {
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
+        onSendRtc={game.sendRtc}
+        onSubscribeRtc={game.subscribeRtc}
         onAddTeamMarker={game.addTeamMarker}
         onRemoveTeamMarker={game.removeTeamMarker}
         onConfirmSafe={game.confirmSafe}

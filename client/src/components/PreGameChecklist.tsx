@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { isIos, useInstall } from "../lib/install";
 import type { LocationState } from "../lib/useLocationPermission";
+import type { MicrophoneState } from "../lib/useMicrophonePermission";
 
 type Status = "ok" | "warn" | "info";
 
@@ -59,6 +60,8 @@ interface PreGameChecklistProps {
   locationState: LocationState;
   /** Simulationsmodus gewählt: fehlender Standort ist dann kein Problem. */
   locationSkipped: boolean;
+  /** Nur gesetzt, wenn der Sprechfunk aktiv ist und ich Detektiv bin. */
+  microphoneState?: MicrophoneState | null;
   /** Warnungen zu Einstellungen und Gruppe (aus shared). */
   checks: PreGameCheck[];
 }
@@ -67,6 +70,7 @@ interface PreGameChecklistProps {
 export function PreGameChecklist({
   locationState,
   locationSkipped,
+  microphoneState = null,
   checks,
 }: PreGameChecklistProps) {
   const { t } = useTranslation();
@@ -80,6 +84,16 @@ export function PreGameChecklist({
       label: t("lobby.checklist.location"),
       hint: locationState === "granted" || locationSkipped ? undefined : t("lobby.locationNeeded"),
     },
+    ...(microphoneState === null
+      ? []
+      : [
+          {
+            id: "microphone",
+            status: microphoneState === "granted" ? ("ok" as const) : ("warn" as const),
+            label: t("lobby.checklist.microphone"),
+            hint: microphoneState === "granted" ? undefined : t("lobby.checklist.microphoneHint"),
+          },
+        ]),
     {
       id: "notifications",
       status: notifications === "granted" ? "ok" : "warn",
