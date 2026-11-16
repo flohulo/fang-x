@@ -328,6 +328,16 @@ export function LobbyScreen({
               <label className="objective-option">
                 <input
                   type="checkbox"
+                  checked={localRuleset.reveal.xCanTrick}
+                  onChange={(event) => updateNested("reveal", { xCanTrick: event.target.checked })}
+                />
+                {t("lobby.xCanTrick")}
+              </label>
+            </ConfigOptionHelp>
+            <ConfigOptionHelp>
+              <label className="objective-option">
+                <input
+                  type="checkbox"
                   checked={localRuleset.radio.enabled}
                   onChange={(event) => updateNested("radio", { enabled: event.target.checked })}
                 />

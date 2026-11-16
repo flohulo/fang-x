@@ -1,6 +1,7 @@
 import type {
   ChatMessage,
   ClientMessage,
+  PingTrickMode,
   TeamMarker,
   GameStats,
   LatLng,
@@ -15,7 +16,7 @@ import type {
 } from "@fang-x/shared";
 import { HUMAN_TICKET_PARAM, WS_CLOSE_ABUSE } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
-import { cachedHumanTicket, ensureHumanTicket } from "./humanCheck";
+import { cachedHumanTicket, ensureHumanTicket, fetchWithTicket } from "./humanCheck";
 import type { ServerError } from "./serverMessages";
 import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
 
@@ -42,7 +43,7 @@ export type RtcHandler = (from: string, signal: RtcSignal) => void;
 /** Reconnect-Versuche mit wachsendem Abstand, aber gedeckelt. */
 const MAX_RECONNECT_DELAY_MS = 10_000;
 /** Fehler, bei denen ein erneuter Versuch sinnlos ist. */
-const FATAL_CODES = new Set(["ROOM_FULL", "NO_GAME"]);
+const FATAL_CODES = new Set(["ROOM_FULL", "NO_GAME", "GAME_ENDED"]);
 
 export function useGame() {
   const [phase, setPhase] = useState<string>("LOBBY");
@@ -67,6 +68,10 @@ export function useGame() {
     train: number;
     at: number;
   } | null>(null);
+  const [pingTrick, setPingTrick] = useState<{
+    armed: PingTrickMode | null;
+    used: PingTrickMode | null;
+  }>({ armed: null, used: null });
   const [teamMarkers, setTeamMarkers] = useState<TeamMarker[]>([]);
   const [inactivity, setInactivity] = useState<{
     playerId: string;
@@ -101,6 +106,8 @@ export function useGame() {
   const intentionalRef = useRef(false);
   const retryTimerRef = useRef<number | null>(null);
   const attemptRef = useRef(0);
+  /** Der letzte Verbindungsaufbau wurde schon beim Handshake abgelehnt (z. B. Ticket ungültig). */
+  const handshakeFailedRef = useRef(false);
   const connectRef = useRef<(session: Session) => void>(() => {});
   const rtcHandlersRef = useRef(new Set<RtcHandler>());
 
@@ -128,8 +135,13 @@ export function useGame() {
     retryTimerRef.current = window.setTimeout(() => {
       retryTimerRef.current = null;
       if (intentionalRef.current) return;
-      // Ticket vorab erneuern, falls es inzwischen abgelaufen ist.
-      void ensureHumanTicket().then(() => {
+      // Ticket vorab erneuern, falls es inzwischen abgelaufen ist. Scheiterte schon der
+      // Handshake, prüft eine Raumabfrage das Ticket; ist es ungültig (z. B. nach einem
+      // Netzwechsel mit neuer IP-Adresse), holt fetchWithTicket ein neues.
+      const refresh = handshakeFailedRef.current
+        ? fetchWithTicket(`/api/games/${encodeURIComponent(session.code)}`).catch(() => null)
+        : ensureHumanTicket();
+      void refresh.then(() => {
         if (intentionalRef.current || sessionRef.current !== session) return;
         connectRef.current(session);
       });
@@ -145,7 +157,11 @@ export function useGame() {
     const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}${query}`);
     wsRef.current = ws;
 
+    let opened = false;
+
     ws.onopen = () => {
+      opened = true;
+      handshakeFailedRef.current = false;
       attemptRef.current = 0;
       setConnected(true);
       setReconnecting(false);
@@ -210,6 +226,7 @@ export function useGame() {
             setObjective(null);
             setTransitStops({ bus: 0, train: 0 });
             setTransitNotice(null);
+            setPingTrick({ armed: null, used: null });
             setTeamMarkers([]);
             setInactivity(null);
             setSafe([]);
@@ -255,6 +272,9 @@ export function useGame() {
           break;
         case "catchPending":
           setCatchPending(msg.pending);
+          break;
+        case "pingTrick":
+          setPingTrick({ armed: msg.armed, used: msg.used });
           break;
         case "markers":
           setTeamMarkers(msg.markers);
@@ -342,6 +362,7 @@ export function useGame() {
       if (wsRef.current !== ws) return;
       wsRef.current = null;
       setConnected(false);
+      handshakeFailedRef.current = !opened;
       if (intentionalRef.current) return;
       // Der Server hat wegen Missbrauchs getrennt: nicht sofort wieder verbinden.
       if (event.code === WS_CLOSE_ABUSE) {
@@ -426,6 +447,10 @@ export function useGame() {
     send({ t: "surrender" });
   };
 
+  const requestPingTrick = (mode: PingTrickMode | "CANCEL") => {
+    send({ t: "setPingTrick", mode });
+  };
+
   const addTeamMarker = (pos: LatLng, kind: TeamMarker["kind"]) => {
     send({ t: "addMarker", pos, kind });
   };
@@ -487,6 +512,7 @@ export function useGame() {
     ruleset,
     transitStops,
     transitNotice,
+    pingTrick,
     teamMarkers,
     inactivity,
     safe,
@@ -505,6 +531,7 @@ export function useGame() {
     connected,
     reconnecting,
     join,
+    requestPingTrick,
     addTeamMarker,
     removeTeamMarker,
     confirmSafe,

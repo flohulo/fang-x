@@ -3,6 +3,7 @@ import type {
   GameStats,
   LatLng,
   ObjectiveState,
+  PingTrickMode,
   RevealEvent,
   RtcIceServer,
   RtcSignal,
@@ -27,6 +28,8 @@ import { useGeolocation } from "../lib/useGeolocation";
 import type { GameResult, PlayerView, RtcHandler } from "../lib/useGame";
 
 interface GameScreenProps {
+  pingTrick: { armed: PingTrickMode | null; used: PingTrickMode | null };
+  onPingTrick: (mode: PingTrickMode | "CANCEL") => void;
   teamMarkers: TeamMarker[];
   onAddTeamMarker: (pos: LatLng, kind: TeamMarker["kind"]) => void;
   onRemoveTeamMarker: (id: number) => void;
@@ -162,6 +165,8 @@ export function GameScreen({
   objective,
   transitStops,
   transitNotice,
+  pingTrick,
+  onPingTrick,
   teamMarkers,
   onAddTeamMarker,
   onRemoveTeamMarker,
@@ -198,6 +203,7 @@ export function GameScreen({
   const [markingKind, setMarkingKind] = useState<TeamMarker["kind"] | null>(null);
   const [transitDialogOpen, setTransitDialogOpen] = useState(false);
   const [surrenderDialogOpen, setSurrenderDialogOpen] = useState(false);
+  const [pingTrickDialogOpen, setPingTrickDialogOpen] = useState(false);
   const [transitMode, setTransitMode] = useState<"bus" | "train">("bus");
   const [transitCount, setTransitCount] = useState(1);
   const [dismissedTransitNoticeAt, setDismissedTransitNoticeAt] = useState<number | null>(null);
@@ -410,6 +416,9 @@ export function GameScreen({
   const canReportPhotoCatch =
     phase === "RUNNING" && ruleset?.catch.method === "PHOTO_CONFIRMATION" && !isX && !catchPending;
   const canUseTransitBudget = isX && trackingActive;
+  const canPingTrick =
+    isX && !!ruleset?.reveal.xCanTrick && (phase === "HEADSTART" || phase === "RUNNING");
+
   const canSurrender =
     isX && !!ruleset?.catch.xCanSurrender && (phase === "HEADSTART" || phase === "RUNNING");
   const surrender = gameResult?.surrender ?? null;
@@ -606,6 +615,22 @@ export function GameScreen({
                       }}
                     >
                       {t("game.chooseObjective")}
+                    </button>
+                  )}
+                  {canPingTrick && (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        setPingTrickDialogOpen(true);
+                      }}
+                    >
+                      {pingTrick.armed
+                        ? t("game.pingTrick.armedButton", {
+                            mode: t(`game.pingTrick.mode.${pingTrick.armed}`),
+                          })
+                        : t("game.pingTrick.button")}
                     </button>
                   )}
                   <button
@@ -887,6 +912,82 @@ export function GameScreen({
             onSendRtc={onSendRtc}
             onSubscribeRtc={onSubscribeRtc}
           />
+        )}
+
+        {pingTrickDialogOpen && (
+          <div
+            className="transit-dialog-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setPingTrickDialogOpen(false);
+            }}
+          >
+            <section
+              className="transit-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="ping-trick-title"
+              aria-describedby="ping-trick-text"
+            >
+              <h2 id="ping-trick-title">{t("game.pingTrick.title")}</h2>
+              <p id="ping-trick-text">
+                {pingTrick.used
+                  ? t("game.pingTrick.usedText", {
+                      mode: t(`game.pingTrick.mode.${pingTrick.used}`),
+                    })
+                  : t("game.pingTrick.text")}
+              </p>
+              {pingTrick.armed && (
+                <p role="status">
+                  {t("game.pingTrick.armedText", {
+                    mode: t(`game.pingTrick.mode.${pingTrick.armed}`),
+                  })}
+                </p>
+              )}
+              <div className="transit-dialog-actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setPingTrickDialogOpen(false)}
+                >
+                  {t("game.pingTrick.close")}
+                </button>
+                {pingTrick.armed && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => {
+                      onPingTrick("CANCEL");
+                      setPingTrickDialogOpen(false);
+                    }}
+                  >
+                    {t("game.pingTrick.cancel")}
+                  </button>
+                )}
+                {!pingTrick.used && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onPingTrick("FAKE");
+                        setPingTrickDialogOpen(false);
+                      }}
+                    >
+                      {t("game.pingTrick.fake")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onPingTrick("SKIP");
+                        setPingTrickDialogOpen(false);
+                      }}
+                    >
+                      {t("game.pingTrick.skip")}
+                    </button>
+                  </>
+                )}
+              </div>
+            </section>
+          </div>
         )}
 
         {surrenderDialogOpen && (

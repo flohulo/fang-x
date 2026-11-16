@@ -24,3 +24,7 @@ estimate, not an exact measurement.
 
 Once the game has ended, the summary stays available like the result until the room is closed.
 Reloading the page still shows it.
+
+New players cannot join a finished game while players of that round may still return (up to
+30 minutes after losing the connection). They see the message "This round has ended" and should
+start a new game instead. Only once everyone has left does the room start again with an empty lobby.

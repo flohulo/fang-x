@@ -560,6 +560,7 @@ export default function App() {
         objective={game.objective}
         transitStops={game.transitStops}
         transitNotice={game.transitNotice}
+        pingTrick={game.pingTrick}
         teamMarkers={game.teamMarkers}
         inactivity={game.inactivity}
         safe={game.safe}
@@ -575,6 +576,7 @@ export default function App() {
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
+        onPingTrick={game.requestPingTrick}
         onSendRtc={game.sendRtc}
         onSubscribeRtc={game.subscribeRtc}
         onAddTeamMarker={game.addTeamMarker}

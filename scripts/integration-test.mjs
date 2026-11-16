@@ -50,22 +50,28 @@ function leadingZeroBits(buf) {
 let humanTicket = null;
 let humanCheckActive = false;
 
-async function fetchTicket() {
-  const info = await (await fetch(`${HTTP}/api/challenge`)).json();
-  if (!info.enabled) return null;
-  humanCheckActive = true;
+function solveChallenge(challenge, difficulty) {
   for (let counter = 0; ; counter++) {
     const solution = counter.toString(36);
-    const digest = createHash("sha256").update(`${info.challenge}:${solution}`).digest();
-    if (leadingZeroBits(digest) < info.difficulty) continue;
-    const res = await fetch(`${HTTP}/api/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ challenge: info.challenge, solution }),
-    });
-    if (!res.ok) throw new Error(`Verify HTTP ${res.status}`);
-    return (await res.json()).ticket;
+    const digest = createHash("sha256").update(`${challenge}:${solution}`).digest();
+    if (leadingZeroBits(digest) >= difficulty) return solution;
   }
+}
+
+// ip: simuliert eine Client-Adresse über CF-Connecting-IP (lokal reicht wrangler ihn durch).
+async function fetchTicket(ip) {
+  const ipHeader = ip ? { "CF-Connecting-IP": ip } : {};
+  const info = await (await fetch(`${HTTP}/api/challenge`, { headers: ipHeader })).json();
+  if (!info.enabled) return null;
+  humanCheckActive = true;
+  const solution = solveChallenge(info.challenge, info.difficulty);
+  const res = await fetch(`${HTTP}/api/verify`, {
+    method: "POST",
+    headers: { ...ipHeader, "Content-Type": "application/json" },
+    body: JSON.stringify({ challenge: info.challenge, solution }),
+  });
+  if (!res.ok) throw new Error(`Verify HTTP ${res.status}`);
+  return (await res.json()).ticket;
 }
 
 async function createGame() {
@@ -142,19 +148,62 @@ async function run() {
       ghost.on("error", () => {});
     });
     assert(ghostStatus === 403, "Menschen-Prüfung: WebSocket ohne Ticket wird abgelehnt");
+
+    // Tickets und Aufgaben gelten nur für die Adresse, für die sie ausgestellt wurden.
+    const lookupStatus = async (ip, ticket) =>
+      (
+        await fetch(`${HTTP}/api/games/ABCDEF`, {
+          headers: { "CF-Connecting-IP": ip, "X-Human-Ticket": ticket },
+        })
+      ).status;
+    const ipTicket = await fetchTicket("198.51.100.1");
+    assert(
+      (await lookupStatus("198.51.100.1", ipTicket)) === 200,
+      "Menschen-Prüfung: Ticket gilt für die eigene Adresse",
+    );
+    assert(
+      (await lookupStatus("198.51.100.2", ipTicket)) === 403,
+      "Menschen-Prüfung: Ticket gilt nicht für eine andere Adresse",
+    );
+    const v6Ticket = await fetchTicket("2001:db8:1:2:aaaa::1");
+    assert(
+      (await lookupStatus("2001:db8:1:2:bbbb::7", v6Ticket)) === 200 &&
+        (await lookupStatus("2001:db8:1:3::1", v6Ticket)) === 403,
+      "Menschen-Prüfung: Bei IPv6 zählt das /64-Netz",
+    );
+    const foreignInfo = await (
+      await fetch(`${HTTP}/api/challenge`, { headers: { "CF-Connecting-IP": "198.51.100.3" } })
+    ).json();
+    const foreignRedeem = await fetch(`${HTTP}/api/verify`, {
+      method: "POST",
+      headers: { "CF-Connecting-IP": "198.51.100.4", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        challenge: foreignInfo.challenge,
+        solution: solveChallenge(foreignInfo.challenge, foreignInfo.difficulty),
+      }),
+    });
+    assert(
+      foreignRedeem.status === 400,
+      "Menschen-Prüfung: Aufgabe lässt sich nicht von einer anderen Adresse einlösen",
+    );
   }
 
   // 0b. Ratenbegrenzung pro Adresse (CF-Connecting-IP; lokal ohne Header ist sie aus)
-  const createFrom = async (ip) =>
-    (
+  // Tickets sind an die Adresse gebunden: pro simulierter Adresse ein eigenes holen.
+  const ipTickets = new Map();
+  const createFrom = async (ip) => {
+    if (!ipTickets.has(ip)) ipTickets.set(ip, await fetchTicket(ip));
+    const ticket = ipTickets.get(ip);
+    return (
       await fetch(`${HTTP}/api/games`, {
         method: "POST",
         headers: {
           "CF-Connecting-IP": ip,
-          ...(humanTicket ? { "X-Human-Ticket": humanTicket } : {}),
+          ...(ticket ? { "X-Human-Ticket": ticket } : {}),
         },
       })
     ).status;
+  };
   const limitIp = `198.51.100.${10 + Math.floor(Math.random() * 200)}`;
   const createStatuses = [];
   for (let i = 0; i < 4; i++) createStatuses.push(await createFrom(limitIp));
@@ -352,6 +401,46 @@ async function run() {
     "X wird informiert, wenn die Sichtung an Detektive übermittelt wird",
   );
 
+  // Ping-Trick: scharf schalten, zurücknehmen, dann falscher Ping bei der nächsten Sichtung
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "SKIP" }));
+  await host.waitFor((m) => m.t === "pingTrick" && m.armed === "SKIP", 5000);
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "CANCEL" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const trickStates = host.messages.filter((m) => m.t === "pingTrick");
+  assert(
+    trickStates[trickStates.length - 1].armed === null,
+    "Ping-Trick lässt sich vor der Sichtung zurücknehmen",
+  );
+  det.ws.send(JSON.stringify({ t: "setPingTrick", mode: "FAKE" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(!det.messages.some((m) => m.t === "pingTrick"), "Nur X kann den Ping-Trick benutzen");
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "FAKE" }));
+  await host.waitFor((m) => m.t === "pingTrick" && m.armed === "FAKE", 5000);
+  const fakeShared = await host.waitFor(
+    (m) => m.t === "positionShared" && !m.live && m.index > reveal.reveal.index,
+    15000,
+  );
+  const metersFromX = Math.hypot(
+    (fakeShared.pos.lat - xPos.lat) * 111_000,
+    (fakeShared.pos.lng - xPos.lng) * 111_000 * Math.cos((xPos.lat * Math.PI) / 180),
+  );
+  assert(metersFromX >= 30, `Falscher Ping liegt abseits von X (${Math.round(metersFromX)} m)`);
+  const fakeReveal = await det.waitFor(
+    (m) => m.t === "reveal" && m.reveal.index === fakeShared.index,
+    5000,
+  );
+  assert(
+    fakeReveal.reveal.pos.lat === fakeShared.pos.lat &&
+      fakeReveal.reveal.pos.lng === fakeShared.pos.lng,
+    "Detektive sehen den falschen Ping wie eine echte Sichtung",
+  );
+  host.ws.send(JSON.stringify({ t: "setPingTrick", mode: "SKIP" }));
+  const trickUsed = await host.waitFor(
+    (m) => m.t === "error" && m.code === "PING_TRICK_USED",
+    5000,
+  );
+  assert(!!trickUsed, "Der Ping-Trick gilt nur einmal pro Runde");
+
   const objectiveTarget = { lat: xPos.lat, lng: xPos.lng + 0.0008 };
   det.ws.send(JSON.stringify({ t: "setObjective", target: objectiveTarget }));
   const unauthorizedObjective = await det.waitFor(
@@ -476,8 +565,10 @@ async function run() {
     "Chat ist nach Spielende deaktiviert",
   );
 
-  host.ws.close();
-  det.ws.close();
+  // Erst wenn alle den Raum verlassen haben, beginnt er von vorn.
+  for (const client of [host, det, det2]) client.ws.send(JSON.stringify({ t: "leave" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  for (const client of [host, det, det2]) client.ws.close();
 
   // Der Verlauf wird beim Zurücksetzen des Raums nicht mitgegeben
   const afterChat = await connect(code);
@@ -859,7 +950,7 @@ async function run() {
   emergencyDetective.ws.send(
     JSON.stringify({ t: "join", code: code7, name: "Notfall-Detektiv", wantsX: false }),
   );
-  await emergencyDetective.waitFor((m) => m.t === "joined");
+  const emergencyDetectiveJoined = await emergencyDetective.waitFor((m) => m.t === "joined");
 
   emergencyX.ws.send(
     JSON.stringify({
@@ -897,9 +988,17 @@ async function run() {
     "Detektive erhalten den exakten Standort und den Namen von X",
   );
 
+  emergencyDetective.ws.terminate();
   const surrenderReconnect = await connect(code7);
   surrenderReconnect.ws.send(
-    JSON.stringify({ t: "join", code: code7, name: "Nachzügler", wantsX: false }),
+    JSON.stringify({
+      t: "join",
+      code: code7,
+      name: "Notfall-Detektiv",
+      wantsX: false,
+      playerId: emergencyDetectiveJoined.playerId,
+      token: emergencyDetectiveJoined.token,
+    }),
   );
   const reconnectedEnd = await surrenderReconnect.waitFor((m) => m.t === "end", 5000);
   assert(
@@ -907,9 +1006,24 @@ async function run() {
     "Standort beim Aufgeben bleibt für Wiedereinsteiger sichtbar",
   );
 
+  // Wer neu dazukommt, während andere noch zurückkehren dürfen, wird abgelehnt.
+  const latecomer = await connect(code7);
+  const latecomerClosed = new Promise((resolve) => latecomer.ws.on("close", resolve));
+  latecomer.ws.send(JSON.stringify({ t: "join", code: code7, name: "Nachzügler", wantsX: false }));
+  const latecomerError = await latecomer.waitFor((m) => m.t === "error", 5000);
+  await latecomerClosed;
+  assert(
+    latecomerError.code === "GAME_ENDED",
+    "Neue Spieler werden nach Spielende abgelehnt (GAME_ENDED)",
+  );
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !surrenderReconnect.messages.some((m) => m.t === "phase" && m.phase === "LOBBY"),
+    "Ein abgelehnter Nachzügler setzt die Auswertung nicht zurück",
+  );
+
   surrenderReconnect.ws.close();
   emergencyX.ws.close();
-  emergencyDetective.ws.close();
 
   // 18. Ohne Regel ist der Notfall-Knopf wirkungslos
   console.log("\n=== Aufgeben nur mit Regel ===");
@@ -929,6 +1043,7 @@ async function run() {
       ruleset: {
         game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
         catch: { xCanSurrender: false },
+        reveal: { xCanTrick: false },
         map: { outOfBoundsEnabled: false },
       },
     }),
@@ -946,10 +1061,53 @@ async function run() {
     !noSurrenderDetective.messages.some((m) => m.t === "end"),
     "Die Runde läuft nach einem abgelehnten Aufgeben weiter",
   );
+  noSurrenderX.ws.send(JSON.stringify({ t: "setPingTrick", mode: "FAKE" }));
+  const trickDisabled = await noSurrenderX.waitFor(
+    (m) => m.t === "error" && m.code === "PING_TRICK_DISABLED",
+    5000,
+  );
+  assert(!!trickDisabled, "Ohne Regel wird der Ping-Trick abgelehnt");
   noSurrenderX.ws.close();
   noSurrenderDetective.ws.close();
 
-  // 18b. Spielernamen werden bereinigt (Steuer- und Formatzeichen, Länge)
+  // 18b. Kurz getrennter Host behält die Leitung, Neue werden nicht zusätzlich Host
+  console.log("\n=== Host kurz getrennt ===");
+  const codeHost = await createGame();
+  const firstHost = await connect(codeHost);
+  firstHost.ws.send(JSON.stringify({ t: "join", code: codeHost, name: "Host", wantsX: false }));
+  const firstHostJoined = await firstHost.waitFor((m) => m.t === "joined");
+  const hostGone = new Promise((resolve) => firstHost.ws.on("close", resolve));
+  firstHost.ws.terminate();
+  await hostGone;
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const newcomer = await connect(codeHost);
+  newcomer.ws.send(JSON.stringify({ t: "join", code: codeHost, name: "Neu", wantsX: false }));
+  const newcomerJoined = await newcomer.waitFor((m) => m.t === "joined");
+  assert(
+    newcomerJoined.youAreHost === false,
+    "Wer während einer kurzen Trennung des Hosts beitritt, wird nicht Host",
+  );
+  const hostBack = await connect(codeHost);
+  hostBack.ws.send(
+    JSON.stringify({
+      t: "join",
+      code: codeHost,
+      name: "Host",
+      wantsX: false,
+      playerId: firstHostJoined.playerId,
+      token: firstHostJoined.token,
+    }),
+  );
+  const hostBackJoined = await hostBack.waitFor((m) => m.t === "joined");
+  assert(
+    hostBackJoined.youAreHost === true &&
+      hostBackJoined.players.filter((p) => p.isHost).length === 1,
+    "Zurückgekehrter Host ist wieder Host, es gibt genau einen Host",
+  );
+  newcomer.ws.close();
+  hostBack.ws.close();
+
+  // 18c. Spielernamen werden bereinigt (Steuer- und Formatzeichen, Länge)
   console.log("\n=== Spielernamen ===");
   const codeName = await createGame();
   const named = await connect(codeName);
@@ -982,6 +1140,45 @@ async function run() {
     new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
   ]);
   assert(closeCode === 4008, "Flut ungültiger Nachrichten trennt die Verbindung (Code 4008)");
+
+  // 20. Ping-Trick: Sichtung überspringen
+  console.log("\n=== Ping-Trick: Sichtung überspringen ===");
+  const codeSkip = await createGame();
+  const skipX = await connect(codeSkip);
+  skipX.ws.send(JSON.stringify({ t: "join", code: codeSkip, name: "Skip-X", wantsX: true }));
+  await skipX.waitFor((m) => m.t === "joined");
+  const skipDetective = await connect(codeSkip);
+  skipDetective.ws.send(
+    JSON.stringify({ t: "join", code: codeSkip, name: "Skip-Detektiv", wantsX: false }),
+  );
+  await skipDetective.waitFor((m) => m.t === "joined");
+  skipX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        reveal: { intervalMinutes: 0.1, firstRevealAfterMinutes: 0.05 },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  await skipX.waitFor((m) => m.t === "config");
+  skipX.ws.send(JSON.stringify({ t: "start" }));
+  await skipX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  skipX.ws.send(JSON.stringify({ t: "position", pos: surrenderPos }));
+  skipX.ws.send(JSON.stringify({ t: "setPingTrick", mode: "SKIP" }));
+  await skipX.waitFor((m) => m.t === "pingTrick" && m.used === "SKIP", 10000);
+  assert(
+    !skipDetective.messages.some((m) => m.t === "reveal"),
+    "Übersprungene Sichtung erreicht die Detektive nicht",
+  );
+  const afterSkip = await skipDetective.waitFor((m) => m.t === "reveal", 15000);
+  assert(
+    afterSkip.reveal.index === 1,
+    "Die Sichtung nach dem Überspringen zählt unauffällig als erste",
+  );
+  skipX.ws.close();
+  skipDetective.ws.close();
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);
