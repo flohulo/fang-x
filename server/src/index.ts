@@ -12,13 +12,16 @@ import {
 import type { DurableObject } from "cloudflare:workers";
 import * as Sentry from "@sentry/cloudflare";
 import { scrubErrorEvent } from "@fang-x/shared";
-import { RateLimiter } from "./rate-limit";
 import { GameRoom } from "./room";
 import { HUMAN_CHECK_DIFFICULTY_BITS } from "@fang-x/shared";
 
 export interface Env {
   GAME_ROOM: DurableObjectNamespace;
-  RATE_LIMIT: DurableObjectNamespace;
+  /** Ratenbegrenzer von Workers (wrangler.toml, [[ratelimits]]), zählen an der Edge. */
+  CREATE_LIMIT: RateLimit;
+  LOOKUP_LIMIT: RateLimit;
+  VERIFY_LIMIT: RateLimit;
+  JOIN_LIMIT: RateLimit;
   ASSETS: Fetcher;
   /** Optional: JSON-Liste von ICE-Servern (STUN/TURN) für den Sprechfunk der Detektive. */
   ICE_SERVERS?: string;
@@ -43,15 +46,10 @@ function sentryOptions(env: Env): Sentry.CloudflareOptions {
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_LENGTH = 6;
 
-// Grenzen pro IP-Adresse
-const CREATE_LIMIT = 10;
-const CREATE_WINDOW_MS = 10 * 60_000;
-const LOOKUP_LIMIT = 60;
-const LOOKUP_WINDOW_MS = 60_000;
-const VERIFY_LIMIT = 30;
-const VERIFY_WINDOW_MS = 10 * 60_000;
-const JOIN_LIMIT = 100;
-const JOIN_WINDOW_MS = 10 * 60_000;
+// Grenzen pro IP-Adresse stehen in wrangler.toml ([[ratelimits]]); Workers erlaubt dort
+// nur Zeitfenster von 10 oder 60 Sekunden.
+const RETRY_AFTER_SECONDS = 60;
+const LOCAL_KEYS = new Set(["lokal", "127.0.0.1", "::1"]);
 
 function generateCode(): string {
   const bytes = new Uint8Array(CODE_LENGTH);
@@ -69,31 +67,21 @@ function clientKey(request: Request): string {
   return request.headers.get("CF-Connecting-IP") ?? "lokal";
 }
 
-async function checkRateLimit(
-  env: Env,
-  request: Request,
-  scope: string,
-  limit: number,
-  windowMs: number,
-): Promise<Response | null> {
-  const stub = env.RATE_LIMIT.get(env.RATE_LIMIT.idFromName("global"));
-  const result = await stub
-    .fetch(
-      new Request("http://internal/check", {
-        method: "POST",
-        body: JSON.stringify({ key: `${scope}:${clientKey(request)}`, limit, windowMs }),
-      }),
-    )
-    .then((r) => r.json() as Promise<{ allowed: boolean; retryAfterSeconds: number }>);
-
-  if (result.allowed) return null;
+async function checkRateLimit(limiter: RateLimit, request: Request): Promise<Response | null> {
+  const key = clientKey(request);
+  // Lokal (wrangler dev, Integrationstest) kommt alles von 127.0.0.1 bzw. ohne Adresse:
+  // nicht begrenzen, sonst teilen sich alle Testverbindungen einen Zähler. In Produktion
+  // setzt Cloudflare immer die echte Adresse des Clients.
+  if (LOCAL_KEYS.has(key)) return null;
+  const { success } = await limiter.limit({ key });
+  if (success) return null;
 
   return Response.json(
     { error: "Zu viele Anfragen. Bitte kurz warten." },
     {
       status: 429,
       headers: {
-        "Retry-After": String(result.retryAfterSeconds),
+        "Retry-After": String(RETRY_AFTER_SECONDS),
         "Cache-Control": "no-store",
       },
     },
@@ -124,7 +112,7 @@ const handler = {
       if (!humanCheckEnabled(env)) {
         return Response.json({ enabled: false }, { headers: NO_STORE });
       }
-      const limited = await checkRateLimit(env, request, "verify", VERIFY_LIMIT, VERIFY_WINDOW_MS);
+      const limited = await checkRateLimit(env.VERIFY_LIMIT, request);
       if (limited) return limited;
       return Response.json(
         {
@@ -140,7 +128,7 @@ const handler = {
       if (!humanCheckEnabled(env)) {
         return Response.json({ enabled: false }, { headers: NO_STORE });
       }
-      const limited = await checkRateLimit(env, request, "verify", VERIFY_LIMIT, VERIFY_WINDOW_MS);
+      const limited = await checkRateLimit(env.VERIFY_LIMIT, request);
       if (limited) return limited;
       const body = (await request.json().catch(() => null)) as {
         challenge?: unknown;
@@ -163,7 +151,7 @@ const handler = {
     if (url.pathname === "/api/games" && request.method === "POST") {
       const unverified = await requireTicket(env, request);
       if (unverified) return unverified;
-      const limited = await checkRateLimit(env, request, "create", CREATE_LIMIT, CREATE_WINDOW_MS);
+      const limited = await checkRateLimit(env.CREATE_LIMIT, request);
       if (limited) return limited;
 
       // Code suchen, der noch frei ist
@@ -193,7 +181,7 @@ const handler = {
     if (codeCheck && request.method === "GET") {
       const unverified = await requireTicket(env, request);
       if (unverified) return unverified;
-      const limited = await checkRateLimit(env, request, "lookup", LOOKUP_LIMIT, LOOKUP_WINDOW_MS);
+      const limited = await checkRateLimit(env.LOOKUP_LIMIT, request);
       if (limited) return limited;
 
       const stub = env.GAME_ROOM.get(env.GAME_ROOM.idFromName(codeCheck[1]));
@@ -220,7 +208,7 @@ const handler = {
       }
       const unverified = await requireTicket(env, request);
       if (unverified) return unverified;
-      const limited = await checkRateLimit(env, request, "join", JOIN_LIMIT, JOIN_WINDOW_MS);
+      const limited = await checkRateLimit(env.JOIN_LIMIT, request);
       if (limited) return limited;
       const code = roomMatch[1];
       const id = env.GAME_ROOM.idFromName(code);
@@ -242,9 +230,4 @@ const GameRoomInstrumented = Sentry.instrumentDurableObjectWithSentry(
   sentryOptions,
   GameRoom as unknown as DurableObjectClass,
 );
-const RateLimiterInstrumented = Sentry.instrumentDurableObjectWithSentry(
-  sentryOptions,
-  RateLimiter as unknown as DurableObjectClass,
-);
-
-export { GameRoomInstrumented as GameRoom, RateLimiterInstrumented as RateLimiter };
+export { GameRoomInstrumented as GameRoom };

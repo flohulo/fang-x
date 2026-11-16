@@ -144,6 +144,29 @@ async function run() {
     assert(ghostStatus === 403, "Menschen-Prüfung: WebSocket ohne Ticket wird abgelehnt");
   }
 
+  // 0b. Ratenbegrenzung pro Adresse (CF-Connecting-IP; lokal ohne Header ist sie aus)
+  const createFrom = async (ip) =>
+    (
+      await fetch(`${HTTP}/api/games`, {
+        method: "POST",
+        headers: {
+          "CF-Connecting-IP": ip,
+          ...(humanTicket ? { "X-Human-Ticket": humanTicket } : {}),
+        },
+      })
+    ).status;
+  const limitIp = `198.51.100.${10 + Math.floor(Math.random() * 200)}`;
+  const createStatuses = [];
+  for (let i = 0; i < 4; i++) createStatuses.push(await createFrom(limitIp));
+  assert(
+    createStatuses.slice(0, 3).every((status) => status === 200) && createStatuses[3] === 429,
+    `Ratenbegrenzung: viertes Spiel pro Minute wird abgelehnt (${createStatuses.join(", ")})`,
+  );
+  assert(
+    (await createFrom("203.0.113.77")) === 200,
+    "Ratenbegrenzung: andere Adressen sind nicht betroffen",
+  );
+
   // 1. Spiel erstellen
   const code = await createGame();
   assert(code && code.length === 6, `Spiel-Code erstellt: ${code}`);
