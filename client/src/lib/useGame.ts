@@ -43,7 +43,7 @@ export type RtcHandler = (from: string, signal: RtcSignal) => void;
 /** Reconnect-Versuche mit wachsendem Abstand, aber gedeckelt. */
 const MAX_RECONNECT_DELAY_MS = 10_000;
 /** Fehler, bei denen ein erneuter Versuch sinnlos ist. */
-const FATAL_CODES = new Set(["ROOM_FULL", "NO_GAME"]);
+const FATAL_CODES = new Set(["ROOM_FULL", "NO_GAME", "GAME_ENDED"]);
 
 export function useGame() {
   const [phase, setPhase] = useState<string>("LOBBY");

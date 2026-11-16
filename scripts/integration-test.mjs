@@ -493,8 +493,10 @@ async function run() {
     "Chat ist nach Spielende deaktiviert",
   );
 
-  host.ws.close();
-  det.ws.close();
+  // Erst wenn alle den Raum verlassen haben, beginnt er von vorn.
+  for (const client of [host, det, det2]) client.ws.send(JSON.stringify({ t: "leave" }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  for (const client of [host, det, det2]) client.ws.close();
 
   // Der Verlauf wird beim Zurücksetzen des Raums nicht mitgegeben
   const afterChat = await connect(code);
@@ -876,7 +878,7 @@ async function run() {
   emergencyDetective.ws.send(
     JSON.stringify({ t: "join", code: code7, name: "Notfall-Detektiv", wantsX: false }),
   );
-  await emergencyDetective.waitFor((m) => m.t === "joined");
+  const emergencyDetectiveJoined = await emergencyDetective.waitFor((m) => m.t === "joined");
 
   emergencyX.ws.send(
     JSON.stringify({
@@ -914,9 +916,17 @@ async function run() {
     "Detektive erhalten den exakten Standort und den Namen von X",
   );
 
+  emergencyDetective.ws.terminate();
   const surrenderReconnect = await connect(code7);
   surrenderReconnect.ws.send(
-    JSON.stringify({ t: "join", code: code7, name: "Nachzügler", wantsX: false }),
+    JSON.stringify({
+      t: "join",
+      code: code7,
+      name: "Notfall-Detektiv",
+      wantsX: false,
+      playerId: emergencyDetectiveJoined.playerId,
+      token: emergencyDetectiveJoined.token,
+    }),
   );
   const reconnectedEnd = await surrenderReconnect.waitFor((m) => m.t === "end", 5000);
   assert(
@@ -924,9 +934,24 @@ async function run() {
     "Standort beim Aufgeben bleibt für Wiedereinsteiger sichtbar",
   );
 
+  // Wer neu dazukommt, während andere noch zurückkehren dürfen, wird abgelehnt.
+  const latecomer = await connect(code7);
+  const latecomerClosed = new Promise((resolve) => latecomer.ws.on("close", resolve));
+  latecomer.ws.send(JSON.stringify({ t: "join", code: code7, name: "Nachzügler", wantsX: false }));
+  const latecomerError = await latecomer.waitFor((m) => m.t === "error", 5000);
+  await latecomerClosed;
+  assert(
+    latecomerError.code === "GAME_ENDED",
+    "Neue Spieler werden nach Spielende abgelehnt (GAME_ENDED)",
+  );
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !surrenderReconnect.messages.some((m) => m.t === "phase" && m.phase === "LOBBY"),
+    "Ein abgelehnter Nachzügler setzt die Auswertung nicht zurück",
+  );
+
   surrenderReconnect.ws.close();
   emergencyX.ws.close();
-  emergencyDetective.ws.close();
 
   // 18. Ohne Regel ist der Notfall-Knopf wirkungslos
   console.log("\n=== Aufgeben nur mit Regel ===");

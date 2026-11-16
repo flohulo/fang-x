@@ -624,9 +624,24 @@ export class GameRoom {
             known.disconnectedAt = null;
             player = known;
           } else {
-            // Ein beendetes Spiel ohne Anwesende beginnt von vorn.
-            if (this.phase === "ENDED" && this.connectedCount() === 0) {
-              this.players.clear();
+            // Ein beendetes Spiel beginnt erst von vorn, wenn niemand mehr einen Platz hat.
+            // Solange Mitspielende noch zurückkommen dürfen, bleibt die Auswertung erhalten
+            // und Neue werden abgelehnt (sie sollen die Ergebnisse nicht löschen oder sehen).
+            if (this.phase === "ENDED") {
+              if (this.players.size > 0) {
+                this.sendTo(ws, {
+                  t: "error",
+                  message: "Diese Runde ist beendet. Starte ein neues Spiel.",
+                  code: "GAME_ENDED",
+                });
+                closed = true;
+                try {
+                  ws.close(4004, "Runde beendet");
+                } catch {
+                  // Ignorieren
+                }
+                return;
+              }
               this.resetToLobby();
             }
             if (this.players.size >= MAX_PLAYERS) {
