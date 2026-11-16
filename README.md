@@ -131,6 +131,15 @@ Projekt an und hinterlege dessen DSN:
 Ohne DSN ist die Fehlerberichterstattung ausgeschaltet. Die Bereinigung der Berichte steht in
 [`shared/src/error-report.ts`](shared/src/error-report.ts).
 
+### Sicherheitsheader
+
+Beim Bauen erzeugt `client/vite.config.ts` die Datei `client/dist/_headers`. Workers Assets
+liefert damit HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`
+(Standort und Mikrofon für den Sprechfunk nur für die eigene Seite, keine Kamera) und eine
+Content Security Policy aus, die das Einbetten in fremde Seiten verbietet. Erlaubt sind nur die eigenen Dateien,
+die Karten-Hosts und, falls `VITE_GLITCHTIP_DSN` gesetzt ist, der GlitchTip-Host. Wer einen
+weiteren Karten- oder Dienst-Host einbindet, muss ihn dort in `MAP_HOSTS` bzw. der CSP ergänzen.
+
 ### Prüfen
 
 > [!NOTE]
