@@ -18,6 +18,8 @@ They share the six-character **game code** with the group – via the invitation
 !!! tip ":material-qrcode: QR code for everyone on site"
     Tap **Show QR code** in the lobby. The others scan it with their phone camera and land directly
     in the game. The QR code contains the same link as **Share invitation**.
+    If Fang X is already installed as an app, the link preferably opens the installed app
+    (depending on operating system and browser).
 
 ## Choosing a role
 
@@ -44,7 +46,11 @@ your location. Without GPS you can try out the game in **simulation mode** on th
 - **Detectives** see the map, the last reveal and – depending on the settings – the locations of
   the other detectives. Depending on the rule, a catch happens automatically within the catch
   radius or via a photo catch.
-- Everyone can write in the chat. The history is deleted after the game ends.
+- Everyone can write in the chat. The history is deleted after the game ends. New messages show a
+  popup while the chat is closed. If alerts are enabled and the app is in the background, you also
+  get a notification.
+- Detectives can talk over the [voice radio](Sprechfunk.md) without X listening in. The host turns
+  it on in the settings.
 
 ## End of the game
 
@@ -66,3 +72,9 @@ When a new version is available, the app asks whether to reload. After **Reload*
 history (changelog) opens automatically so you can see what is new. The back link takes you to
 the home screen at any time, where a running game is resumed. You can also find the changelog in
 the menu and via the version number on the home screen.
+
+## Status and news
+
+The [status page](https://flohulo.github.io/fang-x-status/) shows whether the server is running,
+whether there is a known outage and what is new. You can also find it in the menu under
+**Help > Status and news**.

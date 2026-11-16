@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://flohulo.github.io/fang-x/handbuch/">Handbuch</a> ·
+  <a href="https://flohulo.github.io/fang-x-status/">Status</a> ·
   <a href="#so-funktionierts">So funktioniert's</a> ·
   <a href="#datenschutz-und-sicher-spielen">Datenschutz</a> ·
   <a href="#lokal-ausprobieren">Lokal ausprobieren</a> ·
@@ -70,11 +71,31 @@ bekommen regelmässig ungefähre Hinweise auf X' Standort. Wer X im Fangradius e
 - Spielt rücksichtsvoll: Bleibt an sicheren, öffentlichen Orten, achtet auf den Verkehr und
   respektiert die Privatsphäre anderer.
 
+### Spam-Schutz
+
+Beim Öffnen der Seite löst der Browser unsichtbar eine kleine Rechenaufgabe (Proof-of-Work).
+Der Server stellt dafür ein signiertes Ticket aus, das für das Erstellen, Abfragen und Beitreten
+von Räumen nötig ist. Es gibt keine Cookies, keine Konten und keinen externen Dienst. Zusätzlich
+gelten Limits pro IP-Adresse (Raum erstellen, Raum abfragen, Beitritt). Wer eine Verbindung mit
+fehlerhaften Nachrichten oder Chat-Spam flutet, wird getrennt. Spielverbindungen, die ein
+Browser von einer fremden Webseite aus öffnet, lehnt der Server anhand des `Origin`-Headers ab.
+
+Für den Betrieb den Signaturschlüssel einmalig setzen:
+
+```bash
+cd server
+npx wrangler secret put HUMAN_CHECK_SECRET
+```
+
+Ohne diesen Schlüssel ist die Prüfung ausgeschaltet. Das ist für die lokale Entwicklung gedacht.
+Lokal einschalten geht mit `npx wrangler dev --var HUMAN_CHECK_SECRET:irgendein-text`.
+
 ### Fehlerberichte (optional)
 
 Wenn der Betreiber ein [GlitchTip](https://glitchtip.com/)-Projekt eingerichtet hat, werden
 Programmfehler dorthin gemeldet. Vor dem Senden werden Standortdaten, Nutzerdaten, Header,
-Cookies, Breadcrumbs und Spielcodes entfernt. Ohne eingerichtetes Projekt wird nichts gesendet.
+Cookies, Breadcrumbs, Spielcodes, Reconnect-Tokens und Tickets entfernt; die aufgerufene Adresse
+wird ohne Query-Teil übermittelt. Ohne eingerichtetes Projekt wird nichts gesendet.
 
 ### Kartendaten
 
@@ -113,6 +134,15 @@ Projekt an und hinterlege dessen DSN:
 Ohne DSN ist die Fehlerberichterstattung ausgeschaltet. Die Bereinigung der Berichte steht in
 [`shared/src/error-report.ts`](shared/src/error-report.ts).
 
+### Sicherheitsheader
+
+Beim Bauen erzeugt `client/vite.config.ts` die Datei `client/dist/_headers`. Workers Assets
+liefert damit HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`
+(Standort und Mikrofon für den Sprechfunk nur für die eigene Seite, keine Kamera) und eine
+Content Security Policy aus, die das Einbetten in fremde Seiten verbietet. Erlaubt sind nur die eigenen Dateien,
+die Karten-Hosts und, falls `VITE_GLITCHTIP_DSN` gesetzt ist, der GlitchTip-Host. Wer einen
+weiteren Karten- oder Dienst-Host einbindet, muss ihn dort in `MAP_HOSTS` bzw. der CSP ergänzen.
+
 ### Prüfen
 
 > [!NOTE]
@@ -133,7 +163,11 @@ Weitere Hinweise zum Entwickeln und Mitwirken stehen in
 Die Webseite zum Spiel (Quelle: [`website/`](website/)) liegt unter
 <https://flohulo.github.io/fang-x/>. Das Handbuch mit Spielablauf, allen Einstellungen und Tipps steht unter
 <https://flohulo.github.io/fang-x/handbuch/>. Es wird mit [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
-aus den Seiten in [`docs/`](docs/) gebaut:
+aus den Seiten in [`docs/`](docs/) gebaut. Ob der Server läuft und was es Neues gibt, zeigt die Statusseite
+<https://flohulo.github.io/fang-x-status/> (Quelle: [`flohulo/fang-x-status`](https://github.com/flohulo/fang-x-status),
+betrieben mit [Upptime](https://upptime.js.org/)).
+
+So baust du das Handbuch lokal:
 
 ```bash
 pip install -r requirements-docs.txt

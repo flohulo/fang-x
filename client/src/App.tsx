@@ -11,6 +11,7 @@ import i18n from "./i18n";
 import { LegalScreen } from "./legal";
 import { parseInviteCode } from "./lib/invite";
 import { formatServerError } from "./lib/serverMessages";
+import { ensureHumanTicket, fetchWithTicket } from "./lib/humanCheck";
 import { clearSession, loadSession, saveSession } from "./lib/session";
 import { markChangelogAfterUpdate } from "./lib/updateChangelog";
 import { useGame } from "./lib/useGame";
@@ -75,6 +76,21 @@ async function showPositionSharedNotification(at: number, index: number, live: b
   const title = live
     ? i18n.t("notifications.positionLiveTitle")
     : i18n.t("notifications.positionSharedTitle");
+  if ("serviceWorker" in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    await registration.showNotification(title, options);
+    return;
+  }
+  new Notification(title, options);
+}
+
+async function showChatNotification(name: string, text: string) {
+  const options: NotificationOptions = {
+    body: text,
+    icon: "/icon-192.png",
+    tag: "fang-x-chat",
+  };
+  const title = i18n.t("notifications.chatTitle", { name });
   if ("serviceWorker" in navigator) {
     const registration = await navigator.serviceWorker.ready;
     await registration.showNotification(title, options);
@@ -219,6 +235,11 @@ export default function App() {
     }
   }, []);
 
+  // Menschen-Prüfung beim Öffnen der Seite unsichtbar im Hintergrund erledigen.
+  useEffect(() => {
+    void ensureHumanTicket();
+  }, []);
+
   useEffect(() => {
     if (!alertsEnabled) return;
     const unlockAudio = () => {
@@ -285,6 +306,27 @@ export default function App() {
     });
   }, [alertsEnabled, notificationPermission, game.gameResult, game.myId, game.players]);
 
+  const chatNotifiedRef = useRef<number | null | undefined>(undefined);
+  useEffect(() => {
+    const last =
+      game.chatMessages.length > 0 ? game.chatMessages[game.chatMessages.length - 1] : null;
+    const lastId = last?.id ?? null;
+    // Erster Durchlauf: vorhandenen Verlauf nicht erneut melden.
+    if (chatNotifiedRef.current === undefined || lastId === null) {
+      chatNotifiedRef.current = lastId;
+      return;
+    }
+    if (chatNotifiedRef.current === lastId || !last) return;
+    chatNotifiedRef.current = lastId;
+    if (last.playerId === game.myId) return;
+    if (!alertsEnabled || notificationPermission !== "granted") return;
+    if (document.visibilityState !== "hidden") return;
+    if (typeof navigator.vibrate === "function") navigator.vibrate([150, 80, 150]);
+    void showChatNotification(last.name, last.text).catch((error: unknown) => {
+      console.warn("Chat-Benachrichtigung konnte nicht angezeigt werden:", error);
+    });
+  }, [alertsEnabled, notificationPermission, game.chatMessages, game.myId]);
+
   // Einladungslink: /?code=ABC234
   const initialCode = useMemo(() => parseInviteCode(window.location.search), []);
 
@@ -343,7 +385,7 @@ export default function App() {
       setJoinError(null);
       setCheckingCode(true);
       try {
-        const res = await fetch("/api/games", { method: "POST" });
+        const res = await fetchWithTicket("/api/games", { method: "POST" });
         if (res.status === 429) {
           throw new Error(t("app.tooManyGames"));
         }
@@ -370,7 +412,7 @@ export default function App() {
       try {
         // Vor dem Beitritt prüfen, ob es den Code gibt – sonst würde ein
         // Tippfehler still einen neuen, leeren Raum erzeugen.
-        const res = await fetch(`/api/games/${encodeURIComponent(code)}`);
+        const res = await fetchWithTicket(`/api/games/${encodeURIComponent(code)}`);
         if (res.status === 429) {
           throw new Error(t("app.tooManyAttempts"));
         }
@@ -431,7 +473,7 @@ export default function App() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/games/${encodeURIComponent(saved.code)}`);
+        const res = await fetchWithTicket(`/api/games/${encodeURIComponent(saved.code)}`);
         if (!res.ok) return;
         const { exists } = (await res.json()) as { exists: boolean };
         if (!exists) {
@@ -525,6 +567,7 @@ export default function App() {
         batteryWarning={game.batteryWarning}
         revealTimer={game.revealTimer}
         chatMessages={game.chatMessages}
+        iceServers={game.iceServers}
         catchPending={game.catchPending}
         serverError={gameErrorText}
         yourPositionIsShared={game.yourPositionIsShared}
@@ -534,6 +577,8 @@ export default function App() {
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
         onPingTrick={game.requestPingTrick}
+        onSendRtc={game.sendRtc}
+        onSubscribeRtc={game.subscribeRtc}
         onAddTeamMarker={game.addTeamMarker}
         onRemoveTeamMarker={game.removeTeamMarker}
         onConfirmSafe={game.confirmSafe}

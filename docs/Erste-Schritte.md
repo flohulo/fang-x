@@ -2,7 +2,7 @@
 
 ## Einführung beim ersten Start
 
-Beim ersten Öffnen führt dich die App in drei Schritten durch den Einstieg: eine kurze
+Beim ersten Öffnen führt dich die App in vier Schritten durch den Einstieg: zuerst die Wahl der Sprache, dann eine kurze
 Spielübersicht, die Berechtigungen (Standort sowie Alarm und Benachrichtigungen) und die
 Installation als App auf dem Startbildschirm (PWA). Mit dem X oben rechts schliesst du die Einführung jederzeit; du kannst sie
 später im Menü unter **Hilfe > Einführung erneut ansehen** wieder öffnen. Auf iPhone und iPad
@@ -31,6 +31,8 @@ den **QR-Code** oder indem alle den Code eingeben und beitreten.
 !!! tip ":material-qrcode: QR-Code für alle vor Ort"
     Tippe in der Lobby auf **QR-Code anzeigen**. Die anderen scannen ihn mit der Handykamera und
     landen direkt im Spiel. Der QR-Code enthält denselben Link wie **Einladung teilen**.
+    Ist Fang X bereits als App installiert, öffnet der Link bevorzugt die installierte App (je nach
+    Betriebssystem und Browser).
 
 ## Rolle wählen
 
@@ -59,7 +61,11 @@ Karte ausprobieren.
 - **Detektive** sehen die Karte, die letzte Sichtung und – je nach Einstellung – die Standorte der
   anderen Detektive. Ein Fang ist je nach Regel automatisch im Fangradius oder per Foto-Fang
   möglich.
-- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht.
+- Alle können im Chat schreiben. Nach Spielende wird der Verlauf gelöscht. Bei neuen Nachrichten
+  erscheint bei geschlossenem Chat ein Popup. Ist der Alarm aktiviert und die App im Hintergrund,
+  meldet sich zusätzlich eine Benachrichtigung.
+- Detektive können sich per [Sprechfunk](Sprechfunk.md) unterhalten, ohne dass X mithört. Der Host
+  schaltet ihn in den Einstellungen ein.
 
 ## Spielende
 
@@ -87,3 +93,9 @@ laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerun
 über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
 aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
 Startseite.
+
+## Status und Neuigkeiten
+
+Ob der Server gerade läuft, ob eine Störung bekannt ist und was es Neues gibt, siehst du auf der
+[Statusseite](https://flohulo.github.io/fang-x-status/). Du findest sie auch im Menü unter
+**Hilfe > Status und Neuigkeiten**.

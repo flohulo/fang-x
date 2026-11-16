@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.11.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.10.0...fang-x-v0.11.0) (2026-11-15)
+
+
+### Features
+
+* einladungslinks in der installierten pwa öffnen ([#94](https://github.com/flohulo/fang-x/issues/94)) ([1d7b107](https://github.com/flohulo/fang-x/commit/1d7b10731eca39322adf67f7a10f24c879c64a21))
+* popup und benachrichtigung bei neuen chatnachrichten ([#82](https://github.com/flohulo/fang-x/issues/82)) ([fb10f3a](https://github.com/flohulo/fang-x/commit/fb10f3a443116a66ce72a194272902aa952eaf07))
+* spam-schutz mit menschen-prüfung und verbindungstrennung ([#69](https://github.com/flohulo/fang-x/issues/69)) ([bbfdc4b](https://github.com/flohulo/fang-x/commit/bbfdc4b8d954045a906b0108e381c71448dd53b3))
+* sprachauswahl als ersten schritt der einführung ([#84](https://github.com/flohulo/fang-x/issues/84)) ([de3eaf6](https://github.com/flohulo/fang-x/commit/de3eaf6d38c55b639a92dce1989c63d0eb723276))
+* sprechfunk für detektive per webrtc ergänzen ([#68](https://github.com/flohulo/fang-x/issues/68)) ([c6a271b](https://github.com/flohulo/fang-x/commit/c6a271b2d8de7526c21995c26d424e0fb5c9c33e))
+
+## [0.10.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.9.0...fang-x-v0.10.0) (2026-11-12)
+
+
+### Features
+
+* alle-sicher-abfrage und funkstille-warnung ergänzen ([#72](https://github.com/flohulo/fang-x/issues/72)) ([332b2ff](https://github.com/flohulo/fang-x/commit/332b2ffcc5ccb70f09de9127c1c45e17605486ce))
+* changelog nach app-update automatisch öffnen ([#80](https://github.com/flohulo/fang-x/issues/80)) ([1437437](https://github.com/flohulo/fang-x/commit/1437437c69ece544bfb5901d48788dea89d63d2f))
+* checkliste und warnungen vor dem spiel ([#70](https://github.com/flohulo/fang-x/issues/70)) ([0b61154](https://github.com/flohulo/fang-x/commit/0b6115459e0dce3267272cb4a00a7e8020fcde28))
+* team-markierungen für detektive ergänzen ([#75](https://github.com/flohulo/fang-x/issues/75)) ([c8b454e](https://github.com/flohulo/fang-x/commit/c8b454e2f12fb029a1297a5895fcf132ad6a1d48))
+
 ## [0.9.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.8.0...fang-x-v0.9.0) (2026-11-10)
 
 

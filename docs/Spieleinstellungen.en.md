@@ -21,6 +21,7 @@ The name appears in the file name when the settings are exported as a JSON file 
 | Bonus mission for X | off | [Bonus mission for X](Bonusmission-fuer-X.md) |
 | Emergency button for X | on | [Emergency button](Notfall-Knopf.md) |
 | Ping trick for X | on | [Ping trick](Ping-Trick.md) |
+| Voice radio for detectives | off | [Voice radio](Sprechfunk.md) |
 
 ## More settings
 

@@ -9,10 +9,14 @@ import type {
   ObjectiveState,
   PlayerInfo,
   RevealEvent,
+  RtcIceServer,
+  RtcSignal,
   Ruleset,
   ServerMessage,
 } from "@fang-x/shared";
+import { HUMAN_TICKET_PARAM, WS_CLOSE_ABUSE } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
+import { cachedHumanTicket, ensureHumanTicket } from "./humanCheck";
 import type { ServerError } from "./serverMessages";
 import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
 
@@ -34,6 +38,8 @@ interface Session {
   wantsX: boolean;
 }
 
+export type RtcHandler = (from: string, signal: RtcSignal) => void;
+
 /** Reconnect-Versuche mit wachsendem Abstand, aber gedeckelt. */
 const MAX_RECONNECT_DELAY_MS = 10_000;
 /** Fehler, bei denen ein erneuter Versuch sinnlos ist. */
@@ -54,6 +60,7 @@ export function useGame() {
     indeterminate: boolean;
   } | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [iceServers, setIceServers] = useState<RtcIceServer[]>([]);
   const [transitNotice, setTransitNotice] = useState<{
     mode: "bus" | "train";
     count: number;
@@ -100,6 +107,7 @@ export function useGame() {
   const retryTimerRef = useRef<number | null>(null);
   const attemptRef = useRef(0);
   const connectRef = useRef<(session: Session) => void>(() => {});
+  const rtcHandlersRef = useRef(new Set<RtcHandler>());
 
   const send = (msg: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -125,7 +133,11 @@ export function useGame() {
     retryTimerRef.current = window.setTimeout(() => {
       retryTimerRef.current = null;
       if (intentionalRef.current) return;
-      connectRef.current(session);
+      // Ticket vorab erneuern, falls es inzwischen abgelaufen ist.
+      void ensureHumanTicket().then(() => {
+        if (intentionalRef.current || sessionRef.current !== session) return;
+        connectRef.current(session);
+      });
     }, delay);
   };
 
@@ -133,7 +145,9 @@ export function useGame() {
     clearRetryTimer();
 
     const proto = location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}`);
+    const ticket = cachedHumanTicket();
+    const query = ticket ? `?${HUMAN_TICKET_PARAM}=${encodeURIComponent(ticket)}` : "";
+    const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}${query}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -171,6 +185,7 @@ export function useGame() {
           setTransitStops(msg.transitStops);
           setRevealTimer(null);
           setChatMessages(msg.chat ?? []);
+          setIceServers(msg.iceServers ?? []);
           setCatchPending(msg.catchPending);
           setYouAreHost(msg.youAreHost);
           setReconnecting(false);
@@ -231,6 +246,9 @@ export function useGame() {
         }
         case "chat":
           setChatMessages((current) => [...current, msg.message].slice(-100));
+          break;
+        case "rtc":
+          for (const handler of rtcHandlersRef.current) handler(msg.from, msg.signal);
           break;
         case "transitNotice":
           setTransitNotice({
@@ -327,13 +345,19 @@ export function useGame() {
       }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       // Ein bereits ersetzter Socket (z. B. durch einen neuen Beitritt) darf
       // keinen Reconnect für die aktuelle Verbindung auslösen.
       if (wsRef.current !== ws) return;
       wsRef.current = null;
       setConnected(false);
       if (intentionalRef.current) return;
+      // Der Server hat wegen Missbrauchs getrennt: nicht sofort wieder verbinden.
+      if (event.code === WS_CLOSE_ABUSE) {
+        intentionalRef.current = true;
+        setReconnecting(false);
+        return;
+      }
       // Ungeplant getrennt — Platz bleibt serverseitig frei, wir versuchen es erneut.
       scheduleReconnect();
     };
@@ -386,6 +410,17 @@ export function useGame() {
 
   const sendChat = (text: string) => {
     send({ t: "chat", text });
+  };
+
+  const sendRtc = (signal: RtcSignal, to?: string) => {
+    send({ t: "rtc", to, signal });
+  };
+
+  const subscribeRtc = (handler: RtcHandler) => {
+    rtcHandlersRef.current.add(handler);
+    return () => {
+      rtcHandlersRef.current.delete(handler);
+    };
   };
 
   const reportCatch = () => {
@@ -472,6 +507,7 @@ export function useGame() {
     batteryWarning,
     revealTimer,
     chatMessages,
+    iceServers,
     catchPending,
     lastReveal,
     lastPositionShared,
@@ -494,6 +530,8 @@ export function useGame() {
     setObjectiveTarget,
     requestTransitStop,
     sendChat,
+    sendRtc,
+    subscribeRtc,
     reportCatch,
     resolveCatch,
     surrender,

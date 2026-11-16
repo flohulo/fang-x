@@ -1,7 +1,9 @@
 import { LocationAccess } from "../components/LocationAccess";
+import { MicrophoneAccess } from "../components/MicrophoneAccess";
 import { PlayAreaEditor } from "../components/PlayAreaEditor";
 import { PreGameChecklist, PreGameChecklistItems } from "../components/PreGameChecklist";
 import { useLocationPermission } from "../lib/useLocationPermission";
+import { useMicrophonePermission } from "../lib/useMicrophonePermission";
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
 import { DEFAULT_RULESET, evaluatePreGameChecks } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
@@ -41,6 +43,7 @@ export function LobbyScreen({
   const [qrFailed, setQrFailed] = useState(false);
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
   const location = useLocationPermission();
+  const microphone = useMicrophonePermission();
   const [skipLocation, setSkipLocation] = useState(false);
   const [startLocationError, setStartLocationError] = useState<string | null>(null);
   const [drawingArea, setDrawingArea] = useState(false);
@@ -158,6 +161,9 @@ export function LobbyScreen({
   const hasX = players.some((p) => p.wantsX);
   const hasDetective = players.some((p) => !p.wantsX);
   const others = players.filter((p) => p.id !== myId);
+  // Das Mikrofon braucht nur, wer als Detektiv am Sprechfunk teilnimmt.
+  const me = players.find((p) => p.id === myId);
+  const needsMicrophone = (ruleset ?? localRuleset).radio.enabled && !!me && !me.wantsX;
   const locationOk = location.state === "granted" || skipLocation;
   const canStart = hasX && locationOk;
   const checks = evaluatePreGameChecks(localRuleset, players);
@@ -258,9 +264,18 @@ export function LobbyScreen({
 
       <LocationAccess state={location.state} busy={location.busy} onRequest={location.request} />
 
+      {needsMicrophone && (
+        <MicrophoneAccess
+          state={microphone.state}
+          busy={microphone.busy}
+          onRequest={() => void microphone.request()}
+        />
+      )}
+
       <PreGameChecklist
         locationState={location.state}
         locationSkipped={skipLocation}
+        microphoneState={needsMicrophone ? microphone.state : null}
         checks={checks}
       />
 
@@ -317,6 +332,16 @@ export function LobbyScreen({
                   onChange={(event) => updateNested("reveal", { xCanTrick: event.target.checked })}
                 />
                 {t("lobby.xCanTrick")}
+              </label>
+            </ConfigOptionHelp>
+            <ConfigOptionHelp>
+              <label className="objective-option">
+                <input
+                  type="checkbox"
+                  checked={localRuleset.radio.enabled}
+                  onChange={(event) => updateNested("radio", { enabled: event.target.checked })}
+                />
+                {t("lobby.radio")}
               </label>
             </ConfigOptionHelp>
             <div className="config-field">

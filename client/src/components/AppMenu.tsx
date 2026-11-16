@@ -7,6 +7,9 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 /** Webseite zum Spiel (Quelle: website/). */
 const WEBSITE_URL = "https://flohulo.github.io/fang-x/";
 
+/** Statusseite (Upptime, eigenes Repo flohulo/fang-x-status). */
+const STATUS_URL = "https://flohulo.github.io/fang-x-status/";
+
 /** Weblate-Projekt, in dem die Übersetzungen gepflegt werden. */
 const TRANSLATE_URL = "https://translate.codeberg.org/engage/fang-x/";
 
@@ -168,6 +171,15 @@ export function AppMenu({
                     onClick={() => setOpen(false)}
                   >
                     <span>{t("menu.website")}</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                  <a
+                    href={STATUS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span>{t("menu.status")}</span>
                     <span aria-hidden="true">↗</span>
                   </a>
                   <button

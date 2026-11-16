@@ -44,6 +44,13 @@ Gegenteil: **maximale Konfigurierbarkeit ohne Komplexitäts-Overhead**.
 Jeder Parameter: `key` · Typ · Bereich · **Default** · Bedeutung.
 JSON-Keys sind englisch (Konvention für Contributors), die UI-Sprache ist ausschließlich Deutsch.
 
+Der Server prüft jedes Regelwerk Feld für Feld (`mergeRuleset` in `shared/src/ruleset.ts`):
+Zahlen werden in den erlaubten Bereich geklemmt, ungültige Typen und unbekannte Enum-Werte
+fallen auf den Default zurück, unbekannte Schlüssel werden verworfen. Die Obergrenzen
+entsprechen den Bereichen unten. Die Untergrenzen sind technische Mindestwerte
+(`RULESET_LIMITS`), z. B. Reveal-Intervall mindestens 3 Sekunden und Spieldauer mindestens
+15 Sekunden; die Bereiche in den Tabellen sind die Empfehlung für echte Runden.
+
 ### 3.0 Individuelle Regeln
 
 Alle Regeln sind unabhängig voneinander einstellbar. Es gibt kein festes Profil, das andere
@@ -111,6 +118,12 @@ Der Notfall-Knopf erscheint für X während Vorsprung und Laufzeit in der Karten
 | `objective.enabled` | bool | false | X kann während der Runde ein geheimes Bonusziel setzen. Erreicht ein X-Spieler den gewählten Punkt innerhalb von 50 m, wird die nächste Sichtung einmalig um 2 Minuten verschoben. |
 
 X setzt das Ziel auf der Karte. Es muss innerhalb des Spielgebiets und mindestens 25–100 m vom aktuellen X-Standort entfernt liegen (abhängig von der Gebietsgröße). X sollte nur einen sicheren, öffentlichen und erreichbaren Ort wählen. Zielkoordinaten werden nicht in der Durable-Object-Persistenz gespeichert; nach einem Serverneustart wird ein noch offenes Ziel erneut wählbar.
+
+### 3.4a Sprechfunk
+
+| Key | Typ | Default | Bedeutung |
+|---|---|---|---|
+| `radio.enabled` | bool | false | Sprechfunk (Push-to-talk, WebRTC) zwischen den Detektiven. X hört und sieht ihn nicht. Der Server leitet nur die Signalisierung weiter und nur, wenn die Option aktiv ist. |
 
 ### 3.5 Bewegung & Verkehrsmittel
 

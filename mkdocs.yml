@@ -48,6 +48,8 @@ nav:
       - Bonusmission für X: Bonusmission-fuer-X.md
       - Notfall-Knopf: Notfall-Knopf.md
       - Ping-Trick: Ping-Trick.md
+  - Sprechfunk: Sprechfunk.md
+  - Funkdisziplin: Funkdisziplin.md
   - Team-Markierungen: Team-Markierungen.md
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
   - Akku-Warnung: Akku-Warnung.md
@@ -105,6 +107,8 @@ plugins:
             Bonusmission für X: Bonus mission for X
             Notfall-Knopf: Emergency button
             Ping-Trick: Ping trick
+            Sprechfunk: Voice radio
+            Funkdisziplin: Radio discipline
             Team-Markierungen: Team markers
             Alle sicher und Funkstille: Everyone safe and radio silence
             Akku-Warnung: Low battery warning
@@ -115,3 +119,6 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/flohulo/fang-x
       name: Fang X auf GitHub
+    - icon: material/heart-pulse
+      link: https://flohulo.github.io/fang-x-status/
+      name: Status und Neuigkeiten

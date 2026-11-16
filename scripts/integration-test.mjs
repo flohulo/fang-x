@@ -13,6 +13,7 @@
 // 9. Detektiv bewegt sich zu X → Fang
 // 10. Spielende: Detektive gewinnen
 
+import { createHash } from "node:crypto";
 import WebSocket from "ws";
 
 const SERVER = "ws://localhost:8787";
@@ -31,16 +32,56 @@ function assert(condition, message) {
   }
 }
 
+// Menschen-Prüfung: Ist sie aktiv (HUMAN_CHECK_SECRET gesetzt), lösen wir die Aufgabe
+// wie der Browser. Sonst läuft alles ohne Ticket.
+function leadingZeroBits(buf) {
+  let bits = 0;
+  for (const byte of buf) {
+    if (byte === 0) {
+      bits += 8;
+      continue;
+    }
+    bits += Math.clz32(byte) - 24;
+    break;
+  }
+  return bits;
+}
+
+let humanTicket = null;
+let humanCheckActive = false;
+
+async function fetchTicket() {
+  const info = await (await fetch(`${HTTP}/api/challenge`)).json();
+  if (!info.enabled) return null;
+  humanCheckActive = true;
+  for (let counter = 0; ; counter++) {
+    const solution = counter.toString(36);
+    const digest = createHash("sha256").update(`${info.challenge}:${solution}`).digest();
+    if (leadingZeroBits(digest) < info.difficulty) continue;
+    const res = await fetch(`${HTTP}/api/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ challenge: info.challenge, solution }),
+    });
+    if (!res.ok) throw new Error(`Verify HTTP ${res.status}`);
+    return (await res.json()).ticket;
+  }
+}
+
 async function createGame() {
-  const res = await fetch(`${HTTP}/api/games`, { method: "POST" });
+  const res = await fetch(`${HTTP}/api/games`, {
+    method: "POST",
+    headers: humanTicket ? { "X-Human-Ticket": humanTicket } : {},
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const { code } = await res.json();
   return code;
 }
 
-function connect(code) {
+function connect(code, ticket = humanTicket) {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(`${SERVER}/room/${code}`);
+    const query = ticket ? `?ticket=${encodeURIComponent(ticket)}` : "";
+    const ws = new WebSocket(`${SERVER}/room/${code}${query}`);
     const messages = [];
     const waiters = [];
 
@@ -78,9 +119,53 @@ function connect(code) {
 async function run() {
   console.log("=== Integrationstest: Kompletter Spielablauf ===\n");
 
+  humanTicket = await fetchTicket();
+  if (humanCheckActive) {
+    assert(humanTicket !== null, "Menschen-Prüfung: Ticket nach gelöster Aufgabe erhalten");
+    const noTicket = await fetch(`${HTTP}/api/games`, { method: "POST" });
+    assert(noTicket.status === 403, "Menschen-Prüfung: Raum erstellen ohne Ticket wird abgelehnt");
+    const badTicket = await fetch(`${HTTP}/api/games`, {
+      method: "POST",
+      headers: { "X-Human-Ticket": "t.9999999999999.fehlerhaft" },
+    });
+    assert(badTicket.status === 403, "Menschen-Prüfung: gefälschtes Ticket wird abgelehnt");
+    const badSolution = await fetch(`${HTTP}/api/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ challenge: "c.1.2.3", solution: "0" }),
+    });
+    assert(badSolution.status === 400, "Menschen-Prüfung: falsche Lösung wird abgelehnt");
+    const ghost = new WebSocket(`${SERVER}/room/ABCDEF`);
+    const ghostStatus = await new Promise((resolve) => {
+      ghost.on("unexpected-response", (_req, res) => resolve(res.statusCode));
+      ghost.on("open", () => resolve(101));
+      ghost.on("error", () => {});
+    });
+    assert(ghostStatus === 403, "Menschen-Prüfung: WebSocket ohne Ticket wird abgelehnt");
+  }
+
   // 1. Spiel erstellen
   const code = await createGame();
   assert(code && code.length === 6, `Spiel-Code erstellt: ${code}`);
+
+  // WebSocket-Verbindungen von fremden Seiten werden abgelehnt, die eigene Seite darf.
+  const wsStatus = (origin) => {
+    const query = humanTicket ? `?ticket=${encodeURIComponent(humanTicket)}` : "";
+    const socket = new WebSocket(`${SERVER}/room/${code}${query}`, { origin });
+    return new Promise((resolve) => {
+      socket.on("unexpected-response", (_req, res) => resolve(res.statusCode));
+      socket.on("open", () => {
+        socket.close();
+        resolve(101);
+      });
+      socket.on("error", () => {});
+    });
+  };
+  assert(
+    (await wsStatus("https://boese.example")) === 403,
+    "WebSocket von fremder Seite wird abgelehnt",
+  );
+  assert((await wsStatus(HTTP)) === 101, "WebSocket von der eigenen Seite wird angenommen");
 
   // 2. Host beitritt
   const host = await connect(code);
@@ -107,6 +192,15 @@ async function run() {
     "Host-Rolle zu X gewechselt",
   );
 
+  // 3b. Zweiter Detektiv (für den Sprechfunk)
+  const det2 = await connect(code);
+  det2.ws.send(JSON.stringify({ t: "join", code, name: "Detektivin", wantsX: false }));
+  const det2Joined = await det2.waitFor((m) => m.t === "joined");
+  assert(
+    Array.isArray(det2Joined.iceServers) && det2Joined.iceServers.length > 0,
+    "Beitritt liefert ICE-Server für den Sprechfunk",
+  );
+
   // 4. Konfiguration: kurze Zeiten für Test
   host.ws.send(
     JSON.stringify({
@@ -117,6 +211,7 @@ async function run() {
         catch: { radiusMeters: 50 },
         map: { playAreaRadiusMeters: 100, outOfBoundsGraceSeconds: 0 },
         objective: { enabled: true },
+        radio: { enabled: true },
       },
     }),
   );
@@ -129,6 +224,14 @@ async function run() {
   assert(
     !det.messages.some((message) => message.t === "chat"),
     "Chat ist in der Lobby deaktiviert",
+  );
+
+  // 4c. Sprechfunk ist in der Lobby deaktiviert
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !det2.messages.some((message) => message.t === "rtc"),
+    "Sprechfunk ist in der Lobby deaktiviert",
   );
 
   // 5. Spiel starten
@@ -163,6 +266,33 @@ async function run() {
   assert(
     chatToHost.message.playerId === detJoined.playerId,
     "Chat-Nachrichten tragen den richtigen Absender",
+  );
+
+  // 5c. Sprechfunk: Signale gehen nur zwischen Detektiven, X bekommt nichts
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  const hello = await det2.waitFor((m) => m.t === "rtc" && m.signal.kind === "hello");
+  assert(hello.from === detJoined.playerId, "Sprechfunk-Signal erreicht den anderen Detektiv");
+  det.ws.send(
+    JSON.stringify({
+      t: "rtc",
+      to: det2Joined.playerId,
+      signal: { kind: "offer", sdp: "v=0\r\n" },
+    }),
+  );
+  const offer = await det2.waitFor((m) => m.t === "rtc" && m.signal.kind === "offer");
+  assert(offer.signal.sdp === "v=0\r\n", "Gezieltes Sprechfunk-Signal wird weitergeleitet");
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "offer", sdp: 42 } }));
+  det.ws.send(JSON.stringify({ t: "rtc", to: hostJoined.playerId, signal: { kind: "bye" } }));
+  host.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !host.messages.some((message) => message.t === "rtc"),
+    "X erhält keine Sprechfunk-Signale",
+  );
+  assert(
+    det.messages.every((message) => message.t !== "rtc") &&
+      det2.messages.filter((message) => message.t === "rtc").length === 2,
+    "X kann nicht funken (Sprechfunk) und ungültige Signale werden verworfen",
   );
 
   // 6. X positioniert sich (im Spielgebiet)
@@ -523,6 +653,14 @@ async function run() {
   );
   const mrXReveal = await detective1.waitFor((m) => m.t === "reveal", 5000);
   await detective2.waitFor((m) => m.t === "reveal", 5000);
+
+  // Sprechfunk ist standardmäßig aus: Signale zwischen Detektiven werden nicht weitergeleitet
+  detective1.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert(
+    !detective2.messages.some((m) => m.t === "rtc"),
+    "Sprechfunk ist ohne aktivierte Einstellung gesperrt",
+  );
   assert(
     mrXReveal.reveal.pos.lat === mrXPos.lat,
     "Erster Standort-Ping erfolgt direkt nach dem Vorsprung",
@@ -835,15 +973,49 @@ async function run() {
   noSurrenderX.ws.close();
   noSurrenderDetective.ws.close();
 
-  // 19. Ping-Trick: Sichtung überspringen
-  console.log("\n=== Ping-Trick: Sichtung überspringen ===");
+  // 18b. Spielernamen werden bereinigt (Steuer- und Formatzeichen, Länge)
+  console.log("\n=== Spielernamen ===");
+  const codeName = await createGame();
+  const named = await connect(codeName);
+  named.ws.send(
+    JSON.stringify({
+      t: "join",
+      code: codeName,
+      name: "  Bo\u200Bb\u202E\nder Baumeister mit langem Namen ",
+      wantsX: false,
+    }),
+  );
+  const namedJoined = await named.waitFor((m) => m.t === "joined");
+  const cleanName = namedJoined.players.find((p) => p.id === namedJoined.playerId)?.name;
+  assert(
+    cleanName === "Bob der Baumeister m",
+    `Name ohne unsichtbare Zeichen und auf 20 Zeichen gekürzt: ${cleanName}`,
+  );
+  named.ws.close();
+
+  // 19. Missbrauch: wer die Verbindung mit ungültigem JSON flutet, wird getrennt
+  console.log("\n=== Spam-Schutz: Verbindung trennen ===");
   const code9 = await createGame();
-  const skipX = await connect(code9);
-  skipX.ws.send(JSON.stringify({ t: "join", code: code9, name: "Skip-X", wantsX: true }));
+  const spammer = await connect(code9);
+  spammer.ws.send(JSON.stringify({ t: "join", code: code9, name: "Spammer", wantsX: false }));
+  await spammer.waitFor((m) => m.t === "joined");
+  const spammerClosed = new Promise((resolve) => spammer.ws.on("close", (c) => resolve(c)));
+  for (let i = 0; i < 15; i++) spammer.ws.send("kein json");
+  const closeCode = await Promise.race([
+    spammerClosed,
+    new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
+  ]);
+  assert(closeCode === 4008, "Flut ungültiger Nachrichten trennt die Verbindung (Code 4008)");
+
+  // 20. Ping-Trick: Sichtung überspringen
+  console.log("\n=== Ping-Trick: Sichtung überspringen ===");
+  const codeSkip = await createGame();
+  const skipX = await connect(codeSkip);
+  skipX.ws.send(JSON.stringify({ t: "join", code: codeSkip, name: "Skip-X", wantsX: true }));
   await skipX.waitFor((m) => m.t === "joined");
-  const skipDetective = await connect(code9);
+  const skipDetective = await connect(codeSkip);
   skipDetective.ws.send(
-    JSON.stringify({ t: "join", code: code9, name: "Skip-Detektiv", wantsX: false }),
+    JSON.stringify({ t: "join", code: codeSkip, name: "Skip-Detektiv", wantsX: false }),
   );
   await skipDetective.waitFor((m) => m.t === "joined");
   skipX.ws.send(

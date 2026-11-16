@@ -23,6 +23,7 @@ JSON-Datei exportiert werden.
 | Bonusmission für X | aus | [Bonusmission für X](Bonusmission-fuer-X.md) |
 | Notfall-Knopf für X | an | [Notfall-Knopf](Notfall-Knopf.md) |
 | Ping-Trick für X | an | [Ping-Trick](Ping-Trick.md) |
+| Sprechfunk für Detektive | aus | [Sprechfunk](Sprechfunk.md) |
 
 ## Weitere Einstellungen
 
