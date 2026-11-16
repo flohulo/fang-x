@@ -973,7 +973,44 @@ async function run() {
   noSurrenderX.ws.close();
   noSurrenderDetective.ws.close();
 
-  // 18b. Spielernamen werden bereinigt (Steuer- und Formatzeichen, Länge)
+  // 18b. Kurz getrennter Host behält die Leitung, Neue werden nicht zusätzlich Host
+  console.log("\n=== Host kurz getrennt ===");
+  const codeHost = await createGame();
+  const firstHost = await connect(codeHost);
+  firstHost.ws.send(JSON.stringify({ t: "join", code: codeHost, name: "Host", wantsX: false }));
+  const firstHostJoined = await firstHost.waitFor((m) => m.t === "joined");
+  const hostGone = new Promise((resolve) => firstHost.ws.on("close", resolve));
+  firstHost.ws.terminate();
+  await hostGone;
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const newcomer = await connect(codeHost);
+  newcomer.ws.send(JSON.stringify({ t: "join", code: codeHost, name: "Neu", wantsX: false }));
+  const newcomerJoined = await newcomer.waitFor((m) => m.t === "joined");
+  assert(
+    newcomerJoined.youAreHost === false,
+    "Wer während einer kurzen Trennung des Hosts beitritt, wird nicht Host",
+  );
+  const hostBack = await connect(codeHost);
+  hostBack.ws.send(
+    JSON.stringify({
+      t: "join",
+      code: codeHost,
+      name: "Host",
+      wantsX: false,
+      playerId: firstHostJoined.playerId,
+      token: firstHostJoined.token,
+    }),
+  );
+  const hostBackJoined = await hostBack.waitFor((m) => m.t === "joined");
+  assert(
+    hostBackJoined.youAreHost === true &&
+      hostBackJoined.players.filter((p) => p.isHost).length === 1,
+    "Zurückgekehrter Host ist wieder Host, es gibt genau einen Host",
+  );
+  newcomer.ws.close();
+  hostBack.ws.close();
+
+  // 18c. Spielernamen werden bereinigt (Steuer- und Formatzeichen, Länge)
   console.log("\n=== Spielernamen ===");
   const codeName = await createGame();
   const named = await connect(codeName);
