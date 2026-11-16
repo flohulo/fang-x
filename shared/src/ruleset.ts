@@ -199,82 +199,270 @@ type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
 
-function nonNegativeInteger(value: number | undefined, fallback: number): number {
+// Bereiche, die der Server für jedes Regelwerk erzwingt. Die Obergrenzen folgen
+// docs/spielregeln.md. Die Untergrenzen sind technische Mindestwerte (kein NaN,
+// keine Reveal-Schleife im Millisekundentakt); die UI empfiehlt engere Bereiche.
+export const RULESET_LIMITS = {
+  durationMinutes: [0.25, 480],
+  headStartMinutes: [0, 30],
+  overtimeMaxMinutes: [1, 120],
+  countdownSeconds: [0, 60],
+  firstRevealAfterMinutes: [0, 60],
+  intervalMinutes: [0.05, 30],
+  decreaseStepMinutes: [0, 30],
+  revealRadiusMeters: [0, 5000],
+  radiusShrinkStepMeters: [0, 5000],
+  radiusFloorMeters: [0, 500],
+  jitterMeters: [0, 500],
+  catchRadiusMeters: [5, 1000],
+  confirmSeconds: [0, 300],
+  teamCatchRequired: [1, 10],
+  maxSpeedKmh: [1, 500],
+  speedCheckGraceSeconds: [0, 120],
+  jumpDetectionMeters: [0, 5000],
+  minUpdateSeconds: [5, 300],
+  transitStops: [0, 999],
+  xCount: [1, 5],
+  detectiveTeamCount: [1, 5],
+  playAreaRadiusMeters: [100, 20000],
+  outOfBoundsGraceSeconds: [0, 120],
+} as const satisfies Record<string, readonly [number, number]>;
+
+export const RULESET_NAME_MAX_LENGTH = 60;
+
+type LimitKey = keyof typeof RULESET_LIMITS;
+
+// Endliche Zahl in den Bereich klemmen, sonst Default.
+function num(value: unknown, key: LimitKey, fallback: number): number {
+  const [min, max] = RULESET_LIMITS[key];
   return typeof value === "number" && Number.isFinite(value)
-    ? Math.max(0, Math.floor(value))
+    ? Math.min(max, Math.max(min, value))
     : fallback;
 }
 
-// Kombiniert ein partielles Ruleset rekursiv mit den Defaults.
-// Unbekannte Schlüssel werden ignoriert, fehlende mit Default gefüllt.
-export function mergeRuleset(
-  partial?: (DeepPartial<Ruleset> & { profile?: string }) | null,
-): Ruleset {
-  const p = partial ?? {};
+// Wie num, aber auf ganze Zahlen gerundet.
+function int(value: unknown, key: LimitKey, fallback: number): number {
+  return Math.round(num(value, key, fallback));
+}
+
+function bool(value: unknown, fallback: boolean): boolean {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+const TRANSPORT_MODES: readonly TransportMode[] = ["WALK", "BIKE", "CAR", "TRANSIT"];
+
+function transportModes(value: unknown, fallback: TransportMode[]): TransportMode[] {
+  if (!Array.isArray(value)) return [...fallback];
+  const modes = TRANSPORT_MODES.filter((mode) => value.includes(mode));
+  return modes.length > 0 ? modes : [...fallback];
+}
+
+// Übernimmt nur lat/lng ohne Fremdschlüssel. Die Plausibilität prüft der Raum beim
+// Konfigurieren, damit der Host eine verständliche Fehlermeldung bekommt.
+function startLocation(value: unknown): LatLng | null {
+  if (!value || typeof value !== "object") return null;
+  const { lat, lng } = value as LatLng;
+  return { lat, lng };
+}
+
+// Baut aus beliebigen Eingaben (Host-Nachricht, Snapshot, Import) ein gültiges
+// Regelwerk. Jedes Feld wird einzeln geprüft und geklemmt, Fremdschlüssel fallen weg,
+// fehlende oder ungültige Werte bekommen den Default.
+export function mergeRuleset(partial?: unknown): Ruleset {
+  const p = (partial && typeof partial === "object" ? partial : {}) as DeepPartial<Ruleset> & {
+    profile?: string;
+  };
   const legacyProfile = p.profile === "MR_X";
+  const d = DEFAULT_RULESET;
+  const game = p.game ?? {};
+  const reveal = p.reveal ?? {};
+  const c = p.catch ?? {};
+  const movement = p.movement ?? {};
+  const speed = movement.maxSpeedKmh ?? {};
+  const budget = movement.xTransitBudget ?? {};
+  const roles = p.roles ?? {};
+  const win = p.win ?? {};
+  const map = p.map ?? {};
+
+  const randomMinMinutes = num(
+    reveal.randomMinMinutes,
+    "intervalMinutes",
+    d.reveal.randomMinMinutes,
+  );
+  const revealRadiusMeters = int(
+    reveal.revealRadiusMeters,
+    "revealRadiusMeters",
+    d.reveal.revealRadiusMeters,
+  );
+
   return {
     schemaVersion: 1,
-    name: legacyProfile
-      ? DEFAULT_RULESET.name
-      : typeof p.name === "string"
-        ? p.name
-        : DEFAULT_RULESET.name,
+    name:
+      !legacyProfile && typeof p.name === "string"
+        ? p.name.slice(0, RULESET_NAME_MAX_LENGTH)
+        : d.name,
     game: {
-      ...DEFAULT_RULESET.game,
-      ...(p.game ?? {}),
-      detectivesWaitDuringHeadStart: p.game?.detectivesWaitDuringHeadStart ?? legacyProfile,
+      durationMinutes: num(game.durationMinutes, "durationMinutes", d.game.durationMinutes),
+      headStartMinutes: num(game.headStartMinutes, "headStartMinutes", d.game.headStartMinutes),
+      overtimeEnabled: bool(game.overtimeEnabled, d.game.overtimeEnabled),
+      overtimeMaxMinutes: num(
+        game.overtimeMaxMinutes,
+        "overtimeMaxMinutes",
+        d.game.overtimeMaxMinutes,
+      ),
+      countdownSeconds: num(game.countdownSeconds, "countdownSeconds", d.game.countdownSeconds),
+      pauseAllowed: bool(game.pauseAllowed, d.game.pauseAllowed),
+      detectivesWaitDuringHeadStart: bool(game.detectivesWaitDuringHeadStart, legacyProfile),
     },
-    reveal: { ...DEFAULT_RULESET.reveal, ...(p.reveal ?? {}) },
+    reveal: {
+      firstRevealAfterMinutes: num(
+        reveal.firstRevealAfterMinutes,
+        "firstRevealAfterMinutes",
+        d.reveal.firstRevealAfterMinutes,
+      ),
+      intervalMinutes: num(reveal.intervalMinutes, "intervalMinutes", d.reveal.intervalMinutes),
+      schedule: oneOf(reveal.schedule, ["FIXED", "DECREASING", "RANDOM"], d.reveal.schedule),
+      decreaseStepMinutes: num(
+        reveal.decreaseStepMinutes,
+        "decreaseStepMinutes",
+        d.reveal.decreaseStepMinutes,
+      ),
+      decreaseFloorMinutes: num(
+        reveal.decreaseFloorMinutes,
+        "intervalMinutes",
+        d.reveal.decreaseFloorMinutes,
+      ),
+      randomMinMinutes,
+      randomMaxMinutes: Math.max(
+        randomMinMinutes,
+        num(reveal.randomMaxMinutes, "intervalMinutes", d.reveal.randomMaxMinutes),
+      ),
+      revealRadiusMeters,
+      radiusShrinkEnabled: bool(reveal.radiusShrinkEnabled, d.reveal.radiusShrinkEnabled),
+      radiusShrinkStepMeters: int(
+        reveal.radiusShrinkStepMeters,
+        "radiusShrinkStepMeters",
+        d.reveal.radiusShrinkStepMeters,
+      ),
+      radiusFloorMeters: Math.min(
+        revealRadiusMeters,
+        int(reveal.radiusFloorMeters, "radiusFloorMeters", d.reveal.radiusFloorMeters),
+      ),
+      showExactPoint: bool(reveal.showExactPoint, d.reveal.showExactPoint),
+      jitterMeters: int(reveal.jitterMeters, "jitterMeters", d.reveal.jitterMeters),
+      showTrail: oneOf(reveal.showTrail, ["NONE", "LAST3", "FULL"], d.reveal.showTrail),
+      xSeesDetectives: oneOf(
+        reveal.xSeesDetectives,
+        ["ALWAYS", "ON_REVEAL", "NEVER"],
+        d.reveal.xSeesDetectives,
+      ),
+      detectivesSeesXHistory: bool(reveal.detectivesSeesXHistory, d.reveal.detectivesSeesXHistory),
+    },
     catch: {
-      ...DEFAULT_RULESET.catch,
-      ...(p.catch ?? {}),
       method:
-        p.catch?.method === "PHOTO_CONFIRMATION" || (legacyProfile && !p.catch?.method)
+        c.method === "PHOTO_CONFIRMATION" || (legacyProfile && !c.method)
           ? "PHOTO_CONFIRMATION"
           : "RADIUS",
+      radiusMeters: int(c.radiusMeters, "catchRadiusMeters", d.catch.radiusMeters),
+      confirmSeconds: int(c.confirmSeconds, "confirmSeconds", d.catch.confirmSeconds),
+      teamCatchRequired: int(c.teamCatchRequired, "teamCatchRequired", d.catch.teamCatchRequired),
+      anyDetectiveWins: bool(c.anyDetectiveWins, d.catch.anyDetectiveWins),
+      xCanSurrender: bool(c.xCanSurrender, d.catch.xCanSurrender),
     },
     movement: {
-      ...DEFAULT_RULESET.movement,
-      ...(p.movement ?? {}),
-      transportModes:
-        (p.movement?.transportModes as TransportMode[] | undefined) ??
-        DEFAULT_RULESET.movement.transportModes,
-      xTransportModes:
-        (p.movement?.xTransportModes as TransportMode[] | undefined) ??
-        DEFAULT_RULESET.movement.xTransportModes,
+      transportModes: transportModes(movement.transportModes, d.movement.transportModes),
+      xTransportModes: transportModes(movement.xTransportModes, d.movement.xTransportModes),
       maxSpeedKmh: {
-        ...DEFAULT_RULESET.movement.maxSpeedKmh,
-        ...(p.movement?.maxSpeedKmh ?? {}),
+        WALK: num(speed.WALK, "maxSpeedKmh", d.movement.maxSpeedKmh.WALK),
+        BIKE: num(speed.BIKE, "maxSpeedKmh", d.movement.maxSpeedKmh.BIKE),
+        CAR: num(speed.CAR, "maxSpeedKmh", d.movement.maxSpeedKmh.CAR),
+        TRANSIT: num(speed.TRANSIT, "maxSpeedKmh", d.movement.maxSpeedKmh.TRANSIT),
       },
+      speedCheckGraceSeconds: int(
+        movement.speedCheckGraceSeconds,
+        "speedCheckGraceSeconds",
+        d.movement.speedCheckGraceSeconds,
+      ),
+      jumpDetectionMeters: int(
+        movement.jumpDetectionMeters,
+        "jumpDetectionMeters",
+        d.movement.jumpDetectionMeters,
+      ),
+      minUpdateSeconds: num(
+        movement.minUpdateSeconds,
+        "minUpdateSeconds",
+        d.movement.minUpdateSeconds,
+      ),
       xTransitBudget: {
-        ...DEFAULT_RULESET.movement.xTransitBudget,
-        ...(p.movement?.xTransitBudget ?? {}),
-        enabled: p.movement?.xTransitBudget?.enabled ?? legacyProfile,
-        busStops: nonNegativeInteger(
-          p.movement?.xTransitBudget?.busStops,
-          DEFAULT_RULESET.movement.xTransitBudget.busStops,
+        enabled: bool(budget.enabled, legacyProfile),
+        busStops: Math.floor(
+          num(budget.busStops, "transitStops", d.movement.xTransitBudget.busStops),
         ),
-        trainStops: nonNegativeInteger(
-          p.movement?.xTransitBudget?.trainStops,
-          DEFAULT_RULESET.movement.xTransitBudget.trainStops,
+        trainStops: Math.floor(
+          num(budget.trainStops, "transitStops", d.movement.xTransitBudget.trainStops),
         ),
       },
-      detectivesShareLiveLocation: p.movement?.detectivesShareLiveLocation ?? legacyProfile,
+      detectivesShareLiveLocation: bool(movement.detectivesShareLiveLocation, legacyProfile),
     },
     roles: {
-      ...DEFAULT_RULESET.roles,
-      ...(p.roles ?? {}),
+      xCount: int(roles.xCount, "xCount", d.roles.xCount),
+      xCountAuto: bool(roles.xCountAuto, d.roles.xCountAuto),
+      detectiveTeamCount: int(
+        roles.detectiveTeamCount,
+        "detectiveTeamCount",
+        d.roles.detectiveTeamCount,
+      ),
+      rolesHiddenUntilCatch: bool(roles.rolesHiddenUntilCatch, d.roles.rolesHiddenUntilCatch),
     },
-    win: { ...DEFAULT_RULESET.win, ...(p.win ?? {}) },
+    win: {
+      xWinsBySurvival: bool(win.xWinsBySurvival, d.win.xWinsBySurvival),
+      drawEnabled: bool(win.drawEnabled, d.win.drawEnabled),
+      suddenDeathEnabled: bool(win.suddenDeathEnabled, d.win.suddenDeathEnabled),
+    },
     map: {
-      ...DEFAULT_RULESET.map,
-      ...(p.map ?? {}),
-      startLocation: p.map?.startLocation ?? DEFAULT_RULESET.map.startLocation,
-      playAreaPolygon: sanitizePlayAreaPolygon(p.map?.playAreaPolygon),
+      playAreaRadiusMeters: int(
+        map.playAreaRadiusMeters,
+        "playAreaRadiusMeters",
+        d.map.playAreaRadiusMeters,
+      ),
+      playAreaPolygon: sanitizePlayAreaPolygon(map.playAreaPolygon),
+      startLocation: startLocation(map.startLocation),
+      outOfBoundsEnabled: bool(map.outOfBoundsEnabled, d.map.outOfBoundsEnabled),
+      outOfBoundsGraceSeconds: num(
+        map.outOfBoundsGraceSeconds,
+        "outOfBoundsGraceSeconds",
+        d.map.outOfBoundsGraceSeconds,
+      ),
+      outOfBoundsPenalty: oneOf(
+        map.outOfBoundsPenalty,
+        ["LIVE_SHARE", "WARNING", "TELEPORT_BACK", "INSTANT_LOSS"],
+        d.map.outOfBoundsPenalty,
+      ),
+      detectiveOutOfBoundsPenalty: oneOf(
+        map.detectiveOutOfBoundsPenalty,
+        ["NONE", "WARNING", "TELEPORT_BACK"],
+        d.map.detectiveOutOfBoundsPenalty,
+      ),
     },
-    objective: { ...DEFAULT_RULESET.objective, ...(p.objective ?? {}) },
-    radio: { enabled: p.radio?.enabled === true },
-    privacy: { ...DEFAULT_RULESET.privacy, ...(p.privacy ?? {}) },
+    objective: {
+      enabled: bool(p.objective?.enabled, d.objective.enabled),
+    },
+    radio: {
+      enabled: bool(p.radio?.enabled, d.radio.enabled),
+    },
+    privacy: {
+      locationRetention: oneOf(
+        p.privacy?.locationRetention,
+        ["DELETE_AFTER_GAME", "KEEP_24H", "KEEP_7D"],
+        d.privacy.locationRetention,
+      ),
+      replayEnabled: bool(p.privacy?.replayEnabled, d.privacy.replayEnabled),
+      collectPlayerName: bool(p.privacy?.collectPlayerName, d.privacy.collectPlayerName),
+    },
   };
 }
 

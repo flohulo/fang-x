@@ -44,6 +44,13 @@ Gegenteil: **maximale Konfigurierbarkeit ohne Komplexitäts-Overhead**.
 Jeder Parameter: `key` · Typ · Bereich · **Default** · Bedeutung.
 JSON-Keys sind englisch (Konvention für Contributors), die UI-Sprache ist ausschließlich Deutsch.
 
+Der Server prüft jedes Regelwerk Feld für Feld (`mergeRuleset` in `shared/src/ruleset.ts`):
+Zahlen werden in den erlaubten Bereich geklemmt, ungültige Typen und unbekannte Enum-Werte
+fallen auf den Default zurück, unbekannte Schlüssel werden verworfen. Die Obergrenzen
+entsprechen den Bereichen unten. Die Untergrenzen sind technische Mindestwerte
+(`RULESET_LIMITS`), z. B. Reveal-Intervall mindestens 3 Sekunden und Spieldauer mindestens
+15 Sekunden; die Bereiche in den Tabellen sind die Empfehlung für echte Runden.
+
 ### 3.0 Individuelle Regeln
 
 Alle Regeln sind unabhängig voneinander einstellbar. Es gibt kein festes Profil, das andere
