@@ -148,6 +148,25 @@ async function run() {
   const code = await createGame();
   assert(code && code.length === 6, `Spiel-Code erstellt: ${code}`);
 
+  // WebSocket-Verbindungen von fremden Seiten werden abgelehnt, die eigene Seite darf.
+  const wsStatus = (origin) => {
+    const query = humanTicket ? `?ticket=${encodeURIComponent(humanTicket)}` : "";
+    const socket = new WebSocket(`${SERVER}/room/${code}${query}`, { origin });
+    return new Promise((resolve) => {
+      socket.on("unexpected-response", (_req, res) => resolve(res.statusCode));
+      socket.on("open", () => {
+        socket.close();
+        resolve(101);
+      });
+      socket.on("error", () => {});
+    });
+  };
+  assert(
+    (await wsStatus("https://boese.example")) === 403,
+    "WebSocket von fremder Seite wird abgelehnt",
+  );
+  assert((await wsStatus(HTTP)) === 101, "WebSocket von der eigenen Seite wird angenommen");
+
   // 2. Host beitritt
   const host = await connect(code);
   host.ws.send(JSON.stringify({ t: "join", code, name: "Host", wantsX: false }));

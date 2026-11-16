@@ -102,6 +102,19 @@ async function checkRateLimit(
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
+// WebSockets unterliegen nicht CORS: Ein Browser schickt aber immer den Origin-Header mit.
+// Fremde Seiten dürfen keine Verbindungen in Räume öffnen. Ohne Origin (Skripte, Tests)
+// greifen weiterhin Ticket und Rate-Limit.
+function isForeignOrigin(request: Request, url: URL): boolean {
+  const origin = request.headers.get("Origin");
+  if (origin === null) return false;
+  try {
+    return new URL(origin).host !== url.host;
+  } catch {
+    return true;
+  }
+}
+
 const handler = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -199,6 +212,12 @@ const handler = {
     const roomMatch = url.pathname.match(/^\/room\/([A-Z0-9]{6})$/);
     if (roomMatch && request.headers.get("Upgrade") === "websocket") {
       // WebSocket-Upgrade für den Spiel-Raum
+      if (isForeignOrigin(request, url)) {
+        return Response.json(
+          { error: "Verbindung von fremder Seite abgelehnt." },
+          { status: 403, headers: NO_STORE },
+        );
+      }
       const unverified = await requireTicket(env, request);
       if (unverified) return unverified;
       const limited = await checkRateLimit(env, request, "join", JOIN_LIMIT, JOIN_WINDOW_MS);

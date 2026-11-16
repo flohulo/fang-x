@@ -75,7 +75,8 @@ Beim Öffnen der Seite löst der Browser unsichtbar eine kleine Rechenaufgabe (P
 Der Server stellt dafür ein signiertes Ticket aus, das für das Erstellen, Abfragen und Beitreten
 von Räumen nötig ist. Es gibt keine Cookies, keine Konten und keinen externen Dienst. Zusätzlich
 gelten Limits pro IP-Adresse (Raum erstellen, Raum abfragen, Beitritt). Wer eine Verbindung mit
-fehlerhaften Nachrichten oder Chat-Spam flutet, wird getrennt.
+fehlerhaften Nachrichten oder Chat-Spam flutet, wird getrennt. Spielverbindungen, die ein
+Browser von einer fremden Webseite aus öffnet, lehnt der Server anhand des `Origin`-Headers ab.
 
 Für den Betrieb den Signaturschlüssel einmalig setzen:
 
