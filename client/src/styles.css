@@ -1276,12 +1276,13 @@ label {
 
 .transit-dialog-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 16px;
 }
 
 .transit-dialog-actions button {
-  flex: 1;
+  flex: 1 1 140px;
 }
 
 .transit-budget-actions button,
