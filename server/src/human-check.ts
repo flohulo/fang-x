@@ -14,7 +14,9 @@ import {
   HUMAN_CHECK_DIFFICULTY_BITS,
   HUMAN_CHECK_ERROR_CODE,
   HUMAN_TICKET_HEADER,
+  findTicketProtocol,
   HUMAN_TICKET_PARAM,
+  HUMAN_TICKET_PROTOCOL_PREFIX,
   leadingZeroBits,
 } from "@fang-x/shared";
 
@@ -140,8 +142,12 @@ export async function requireTicket(
   request: Request,
 ): Promise<Response | null> {
   const url = new URL(request.url);
+  const protocol = findTicketProtocol(request.headers.get("Sec-WebSocket-Protocol"));
   const ticket =
-    request.headers.get(HUMAN_TICKET_HEADER) ?? url.searchParams.get(HUMAN_TICKET_PARAM);
+    request.headers.get(HUMAN_TICKET_HEADER) ??
+    protocol?.slice(HUMAN_TICKET_PROTOCOL_PREFIX.length) ??
+    // Veraltet, nur für ältere Clients (siehe HUMAN_TICKET_PARAM).
+    url.searchParams.get(HUMAN_TICKET_PARAM);
   if (await isValidTicket(env, ticket, clientIp(request))) return null;
   return Response.json(
     { error: "Bitte bestätige zuerst, dass du ein Mensch bist.", code: HUMAN_CHECK_ERROR_CODE },

@@ -86,8 +86,10 @@ async function createGame() {
 
 function connect(code, ticket = humanTicket) {
   return new Promise((resolve, reject) => {
-    const query = ticket ? `?ticket=${encodeURIComponent(ticket)}` : "";
-    const ws = new WebSocket(`${SERVER}/room/${code}${query}`);
+    const ws = new WebSocket(
+      `${SERVER}/room/${code}`,
+      ticket ? [`fangx-ticket.${ticket}`] : undefined,
+    );
     const messages = [];
     const waiters = [];
 
@@ -220,7 +222,31 @@ async function run() {
   const code = await createGame();
   assert(code && code.length === 6, `Spiel-Code erstellt: ${code}`);
 
+  // Das Ticket im Subprotokoll wird angenommen und bestätigt, ein falsches abgelehnt.
+  if (humanCheckActive) {
+    const viaProtocol = (ticket) =>
+      new Promise((resolve) => {
+        const socket = new WebSocket(`${SERVER}/room/${code}`, [`fangx-ticket.${ticket}`]);
+        socket.on("unexpected-response", (_req, res) => resolve(res.statusCode));
+        socket.on("open", () => {
+          const chosen = socket.protocol;
+          socket.close();
+          resolve(chosen);
+        });
+        socket.on("error", () => {});
+      });
+    assert(
+      (await viaProtocol(humanTicket)) === `fangx-ticket.${humanTicket}`,
+      "Menschen-Prüfung: Ticket im Subprotokoll wird angenommen und bestätigt",
+    );
+    assert(
+      (await viaProtocol("t.1.abc.def")) === 403,
+      "Menschen-Prüfung: falsches Ticket im Subprotokoll wird abgelehnt",
+    );
+  }
+
   // WebSocket-Verbindungen von fremden Seiten werden abgelehnt, die eigene Seite darf.
+  // Das Ticket in der URL (veraltet) wird für ältere Clients noch angenommen.
   const wsStatus = (origin) => {
     const query = humanTicket ? `?ticket=${encodeURIComponent(humanTicket)}` : "";
     const socket = new WebSocket(`${SERVER}/room/${code}${query}`, { origin });
