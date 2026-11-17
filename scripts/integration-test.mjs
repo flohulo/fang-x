@@ -269,8 +269,8 @@ async function run() {
   det2.ws.send(JSON.stringify({ t: "join", code, name: "Detektivin", wantsX: false }));
   const det2Joined = await det2.waitFor((m) => m.t === "joined");
   assert(
-    Array.isArray(det2Joined.iceServers) && det2Joined.iceServers.length > 0,
-    "Beitritt liefert ICE-Server für den Sprechfunk",
+    det2Joined.iceServers === undefined,
+    "Der Beitritt liefert noch keine ICE-Server (Rollen stehen erst mit dem Start fest)",
   );
 
   // 4. Konfiguration: kurze Zeiten für Test
@@ -341,6 +341,16 @@ async function run() {
   );
 
   // 5c. Sprechfunk: Signale gehen nur zwischen Detektiven, X bekommt nichts
+  const ice = await det2.waitFor((m) => m.t === "iceServers");
+  assert(
+    Array.isArray(ice.iceServers) && ice.iceServers.length > 0,
+    "Detektive erhalten mit dem Start die ICE-Server für den Sprechfunk",
+  );
+  assert(
+    host.messages.every((m) => m.t !== "iceServers"),
+    "X erhält keine ICE-Server",
+  );
+  det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "offer", sdp: "v=0\r\n" } }));
   det.ws.send(JSON.stringify({ t: "rtc", signal: { kind: "hello", reply: true } }));
   const hello = await det2.waitFor((m) => m.t === "rtc" && m.signal.kind === "hello");
   assert(hello.from === detJoined.playerId, "Sprechfunk-Signal erreicht den anderen Detektiv");
@@ -364,7 +374,7 @@ async function run() {
   assert(
     det.messages.every((message) => message.t !== "rtc") &&
       det2.messages.filter((message) => message.t === "rtc").length === 2,
-    "X kann nicht funken (Sprechfunk) und ungültige Signale werden verworfen",
+    "X kann nicht funken, ungültige Signale und Angebote ohne Empfänger werden verworfen",
   );
 
   // 6. X positioniert sich (im Spielgebiet)

@@ -71,4 +71,4 @@ Lege dafür dem Worker die Variable `ICE_SERVERS` als JSON-Liste an, zum Beispie
 ```
 
 Weil darin Zugangsdaten stehen können, setze die Variable als Secret
-(`wrangler secret put ICE_SERVERS`). Die Liste geht an alle Spielenden eines Raums.
+(`wrangler secret put ICE_SERVERS`). Die Liste geht nur an die Detektive eines Raums und nur, wenn der Sprechfunk aktiviert ist.

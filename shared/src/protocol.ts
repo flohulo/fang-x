@@ -165,8 +165,11 @@ export type ServerMessage =
       chat: ChatMessage[];
       catchPending: boolean;
       youAreHost: boolean;
-      /** ICE-Server (STUN/TURN) für den Sprechfunk. */
-      iceServers?: RtcIceServer[];
+    }
+  | {
+      /** ICE-Server (STUN/TURN) für den Sprechfunk. Geht nur an Detektive, nur bei aktivem Sprechfunk. */
+      t: "iceServers";
+      iceServers: RtcIceServer[];
     }
   | { t: "players"; players: PlayerInfo[] }
   | {
