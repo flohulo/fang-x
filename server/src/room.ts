@@ -674,8 +674,8 @@ export class GameRoom {
             chat: this.chatMessages,
             catchPending: this.catchPending,
             youAreHost: player.isHost,
-            iceServers: this.iceServers,
           });
+          this.sendIceServers(player);
           // Phase/Zeit/Reveals nachliefern — nach einem Reload fehlt dem
           // Client sonst der komplette Spielzustand.
           this.sendTo(ws, this.phaseMessage());
@@ -1063,6 +1063,7 @@ export class GameRoom {
     const startedAt = this.phaseEndsAt ?? Date.now();
     this.phase = "HEADSTART";
     this.phaseEndsAt = startedAt + this.ruleset.game.headStartMinutes * 60000;
+    for (const player of this.players.values()) this.sendIceServers(player);
     this.broadcastPhase();
     this.broadcastPlayers();
     this.persist();
@@ -1532,6 +1533,16 @@ export class GameRoom {
     return null;
   }
 
+  /**
+   * ICE-Server (mögliche TURN-Zugangsdaten) bekommen nur Detektive, und nur wenn der Host den
+   * Sprechfunk aktiviert hat. Die Rollen stehen erst mit dem Start fest.
+   */
+  private sendIceServers(player: Player) {
+    if (!this.ruleset.radio.enabled || player.role === "X") return;
+    if (this.phase !== "HEADSTART" && this.phase !== "RUNNING") return;
+    this.sendTo(player.ws, { t: "iceServers", iceServers: this.iceServers });
+  }
+
   private sendPingTrick(player: Player) {
     if (player.role !== "X") return;
     this.sendTo(player.ws, { t: "pingTrick", armed: player.trickArmed, used: player.trickUsed });
@@ -1843,7 +1854,7 @@ export class GameRoom {
 
   /**
    * Leitet Sprechfunk-Signale nur zwischen Detektiven weiter, solange die Runde läuft und der Host
-   * den Sprechfunk aktiviert hat.
+   * den Sprechfunk aktiviert hat. Ohne Empfänger (`to`) sind nur hello und bye erlaubt.
    * X bekommt nie ein Signal und kann keines senden. Inhalte (SDP, Kandidaten)
    * werden nicht geloggt, weil sie IP-Adressen enthalten.
    */
@@ -1852,6 +1863,9 @@ export class GameRoom {
     if (this.phase !== "HEADSTART" && this.phase !== "RUNNING") return;
     const clean = sanitizeRtcSignal(signal);
     if (!clean) return;
+    // An alle gehen nur hello und bye. Angebote, Antworten und Kandidaten brauchen einen
+    // Empfänger, sonst ließe sich ein Signal von bis zu 16 KB an jede Person verteilen.
+    if (typeof to !== "string" && clean.kind !== "hello" && clean.kind !== "bye") return;
 
     const message: ServerMessage = { t: "rtc", from: player.id, signal: clean };
     if (typeof to === "string") {

@@ -196,7 +196,7 @@ export function useGame() {
           setTransitStops(msg.transitStops);
           setRevealTimer(null);
           setChatMessages(msg.chat ?? []);
-          setIceServers(msg.iceServers ?? []);
+          setIceServers([]);
           setCatchPending(msg.catchPending);
           setYouAreHost(msg.youAreHost);
           setReconnecting(false);
@@ -257,6 +257,9 @@ export function useGame() {
         }
         case "chat":
           setChatMessages((current) => [...current, msg.message].slice(-100));
+          break;
+        case "iceServers":
+          setIceServers(msg.iceServers);
           break;
         case "rtc":
           for (const handler of rtcHandlersRef.current) handler(msg.from, msg.signal);
