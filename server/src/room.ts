@@ -21,6 +21,7 @@ import {
   DEFAULT_RULESET,
   destinationPoint,
   distanceMeters,
+  findTicketProtocol,
   type GameStats,
   isInsidePlayArea,
   jitterPoint,
@@ -262,7 +263,14 @@ export class GameRoom {
       const pair = new WebSocketPair();
       const [client, server] = Object.values(pair);
       await this.handleSession(server);
-      return new Response(null, { status: 101, webSocket: client });
+      // Der Client bietet das Ticket als Subprotokoll an; der Browser verlangt, dass der
+      // Server genau eines davon bestätigt (das Ticket selbst prüft schon der Worker).
+      const protocol = findTicketProtocol(request.headers.get("Sec-WebSocket-Protocol"));
+      return new Response(null, {
+        status: 101,
+        webSocket: client,
+        headers: protocol ? { "Sec-WebSocket-Protocol": protocol } : undefined,
+      });
     }
 
     return new Response("Nicht gefunden", { status: 404 });

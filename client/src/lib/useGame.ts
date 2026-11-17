@@ -14,7 +14,7 @@ import type {
   Ruleset,
   ServerMessage,
 } from "@fang-x/shared";
-import { HUMAN_TICKET_PARAM, WS_CLOSE_ABUSE } from "@fang-x/shared";
+import { HUMAN_TICKET_PROTOCOL_PREFIX, WS_CLOSE_ABUSE } from "@fang-x/shared";
 import { useEffect, useRef, useState } from "react";
 import { cachedHumanTicket, ensureHumanTicket, fetchWithTicket } from "./humanCheck";
 import type { ServerError } from "./serverMessages";
@@ -153,8 +153,11 @@ export function useGame() {
 
     const proto = location.protocol === "https:" ? "wss" : "ws";
     const ticket = cachedHumanTicket();
-    const query = ticket ? `?${HUMAN_TICKET_PARAM}=${encodeURIComponent(ticket)}` : "";
-    const ws = new WebSocket(`${proto}://${location.host}/room/${session.code}${query}`);
+    // Das Ticket reist als Subprotokoll statt in der URL, damit es in keinem Log auftaucht.
+    const ws = new WebSocket(
+      `${proto}://${location.host}/room/${session.code}`,
+      ticket ? [HUMAN_TICKET_PROTOCOL_PREFIX + ticket] : undefined,
+    );
     wsRef.current = ws;
 
     let opened = false;
