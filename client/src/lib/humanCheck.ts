@@ -64,8 +64,28 @@ function solve(challenge: string, difficulty: number): Promise<string> {
   });
 }
 
+/** Wie oft nach einer Antwort 429 (zu viele Anfragen) erneut versucht wird. */
+const MAX_RATE_LIMIT_RETRIES = 2;
+const MAX_RETRY_WAIT_MS = 30_000;
+
+/** Wartezeit aus dem Retry-After-Header, begrenzt; ohne Header 5 Sekunden. */
+function retryDelayMs(res: Response): number {
+  const seconds = Number(res.headers.get("Retry-After"));
+  const ms = Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : 5_000;
+  return Math.min(ms, MAX_RETRY_WAIT_MS);
+}
+
+/** Wie fetch, wartet aber bei 429 kurz und versucht es erneut (Gruppen teilen sich oft eine IP). */
+async function fetchRetrying(input: string, init?: RequestInit): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(input, init);
+    if (res.status !== 429 || attempt >= MAX_RATE_LIMIT_RETRIES) return res;
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs(res)));
+  }
+}
+
 async function requestTicket(): Promise<string | null> {
-  const challengeRes = await fetch("/api/challenge");
+  const challengeRes = await fetchRetrying("/api/challenge");
   if (!challengeRes.ok) throw new Error(`challenge ${challengeRes.status}`);
   const info = (await challengeRes.json()) as {
     enabled: boolean;
@@ -76,7 +96,7 @@ async function requestTicket(): Promise<string | null> {
   if (!info.enabled || !info.challenge || !info.difficulty) return null;
 
   const solution = await solve(info.challenge, info.difficulty);
-  const verifyRes = await fetch("/api/verify", {
+  const verifyRes = await fetchRetrying("/api/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ challenge: info.challenge, solution }),

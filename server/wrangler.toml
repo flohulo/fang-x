@@ -17,7 +17,9 @@ name = "GAME_ROOM"
 class_name = "GameRoom"
 
 # Ratenbegrenzung pro IP-Adresse, gezählt an der Edge (kein Durable Object).
-# Workers erlaubt als Zeitfenster nur 10 oder 60 Sekunden.
+# Workers erlaubt als Zeitfenster nur 10 oder 60 Sekunden. Eine Gruppe im selben WLAN oder
+# Mobilfunknetz teilt sich oft eine IPv4-Adresse: Verify und Join brauchen deshalb Spielraum
+# für mehrere Geräte, die gleichzeitig einen Einladungslink öffnen oder neu verbinden.
 [[ratelimits]]
 name = "CREATE_LIMIT"
 namespace_id = "1001"
@@ -31,12 +33,12 @@ simple = { limit = 60, period = 60 }
 [[ratelimits]]
 name = "VERIFY_LIMIT"
 namespace_id = "1003"
-simple = { limit = 10, period = 60 }
+simple = { limit = 40, period = 60 }
 
 [[ratelimits]]
 name = "JOIN_LIMIT"
 namespace_id = "1004"
-simple = { limit = 20, period = 60 }
+simple = { limit = 60, period = 60 }
 
 [[migrations]]
 tag = "v1"
