@@ -3091,3 +3091,7 @@ label {
   font-weight: 800;
   line-height: 1;
 }
+
+.maplibregl-popup-content {
+  color: #0f172a;
+}

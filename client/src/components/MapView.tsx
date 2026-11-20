@@ -473,7 +473,11 @@ export function MapView({
       const time = formatTime(ping.at);
       return new Marker({ element: el, anchor: "bottom" })
         .setLngLat([ping.pos.lng, ping.pos.lat])
-        .setPopup(new Popup().setText(i18n.t("map.pingPopup", { index: ping.index, time })))
+        .setPopup(
+          new Popup({ closeButton: false }).setText(
+            i18n.t("map.pingPopup", { index: ping.index, time }),
+          ),
+        )
         .addTo(map);
     });
   }, [pingHistory]);
@@ -551,7 +555,7 @@ export function MapView({
           el.style.background = player.color;
         }
 
-        const popup = new Popup({ offset: player.isSelf ? 20 : 14 });
+        const popup = new Popup({ closeButton: false, offset: player.isSelf ? 20 : 14 });
         const id = player.id;
         // Text beim Öffnen frisch bauen, damit die Zeitangabe stimmt.
         popup.on("open", () => {
@@ -601,7 +605,7 @@ export function MapView({
     revealMarkerRef.current = new Marker({ element: el, anchor: "bottom" })
       .setLngLat([lastReveal.pos.lng, lastReveal.pos.lat])
       .setPopup(
-        new Popup().setText(
+        new Popup({ closeButton: false }).setText(
           i18n.t(lastReveal.isLive ? "map.xPinPopupLive" : "map.xPinPopup", { time }),
         ),
       )
@@ -649,7 +653,7 @@ export function MapView({
     objectiveMarkerRef.current = new Marker({ element: el })
       .setLngLat([target.lng, target.lat])
       .setPopup(
-        new Popup().setText(
+        new Popup({ closeButton: false }).setText(
           objective.status === "COMPLETED"
             ? i18n.t("map.objectiveReached")
             : i18n.t("map.objectiveRadius", { meters: objective.radiusMeters }),
@@ -686,7 +690,7 @@ export function MapView({
     // Spieler-Marker liegt, wenn X noch am Startpunkt steht.
     startMarkerRef.current = new Marker({ element: el, anchor: "bottom", offset: [0, -16] })
       .setLngLat([startLng, startLat])
-      .setPopup(new Popup().setText(i18n.t("map.startPopup")))
+      .setPopup(new Popup({ closeButton: false }).setText(i18n.t("map.startPopup")))
       .addTo(map);
   }, [startLat, startLng]);
 
