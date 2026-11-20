@@ -469,11 +469,7 @@ export function MapView({
     if (!map) return;
     for (const marker of pingMarkersRef.current) marker.remove();
     pingMarkersRef.current = pingHistory.map((ping) => {
-      const el = pinElement(
-        "#ef4444",
-        i18n.t("map.pingLabel", { index: ping.index }),
-        ping.index,
-      );
+      const el = pinElement("#ef4444", i18n.t("map.pingLabel", { index: ping.index }), ping.index);
       const time = formatTime(ping.at);
       return new Marker({ element: el, anchor: "bottom" })
         .setLngLat([ping.pos.lng, ping.pos.lat])
