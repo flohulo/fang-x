@@ -32,6 +32,7 @@ Anhaltspunkt haben. Ein früher erster Ping bringt die Jagd schneller in Gang.
 
 ## Ping-Verlauf für X
 
-X sieht auf der eigenen Karte alle bisherigen Standortmeldungen als nummerierte Marker. Angezeigt
-wird die Position, die die Detektive erhalten haben (inklusive Versatz). Antippen eines Markers
-zeigt die Uhrzeit der Meldung.
+X sieht auf der eigenen Karte alle bisherigen Standortmeldungen als rote Pins mit Fadenkreuz-Symbol.
+Angezeigt wird die Position, die die Detektive erhalten haben (inklusive Versatz). Antippen eines
+Pins zeigt die Nummer und die Uhrzeit der Meldung. Die Detektive sehen die letzte Sichtung
+ebenfalls als Pin, mit der Uhrzeit der Meldung.

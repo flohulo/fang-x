@@ -86,6 +86,12 @@ Benachrichtigung.
 Schon während des Countdowns ("Start in …") siehst du deinen eigenen Standort auf der Karte. Dein
 Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet.
 
+## Standorte auf der Karte
+
+Dein eigener Standort ist immer sichtbar: ein blauer Kreis mit Personen-Symbol. Tippst du auf den
+Live-Standort eines anderen Spielers, siehst du seinen Namen und wann er zuletzt synchronisiert
+wurde. Pins von X (rotes Fadenkreuz-Symbol) zeigen beim Antippen die Uhrzeit der Standortmeldung.
+
 ## App-Updates
 
 Steht eine neue Version bereit, fragt dich die App, ob sie neu geladen werden soll. Nach **Neu

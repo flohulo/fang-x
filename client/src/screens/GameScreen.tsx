@@ -393,12 +393,20 @@ export function GameScreen({
     }
   };
 
+  // Zeitpunkt der letzten Positionsaktualisierung des eigenen Geräts.
+  const [ownPositionAt, setOwnPositionAt] = useState<number | null>(null);
+  useEffect(() => {
+    setOwnPositionAt(position ? Date.now() : null);
+  }, [position]);
+
   const playerMarkers = players.map((p) => ({
     id: p.id,
     name: p.name,
     color: p.color,
     role: p.role,
     pos: p.id === myId ? position : (p.position ?? null),
+    syncedAt: p.id === myId ? ownPositionAt : (p.positionAt ?? null),
+    isSelf: p.id === myId,
   }));
 
   const hint = buildHint(t, {
