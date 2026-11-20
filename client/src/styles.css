@@ -3062,8 +3062,8 @@ label {
 .map-container .x-pin {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border: 2px solid #fff;
   border-radius: 50% 50% 50% 0;
   background: var(--pin-color, #ef4444);
@@ -3076,6 +3076,18 @@ label {
 }
 
 .map-container .x-pin > span {
+  position: relative;
   display: grid;
+  place-items: center;
   transform: rotate(45deg);
+}
+
+.map-container .x-pin > span > b {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
 }

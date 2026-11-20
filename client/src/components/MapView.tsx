@@ -242,21 +242,27 @@ function svgIcon(paths: string[], size: number) {
 
 // Person (eigener Standort) und Fadenkreuz (Pin von X).
 const PERSON_ICON = ["M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M4 21a8 8 0 0 1 16 0"];
+// Fadenkreuz mit grossem Ring, damit die Nummer in der Mitte Platz hat.
 const CROSSHAIR_ICON = [
-  "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
-  "M12 2v4",
-  "M12 18v4",
-  "M2 12h4",
-  "M18 12h4",
+  "M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z",
+  "M12 0.5v3",
+  "M12 20.5v3",
+  "M0.5 12h3",
+  "M20.5 12h3",
 ];
 
-function pinElement(background: string, label: string) {
+function pinElement(background: string, label: string, index?: number) {
   const el = document.createElement("div");
   el.className = "x-pin";
   el.style.setProperty("--pin-color", background);
   el.setAttribute("aria-label", label);
   const icon = document.createElement("span");
-  icon.appendChild(svgIcon(CROSSHAIR_ICON, 14));
+  icon.appendChild(svgIcon(CROSSHAIR_ICON, 26));
+  if (index && index > 0) {
+    const number = document.createElement("b");
+    number.textContent = String(index);
+    icon.appendChild(number);
+  }
   el.appendChild(icon);
   return el;
 }
@@ -463,7 +469,11 @@ export function MapView({
     if (!map) return;
     for (const marker of pingMarkersRef.current) marker.remove();
     pingMarkersRef.current = pingHistory.map((ping) => {
-      const el = pinElement("#ef4444", i18n.t("map.pingLabel", { index: ping.index }));
+      const el = pinElement(
+        "#ef4444",
+        i18n.t("map.pingLabel", { index: ping.index }),
+        ping.index,
+      );
       const time = formatTime(ping.at);
       return new Marker({ element: el, anchor: "bottom" })
         .setLngLat([ping.pos.lng, ping.pos.lat])
@@ -590,7 +600,7 @@ export function MapView({
     revealMarkerRef.current?.remove();
     revealMarkerRef.current = null;
     if (!map || !lastReveal || pingHistory.length > 0) return;
-    const el = pinElement("#ef4444", i18n.t("map.xPinLabel"));
+    const el = pinElement("#ef4444", i18n.t("map.xPinLabel"), lastReveal.index);
     const time = formatTime(lastReveal.at);
     revealMarkerRef.current = new Marker({ element: el, anchor: "bottom" })
       .setLngLat([lastReveal.pos.lng, lastReveal.pos.lat])
