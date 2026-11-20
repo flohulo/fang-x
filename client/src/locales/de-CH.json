@@ -463,7 +463,13 @@
     "startPoint": "Startpunkt",
     "startPopup": "Startpunkt · da hät d Rundi aagfange",
     "objectiveReached": "Missionsziel erreicht",
-    "objectiveRadius": "Missionsziel · {{meters}} m"
+    "objectiveRadius": "Missionsziel · {{meters}} m",
+    "you": "Du",
+    "playerPopup": "{{name}} · zletscht synchronisiert um {{time}} Uhr (vor {{seconds}} s)",
+    "playerPopupUnknown": "{{name}} · no nöd synchronisiert",
+    "xPinLabel": "Standort vo X",
+    "xPinPopup": "Standort vo X vo {{time}} Uhr",
+    "xPinPopupLive": "Live-Standort vo X vo {{time}} Uhr"
   },
   "errors": {
     "MESSAGE_TOO_LARGE": "Nachricht z gross.",

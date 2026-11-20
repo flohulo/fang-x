@@ -21,7 +21,11 @@ import type { ServerError } from "./serverMessages";
 import { clearPlayerId, loadPlayerId, loadPlayerToken, savePlayerId } from "./session";
 
 /** Spieler inklusive der Position, soweit der Server sie freigibt. */
-export type PlayerView = PlayerInfo & { position?: LatLng | null };
+export type PlayerView = PlayerInfo & {
+  position?: LatLng | null;
+  /** Zeitpunkt (ms), zu dem die Position zuletzt synchronisiert wurde. */
+  positionAt?: number | null;
+};
 
 export interface GameResult {
   winner: string;
@@ -209,6 +213,7 @@ export function useGame() {
             msg.players.map((player) => ({
               ...player,
               position: current.find((existing) => existing.id === player.id)?.position ?? null,
+              positionAt: current.find((existing) => existing.id === player.id)?.positionAt ?? null,
             })),
           );
           break;
@@ -307,7 +312,9 @@ export function useGame() {
         case "playerPosition":
           setPlayers((current) =>
             current.map((player) =>
-              player.id === msg.playerId ? { ...player, position: msg.pos } : player,
+              player.id === msg.playerId
+                ? { ...player, position: msg.pos, positionAt: msg.pos ? Date.now() : null }
+                : player,
             ),
           );
           break;

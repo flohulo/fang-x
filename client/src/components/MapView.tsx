@@ -205,6 +205,66 @@ interface PlayerMarker {
   color: string;
   role: string;
   pos: LatLng | null;
+  /** Zeitpunkt (ms) der letzten Standort-Synchronisierung. */
+  syncedAt?: number | null;
+  /** Der eigene Standort wird immer gezeigt und besonders gekennzeichnet. */
+  isSelf?: boolean;
+}
+
+function formatTime(ms: number, seconds = false) {
+  return new Date(ms).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    ...(seconds ? { second: "2-digit" } : {}),
+  });
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function svgIcon(paths: string[], size: number) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", String(size));
+  svg.setAttribute("height", String(size));
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "2.5");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("aria-hidden", "true");
+  for (const d of paths) {
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", d);
+    svg.appendChild(path);
+  }
+  return svg;
+}
+
+// Person (eigener Standort) und Fadenkreuz (Pin von X).
+const PERSON_ICON = ["M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M4 21a8 8 0 0 1 16 0"];
+// Fadenkreuz mit grossem Ring, damit die Nummer in der Mitte Platz hat.
+const CROSSHAIR_ICON = [
+  "M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z",
+  "M12 0.5v3",
+  "M12 20.5v3",
+  "M0.5 12h3",
+  "M20.5 12h3",
+];
+
+function pinElement(background: string, label: string, index?: number) {
+  const el = document.createElement("div");
+  el.className = "x-pin";
+  el.style.setProperty("--pin-color", background);
+  el.setAttribute("aria-label", label);
+  const icon = document.createElement("span");
+  icon.appendChild(svgIcon(CROSSHAIR_ICON, 26));
+  if (index && index > 0) {
+    const number = document.createElement("b");
+    number.textContent = String(index);
+    icon.appendChild(number);
+  }
+  el.appendChild(icon);
+  return el;
 }
 
 interface MapViewProps {
@@ -409,27 +469,15 @@ export function MapView({
     if (!map) return;
     for (const marker of pingMarkersRef.current) marker.remove();
     pingMarkersRef.current = pingHistory.map((ping) => {
-      const el = document.createElement("div");
-      el.textContent = String(ping.index);
-      el.setAttribute("aria-label", i18n.t("map.pingLabel", { index: ping.index }));
-      el.style.width = "22px";
-      el.style.height = "22px";
-      el.style.display = "grid";
-      el.style.placeItems = "center";
-      el.style.borderRadius = "50%";
-      el.style.border = "2px solid white";
-      el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
-      el.style.background = "#ef4444";
-      el.style.color = "white";
-      el.style.fontSize = "12px";
-      el.style.fontWeight = "700";
-      const time = new Date(ping.at).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      return new Marker({ element: el })
+      const el = pinElement("#ef4444", i18n.t("map.pingLabel", { index: ping.index }), ping.index);
+      const time = formatTime(ping.at);
+      return new Marker({ element: el, anchor: "bottom" })
         .setLngLat([ping.pos.lng, ping.pos.lat])
-        .setPopup(new Popup().setText(i18n.t("map.pingPopup", { index: ping.index, time })))
+        .setPopup(
+          new Popup({ closeButton: false }).setText(
+            i18n.t("map.pingPopup", { index: ping.index, time }),
+          ),
+        )
         .addTo(map);
     });
   }, [pingHistory]);
@@ -477,6 +525,7 @@ export function MapView({
   }, [teamMarkers]);
 
   // Spieler-Marker aktualisieren
+  const playerInfoRef = useRef<Map<string, PlayerMarker>>(new Map());
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -487,20 +536,46 @@ export function MapView({
     for (const player of players) {
       if (!player.pos) continue;
       activeIds.add(player.id);
+      playerInfoRef.current.set(player.id, player);
 
       let marker = markers.get(player.id);
       if (!marker) {
         const el = document.createElement("div");
-        el.style.width = "24px";
-        el.style.height = "24px";
-        el.style.borderRadius = "50%";
-        el.style.border = "3px solid white";
-        el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
-        el.style.background = player.color;
+        if (player.isSelf) {
+          // Eigener Standort: Person im Kreis, mit Puls, immer im Vordergrund.
+          el.className = "self-marker";
+          el.setAttribute("aria-label", i18n.t("map.you"));
+          el.appendChild(svgIcon(PERSON_ICON, 16));
+        } else {
+          el.style.width = "24px";
+          el.style.height = "24px";
+          el.style.borderRadius = "50%";
+          el.style.border = "3px solid white";
+          el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
+          el.style.background = player.color;
+        }
+
+        const popup = new Popup({ closeButton: false, offset: player.isSelf ? 20 : 14 });
+        const id = player.id;
+        // Text beim Öffnen frisch bauen, damit die Zeitangabe stimmt.
+        popup.on("open", () => {
+          const info = playerInfoRef.current.get(id);
+          if (!info) return;
+          const name = info.isSelf ? i18n.t("map.you") : info.name;
+          popup.setText(
+            info.syncedAt
+              ? i18n.t("map.playerPopup", {
+                  name,
+                  time: formatTime(info.syncedAt, true),
+                  seconds: Math.max(0, Math.round((Date.now() - info.syncedAt) / 1000)),
+                })
+              : i18n.t("map.playerPopupUnknown", { name }),
+          );
+        });
 
         marker = new Marker({ element: el })
           .setLngLat([player.pos.lng, player.pos.lat])
-          .setPopup(new Popup().setText(player.name))
+          .setPopup(popup)
           .addTo(map);
         markers.set(player.id, marker);
       } else {
@@ -513,9 +588,29 @@ export function MapView({
       if (!activeIds.has(id)) {
         marker.remove();
         markers.delete(id);
+        playerInfoRef.current.delete(id);
       }
     }
   }, [players]);
+
+  // Letzter Standort von X als Pin (für Detektive; X sieht seine Pings oben).
+  const revealMarkerRef = useRef<Marker | null>(null);
+  useEffect(() => {
+    const map = mapRef.current;
+    revealMarkerRef.current?.remove();
+    revealMarkerRef.current = null;
+    if (!map || !lastReveal || pingHistory.length > 0) return;
+    const el = pinElement("#ef4444", i18n.t("map.xPinLabel"), lastReveal.index);
+    const time = formatTime(lastReveal.at);
+    revealMarkerRef.current = new Marker({ element: el, anchor: "bottom" })
+      .setLngLat([lastReveal.pos.lng, lastReveal.pos.lat])
+      .setPopup(
+        new Popup({ closeButton: false }).setText(
+          i18n.t(lastReveal.isLive ? "map.xPinPopupLive" : "map.xPinPopup", { time }),
+        ),
+      )
+      .addTo(map);
+  }, [lastReveal, pingHistory]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -558,7 +653,7 @@ export function MapView({
     objectiveMarkerRef.current = new Marker({ element: el })
       .setLngLat([target.lng, target.lat])
       .setPopup(
-        new Popup().setText(
+        new Popup({ closeButton: false }).setText(
           objective.status === "COMPLETED"
             ? i18n.t("map.objectiveReached")
             : i18n.t("map.objectiveRadius", { meters: objective.radiusMeters }),
@@ -595,7 +690,7 @@ export function MapView({
     // Spieler-Marker liegt, wenn X noch am Startpunkt steht.
     startMarkerRef.current = new Marker({ element: el, anchor: "bottom", offset: [0, -16] })
       .setLngLat([startLng, startLat])
-      .setPopup(new Popup().setText(i18n.t("map.startPopup")))
+      .setPopup(new Popup({ closeButton: false }).setText(i18n.t("map.startPopup")))
       .addTo(map);
   }, [startLat, startLng]);
 

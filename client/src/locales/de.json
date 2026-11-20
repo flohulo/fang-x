@@ -490,7 +490,13 @@
     "startPoint": "Startpunkt",
     "startPopup": "Startpunkt · hier begann die Runde",
     "objectiveReached": "Missionsziel erreicht",
-    "objectiveRadius": "Missionsziel · {{meters}} m"
+    "objectiveRadius": "Missionsziel · {{meters}} m",
+    "you": "Du",
+    "playerPopup": "{{name}} · zuletzt synchronisiert um {{time}} Uhr (vor {{seconds}} s)",
+    "playerPopupUnknown": "{{name}} · noch nicht synchronisiert",
+    "xPinLabel": "Standort von X",
+    "xPinPopup": "Standort von X von {{time}} Uhr",
+    "xPinPopupLive": "Live-Standort von X von {{time}} Uhr"
   },
   "errors": {
     "MESSAGE_TOO_LARGE": "Nachricht zu gross.",
