@@ -1072,6 +1072,26 @@ label {
   position: relative;
 }
 
+.number-field {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.number-field input {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.number-field-step {
+  flex: 0 0 auto;
+  width: 44px;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 .optional-game-settings {
   display: grid;
   gap: 12px;
