@@ -21,7 +21,7 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "prettier": "^3.10.0",
-    "ws": "^8.22.2"
+    "prettier": "^3.10.1",
+    "ws": "^8.23.0"
   }
 }
