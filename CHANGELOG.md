@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.12.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.11.0...fang-x-v0.12.0) (2026-11-20)
+
+
+### Features
+
+* eigenen standort markieren und sync-zeit an karten-pins anzeigen ([#105](https://github.com/flohulo/fang-x/issues/105)) ([e43a5a5](https://github.com/flohulo/fang-x/commit/e43a5a5256e44ec23f05fe576fad3884b44d36ee))
+* ping-trick für x ergänzen ([#76](https://github.com/flohulo/fang-x/issues/76)) ([e52196e](https://github.com/flohulo/fang-x/commit/e52196e3b04a958c881b51775860c3fe7c81a612))
+* sicherheitsheader für die app ausliefern ([#91](https://github.com/flohulo/fang-x/issues/91)) ([9b2c744](https://github.com/flohulo/fang-x/commit/9b2c744062ebe983a40217d168831b6ec04d4c4d))
+* statusseite in app, webseite und handbuch verlinken ([#96](https://github.com/flohulo/fang-x/issues/96)) ([784f58a](https://github.com/flohulo/fang-x/commit/784f58a95da2d2f968e8871e147198e9d87488bc))
+
+
+### Bug Fixes
+
+* fehlerberichte gründlicher bereinigen ([#90](https://github.com/flohulo/fang-x/issues/90)) ([9c3dac2](https://github.com/flohulo/fang-x/commit/9c3dac2c92a038688721f60d76bae283ac6fa347))
+* menschen-prüfung an ip binden und im worker rechnen ([#100](https://github.com/flohulo/fang-x/issues/100)) ([c5bad3f](https://github.com/flohulo/fang-x/commit/c5bad3f00f7ee4315ce9611c6be93777c97e7b64))
+* nur einen host pro raum vergeben ([#93](https://github.com/flohulo/fang-x/issues/93)) ([48459b9](https://github.com/flohulo/fang-x/commit/48459b94da2f811ff92ca8532c004a49e436280d))
+* rate-limits für gruppen im selben netz entschärfen ([#102](https://github.com/flohulo/fang-x/issues/102)) ([c678e0b](https://github.com/flohulo/fang-x/commit/c678e0b4a1f78700fcbc669c9dd8f6623aebeabc))
+* regelwerk serverseitig auf bereiche prüfen ([#89](https://github.com/flohulo/fang-x/issues/89)) ([1b509b2](https://github.com/flohulo/fang-x/commit/1b509b2420b7852a2eac7b0f3d266bf9b20fb2be))
+* späte beitritte löschen keine ergebnisse mehr ([#99](https://github.com/flohulo/fang-x/issues/99)) ([c6233e5](https://github.com/flohulo/fang-x/commit/c6233e58f8ab34fa84ad6d99d1b0a4bfd07cbe3e))
+* spielernamen serverseitig bereinigen ([#95](https://github.com/flohulo/fang-x/issues/95)) ([4e529ce](https://github.com/flohulo/fang-x/commit/4e529ceba5f38a16e80027f0cc0f6f7eb69b32bc))
+* sprechfunk-signale und ice-server einschränken ([#103](https://github.com/flohulo/fang-x/issues/103)) ([7f474e9](https://github.com/flohulo/fang-x/commit/7f474e935cee150262b6d34588bfe6279327bccb))
+* ticket der menschen-prüfung nicht mehr in der websocket-url senden ([#104](https://github.com/flohulo/fang-x/issues/104)) ([63f79e6](https://github.com/flohulo/fang-x/commit/63f79e6c775750e524d86c11907bb26324b7476f))
+* websocket-verbindungen von fremden seiten ablehnen ([#92](https://github.com/flohulo/fang-x/issues/92)) ([01190d9](https://github.com/flohulo/fang-x/commit/01190d9b73dc03a2f7ab363b07c9ae2d6a09ae27))
+
+
+### Performance Improvements
+
+* natives rate-limiting von workers statt globalem durable object ([#101](https://github.com/flohulo/fang-x/issues/101)) ([256acca](https://github.com/flohulo/fang-x/commit/256accad3633980cd982dc3f311823ca6b0ee8f6))
+
 ## [0.11.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.10.0...fang-x-v0.11.0) (2026-11-15)
 
 
