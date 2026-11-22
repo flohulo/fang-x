@@ -480,8 +480,11 @@ export function useGame() {
     send({ t: "batteryLow", level });
   };
 
-  const sendPosition = (pos: LatLng) => {
+  /** Liefert false, wenn die Verbindung gerade nicht offen ist und nichts gesendet wurde. */
+  const sendPosition = (pos: LatLng): boolean => {
+    if (wsRef.current?.readyState !== WebSocket.OPEN) return false;
     send({ t: "position", pos });
+    return true;
   };
 
   const leave = () => {

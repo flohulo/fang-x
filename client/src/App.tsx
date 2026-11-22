@@ -573,6 +573,7 @@ export default function App() {
         yourPositionIsShared={game.yourPositionIsShared}
         gameResult={game.gameResult}
         onPosition={game.sendPosition}
+        connected={game.connected}
         onSetObjective={game.setObjectiveTarget}
         onUseTransitStop={game.requestTransitStop}
         onSendChat={game.sendChat}
