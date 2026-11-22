@@ -6,6 +6,9 @@ export function useGeolocation(enabled: boolean, onPosition: (pos: LatLng) => vo
   const [position, setPosition] = useState<LatLng | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [simulated, setSimulated] = useState(false);
+  // Liefert die genaue Ortung (GPS) nichts, etwa in Gebäuden, fällt die Ortung auf
+  // Netzwerk-/WLAN-Standort zurück, damit du dich wenigstens ungefähr siehst.
+  const [lowAccuracy, setLowAccuracy] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const onPosRef = useRef(onPosition);
   onPosRef.current = onPosition;
@@ -33,9 +36,10 @@ export function useGeolocation(enabled: boolean, onPosition: (pos: LatLng) => vo
       },
       (err) => {
         setError(err.message);
+        if (err.code !== err.PERMISSION_DENIED) setLowAccuracy(true);
       },
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: !lowAccuracy,
         maximumAge: 5000,
         timeout: 15000,
       },
@@ -46,7 +50,7 @@ export function useGeolocation(enabled: boolean, onPosition: (pos: LatLng) => vo
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
     };
-  }, [enabled, simulated]);
+  }, [enabled, simulated, lowAccuracy]);
 
   const setSimulatedPosition = (pos: LatLng) => {
     setSimulated(true);
