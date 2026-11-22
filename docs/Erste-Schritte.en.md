@@ -69,7 +69,8 @@ notification.
 ## Locations on the map
 
 Your own location is always visible: a blue circle with a person icon. Tap another player's live
-location to see their name and when it was last synced. Tapping a pin of X (red crosshair icon)
+location to see their name and when it was last synced. If a player's device is not delivering a
+new location right now, their last known location stays on the map; the time shows how old it is. Tapping a pin of X (red crosshair icon)
 shows the time of that location report.
 
 ## App updates

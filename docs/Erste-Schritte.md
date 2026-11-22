@@ -90,7 +90,8 @@ Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server
 
 Dein eigener Standort ist immer sichtbar: ein blauer Kreis mit Personen-Symbol. Tippst du auf den
 Live-Standort eines anderen Spielers, siehst du seinen Namen und wann er zuletzt synchronisiert
-wurde. Pins von X (rotes Fadenkreuz-Symbol) zeigen beim Antippen die Uhrzeit der Standortmeldung.
+wurde. Liefert das Gerät eines Spielers gerade keinen neuen Standort, bleibt sein zuletzt
+bekannter Standort auf der Karte stehen; die Zeitangabe zeigt dir, wie alt er ist. Pins von X (rotes Fadenkreuz-Symbol) zeigen beim Antippen die Uhrzeit der Standortmeldung.
 
 ## App-Updates
 
