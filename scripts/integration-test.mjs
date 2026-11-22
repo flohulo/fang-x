@@ -1216,6 +1216,32 @@ async function run() {
   skipX.ws.close();
   skipDetective.ws.close();
 
+  // Rückmeldung zur Runde: gültige Angaben werden angenommen, ungültige abgelehnt.
+  const postFeedback = (body) =>
+    fetch(`${HTTP}/api/feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(humanTicket ? { "X-Human-Ticket": humanTicket } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+  assert(
+    (await postFeedback({ rating: 2, reason: "Zu wenig Sichtungen", role: "DETECTIVE" })).ok,
+    "Rückmeldung mit Sternen und Begründung wird angenommen",
+  );
+  assert((await postFeedback({ rating: 5, role: "X" })).ok, "Rückmeldung ohne Begründung geht");
+  assert((await postFeedback({ rating: 6 })).status === 400, "Sternezahl über 5 wird abgelehnt");
+  assert(
+    (await postFeedback({ rating: 3, reason: "x".repeat(501) })).status === 400,
+    "Zu langer Freitext wird abgelehnt",
+  );
+  const feedbackRead = await fetch(`${HTTP}/api/feedback`);
+  assert(
+    feedbackRead.status === 404 || feedbackRead.status === 401,
+    "Rückmeldungen lassen sich ohne Admin-Token nicht lesen",
+  );
+
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);
 }

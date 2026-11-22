@@ -954,6 +954,62 @@ label {
   border-radius: 50%;
 }
 
+.feedback {
+  margin: 16px 0 0;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.feedback h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.feedback-stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 8px 0 12px;
+}
+
+button.feedback-star {
+  background: transparent;
+  color: var(--text-dim);
+  padding: 4px 8px;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+button.feedback-star-on {
+  color: var(--accent);
+}
+
+.feedback-label {
+  display: block;
+  margin: 0 0 6px;
+}
+
+.feedback textarea {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--radius);
+  padding: 12px;
+  font: inherit;
+  font-size: 1rem;
+  width: 100%;
+  resize: vertical;
+}
+
+.feedback textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.feedback-error {
+  color: var(--danger);
+}
+
 .map-overlay {
   position: absolute;
   top: 0;

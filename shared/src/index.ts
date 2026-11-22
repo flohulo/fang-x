@@ -5,3 +5,4 @@ export * from "./human-check";
 export * from "./error-report";
 export * from "./preGameCheck";
 export * from "./player-name";
+export * from "./feedback";

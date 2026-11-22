@@ -12,22 +12,27 @@ import {
 } from "./human-check";
 import type { DurableObject } from "cloudflare:workers";
 import * as Sentry from "@sentry/cloudflare";
-import { scrubErrorEvent } from "@fang-x/shared";
+import { parseFeedback, scrubErrorEvent } from "@fang-x/shared";
 import { GameRoom } from "./room";
+import { FEEDBACK_OBJECT_NAME, FeedbackStore } from "./feedback";
 import { HUMAN_CHECK_DIFFICULTY_BITS } from "@fang-x/shared";
 
 export interface Env {
   GAME_ROOM: DurableObjectNamespace;
+  FEEDBACK: DurableObjectNamespace;
   /** Ratenbegrenzer von Workers (wrangler.toml, [[ratelimits]]), zählen an der Edge. */
   CREATE_LIMIT: RateLimit;
   LOOKUP_LIMIT: RateLimit;
   VERIFY_LIMIT: RateLimit;
   JOIN_LIMIT: RateLimit;
+  FEEDBACK_LIMIT: RateLimit;
   ASSETS: Fetcher;
   /** Optional: JSON-Liste von ICE-Servern (STUN/TURN) für den Sprechfunk der Detektive. */
   ICE_SERVERS?: string;
   /** Signaturschlüssel der Menschen-Prüfung (wrangler secret). Ohne ihn ist sie aus. */
   HUMAN_CHECK_SECRET?: string;
+  /** Optional: Token zum Auslesen der Rückmeldungen (wrangler secret). Ohne ihn ist das Lesen aus. */
+  FEEDBACK_ADMIN_TOKEN?: string;
   // Optional: DSN des GlitchTip-Projekts. Ohne DSN ist die Fehlerberichterstattung aus.
   GLITCHTIP_DSN?: string;
 }
@@ -102,6 +107,18 @@ function isForeignOrigin(request: Request, url: URL): boolean {
   } catch {
     return true;
   }
+}
+
+// Vergleich ohne frühen Abbruch, damit das Token nicht über die Antwortzeit erraten wird.
+function tokenMatches(request: Request, expected: string): boolean {
+  const header = request.headers.get("Authorization") ?? "";
+  const given = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const enc = new TextEncoder();
+  const a = enc.encode(given);
+  const b = enc.encode(expected);
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < b.length; i++) diff |= (a[i] ?? 0) ^ b[i];
+  return diff === 0;
 }
 
 const handler = {
@@ -192,6 +209,39 @@ const handler = {
       return Response.json({ code: codeCheck[1], exists }, { headers: NO_STORE });
     }
 
+    // Rückmeldung zur Runde (anonym). Auslesen nur mit Admin-Token.
+    if (url.pathname === "/api/feedback") {
+      const stub = env.FEEDBACK.get(env.FEEDBACK.idFromName(FEEDBACK_OBJECT_NAME));
+
+      if (request.method === "POST") {
+        const unverified = await requireTicket(env, request);
+        if (unverified) return unverified;
+        const limited = await checkRateLimit(env.FEEDBACK_LIMIT, request);
+        if (limited) return limited;
+        const input = parseFeedback(await request.json().catch(() => null));
+        if (!input) {
+          return Response.json(
+            { error: "Die Rückmeldung ist ungültig." },
+            { status: 400, headers: NO_STORE },
+          );
+        }
+        await stub.fetch(
+          new Request("http://internal/add", { method: "POST", body: JSON.stringify(input) }),
+        );
+        return Response.json({ ok: true }, { headers: NO_STORE });
+      }
+
+      if (request.method === "GET") {
+        if (!env.FEEDBACK_ADMIN_TOKEN) {
+          return Response.json({ error: "Unbekannter Endpunkt" }, { status: 404 });
+        }
+        if (!tokenMatches(request, env.FEEDBACK_ADMIN_TOKEN)) {
+          return Response.json({ error: "Nicht erlaubt." }, { status: 401, headers: NO_STORE });
+        }
+        return stub.fetch(new Request("http://internal/summary"));
+      }
+    }
+
     // Unbekannte API-Pfade bekommen JSON statt der SPA-HTML-Seite
     if (url.pathname.startsWith("/api/")) {
       return Response.json({ error: "Unbekannter Endpunkt" }, { status: 404 });
@@ -232,3 +282,9 @@ const GameRoomInstrumented = Sentry.instrumentDurableObjectWithSentry(
   GameRoom as unknown as DurableObjectClass,
 );
 export { GameRoomInstrumented as GameRoom };
+
+const FeedbackStoreInstrumented = Sentry.instrumentDurableObjectWithSentry(
+  sentryOptions,
+  FeedbackStore as unknown as DurableObjectClass,
+);
+export { FeedbackStoreInstrumented as FeedbackStore };
