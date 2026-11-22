@@ -204,6 +204,8 @@ export class GameRoom {
   private catchSince = new Map<string, number>();
   private lastRevealIndex = 0;
   private lastRevealAt = 0;
+  /** X wurde schon informiert, dass er in den letzten Spielminuten live gezeigt wird. */
+  private finalLiveNotified = false;
   private nextRevealAt: number | null = null;
   /** Verlauf der Reveals (nur im Speicher, nicht persistiert) */
   private xPositions: Array<{ pos: LatLng; at: number; radius: number }> = [];
@@ -1088,6 +1090,7 @@ export class GameRoom {
     const durationMs = this.ruleset.game.durationMinutes * 60000;
     this.phaseEndsAt = startedAt + durationMs;
 
+    this.finalLiveNotified = false;
     // Erster Reveal nach firstRevealAfterMinutes, dann im Intervall
     this.nextRevealAt = startedAt + this.ruleset.reveal.firstRevealAfterMinutes * 60000;
 
@@ -1299,7 +1302,7 @@ export class GameRoom {
       if (this.xCurrentlyOutOfBounds) {
         // Zurück im Gebiet → Live-Tracking stoppen
         this.xCurrentlyOutOfBounds = false;
-        if (penalty === "LIVE_SHARE") {
+        if (penalty === "LIVE_SHARE" && !this.inFinalLiveWindow(Date.now())) {
           this.sendTo(x.ws, { t: "yourPositionIsShared", shared: false });
         }
         this.persist();
@@ -1441,6 +1444,17 @@ export class GameRoom {
     }
   }
 
+  /** Läuft gerade die Zeit, in der X dauerhaft live gezeigt wird (Regel liveLocationFinalMinutes)? */
+  private inFinalLiveWindow(now: number): boolean {
+    const minutes = this.ruleset.reveal.liveLocationFinalMinutes;
+    return (
+      minutes > 0 &&
+      this.phase === "RUNNING" &&
+      this.phaseEndsAt !== null &&
+      now >= this.phaseEndsAt - minutes * 60_000
+    );
+  }
+
   private tick() {
     if (this.phase !== "RUNNING") return;
     const now = Date.now();
@@ -1463,6 +1477,25 @@ export class GameRoom {
           isLive: true,
         };
         this.broadcast({ t: "reveal", reveal: liveReveal });
+      }
+    }
+
+    // Letzte Spielminuten: X ist für die Detektive dauerhaft live sichtbar.
+    if (this.inFinalLiveWindow(now)) {
+      const liveX = [...this.players.values()].find((p) => p.role === "X");
+      if (liveX && !this.finalLiveNotified) {
+        this.finalLiveNotified = true;
+        this.sendTo(liveX.ws, { t: "yourPositionIsShared", shared: true });
+      }
+      if (liveX?.position) {
+        const liveReveal: RevealEvent = {
+          pos: liveX.position,
+          radiusMeters: 0,
+          at: now,
+          index: this.lastRevealIndex,
+          isLive: true,
+        };
+        this.broadcastToDetectives({ t: "reveal", reveal: liveReveal });
       }
     }
 

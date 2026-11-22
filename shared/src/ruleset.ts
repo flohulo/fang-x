@@ -53,6 +53,8 @@ export interface Ruleset {
     showTrail: ShowTrail;
     xSeesDetectives: XSeesDetectives;
     detectivesSeesXHistory: boolean;
+    /** In den letzten N Spielminuten sehen die Detektive X dauerhaft live (0 = aus). */
+    liveLocationFinalMinutes: number;
   };
   catch: {
     method: CatchMethod;
@@ -142,6 +144,7 @@ export const DEFAULT_RULESET: Ruleset = {
     showTrail: "LAST3",
     xSeesDetectives: "ON_REVEAL",
     detectivesSeesXHistory: true,
+    liveLocationFinalMinutes: 0,
   },
   catch: {
     method: "RADIUS",
@@ -211,6 +214,7 @@ export const RULESET_LIMITS = {
   overtimeMaxMinutes: [1, 120],
   countdownSeconds: [0, 60],
   firstRevealAfterMinutes: [0, 60],
+  liveLocationFinalMinutes: [0, 60],
   intervalMinutes: [0.05, 30],
   decreaseStepMinutes: [0, 30],
   revealRadiusMeters: [0, 5000],
@@ -365,6 +369,11 @@ export function mergeRuleset(partial?: unknown): Ruleset {
         d.reveal.xSeesDetectives,
       ),
       detectivesSeesXHistory: bool(reveal.detectivesSeesXHistory, d.reveal.detectivesSeesXHistory),
+      liveLocationFinalMinutes: num(
+        reveal.liveLocationFinalMinutes,
+        "liveLocationFinalMinutes",
+        d.reveal.liveLocationFinalMinutes,
+      ),
     },
     catch: {
       method:

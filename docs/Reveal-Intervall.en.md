@@ -29,3 +29,9 @@ applies.
 
 A later first ping gives X time to break away without the detectives immediately having a clue.
 An early first ping gets the hunt going faster.
+
+## Live location in the final minutes
+
+With the rule `reveal.liveLocationFinalMinutes` the detectives see X live on the map during the last
+minutes of the game, in addition to the regular reports. The value is the number of minutes before
+the end; **0** turns the feature off (default). X is notified as soon as their location is shared.
