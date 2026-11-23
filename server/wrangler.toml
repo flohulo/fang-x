@@ -16,11 +16,6 @@ not_found_handling = "single-page-application"
 name = "GAME_ROOM"
 class_name = "GameRoom"
 
-# Anonyme Rückmeldungen zur Runde: eine einzelne Instanz mit SQLite.
-[[durable_objects.bindings]]
-name = "FEEDBACK"
-class_name = "FeedbackStore"
-
 # Ratenbegrenzung pro IP-Adresse, gezählt an der Edge (kein Durable Object).
 # Workers erlaubt als Zeitfenster nur 10 oder 60 Sekunden. Eine Gruppe im selben WLAN oder
 # Mobilfunknetz teilt sich oft eine IPv4-Adresse: Verify und Join brauchen deshalb Spielraum
@@ -62,7 +57,3 @@ new_sqlite_classes = ["RateLimiter"]
 [[migrations]]
 tag = "v3"
 deleted_classes = ["RateLimiter"]
-
-[[migrations]]
-tag = "v4"
-new_sqlite_classes = ["FeedbackStore"]

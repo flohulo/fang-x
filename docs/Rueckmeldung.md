@@ -19,13 +19,8 @@ bitte keine persönlichen Daten in den Text.
 
 ## Für Betreiber
 
-Die Rückmeldungen liegen in einem eigenen Durable Object mit SQLite (`FeedbackStore`). Zum Auslesen
-legst du ein Geheimnis an:
-
-```bash
-npx wrangler secret put FEEDBACK_ADMIN_TOKEN
-```
-
-Danach liefert `GET /api/feedback` mit dem Header `Authorization: Bearer <Token>` die Anzahl je
-Sternezahl, den Durchschnitt und die letzten 100 Rückmeldungen als JSON. Ohne gesetztes Token ist
-das Auslesen abgeschaltet. Das Senden ist pro IP-Adresse begrenzt (10 pro Minute).
+Jede Rückmeldung geht als Ereignis an GlitchTip, dasselbe Projekt wie die Fehlerberichte (Secret
+`GLITCHTIP_DSN`). Sie sind am Tag `kind = round-feedback` zu erkennen und tragen die Tags `rating`
+(1 bis 5) und `role`; der Text steht unter „Additional Data“ als `reason`. Rückmeldungen mit gleicher
+Sternezahl landen in einem gemeinsamen Eintrag, GlitchTip zählt sie dort mit. Ohne `GLITCHTIP_DSN`
+werden Rückmeldungen verworfen. Das Senden ist pro IP-Adresse begrenzt (10 pro Minute).

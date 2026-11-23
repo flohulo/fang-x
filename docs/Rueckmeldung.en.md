@@ -19,12 +19,8 @@ data in the text.
 
 ## For operators
 
-Feedback is kept in its own Durable Object with SQLite (`FeedbackStore`). To read it, set a secret:
-
-```bash
-npx wrangler secret put FEEDBACK_ADMIN_TOKEN
-```
-
-Then `GET /api/feedback` with the header `Authorization: Bearer <token>` returns the count per star
-rating, the average and the latest 100 entries as JSON. Without the token set, reading is disabled.
-Sending is limited per IP address (10 per minute).
+Every piece of feedback is sent to GlitchTip as an event, in the same project as the error reports
+(secret `GLITCHTIP_DSN`). Look for the tag `kind = round-feedback`; events carry the tags `rating`
+(1 to 5) and `role`, and the text is under "Additional Data" as `reason`. Feedback with the same
+star rating is grouped into one issue, so GlitchTip counts them there. Without `GLITCHTIP_DSN`,
+feedback is discarded. Sending is limited per IP address (10 per minute).

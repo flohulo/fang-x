@@ -1236,11 +1236,6 @@ async function run() {
     (await postFeedback({ rating: 3, reason: "x".repeat(501) })).status === 400,
     "Zu langer Freitext wird abgelehnt",
   );
-  const feedbackRead = await fetch(`${HTTP}/api/feedback`);
-  assert(
-    feedbackRead.status === 404 || feedbackRead.status === 401,
-    "Rückmeldungen lassen sich ohne Admin-Token nicht lesen",
-  );
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);
