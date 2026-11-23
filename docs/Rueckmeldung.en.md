@@ -23,4 +23,4 @@ Every piece of feedback is sent to GlitchTip as an event, in the same project as
 (secret `GLITCHTIP_DSN`). Look for the tag `kind = round-feedback`; events carry the tags `rating`
 (1 to 5) and `role`, and the text is under "Additional Data" as `reason`. Feedback with the same
 star rating is grouped into one issue, so GlitchTip counts them there. Without `GLITCHTIP_DSN`,
-feedback is discarded. Sending is limited per IP address (10 per minute).
+the app does not show the feedback section at all. Sending is limited per IP address (10 per minute).

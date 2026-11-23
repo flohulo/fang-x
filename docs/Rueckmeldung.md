@@ -23,4 +23,4 @@ Jede Rückmeldung geht als Ereignis an GlitchTip, dasselbe Projekt wie die Fehle
 `GLITCHTIP_DSN`). Sie sind am Tag `kind = round-feedback` zu erkennen und tragen die Tags `rating`
 (1 bis 5) und `role`; der Text steht unter „Additional Data“ als `reason`. Rückmeldungen mit gleicher
 Sternezahl landen in einem gemeinsamen Eintrag, GlitchTip zählt sie dort mit. Ohne `GLITCHTIP_DSN`
-werden Rückmeldungen verworfen. Das Senden ist pro IP-Adresse begrenzt (10 pro Minute).
+zeigt die App das Rückmeldungsfenster gar nicht erst an. Das Senden ist pro IP-Adresse begrenzt (10 pro Minute).

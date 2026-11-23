@@ -1226,11 +1226,19 @@ async function run() {
       },
       body: JSON.stringify(body),
     });
+  // Ohne GLITCHTIP_DSN (lokal) ist die Rückmeldung aus; mit DSN wird sie angenommen.
+  const { enabled: feedbackEnabled } = await (await fetch(`${HTTP}/api/feedback`)).json();
+  assert(typeof feedbackEnabled === "boolean", "Server meldet, ob Rückmeldungen möglich sind");
+  const expectedStatus = feedbackEnabled ? 200 : 503;
   assert(
-    (await postFeedback({ rating: 2, reason: "Zu wenig Sichtungen", role: "DETECTIVE" })).ok,
-    "Rückmeldung mit Sternen und Begründung wird angenommen",
+    (await postFeedback({ rating: 2, reason: "Zu wenig Sichtungen", role: "DETECTIVE" })).status ===
+      expectedStatus,
+    "Rückmeldung mit Sternen und Begründung wird je nach Einrichtung angenommen oder abgelehnt",
   );
-  assert((await postFeedback({ rating: 5, role: "X" })).ok, "Rückmeldung ohne Begründung geht");
+  assert(
+    (await postFeedback({ rating: 5, role: "X" })).status === expectedStatus,
+    "Rückmeldung ohne Begründung verhält sich ebenso",
+  );
   assert((await postFeedback({ rating: 6 })).status === 400, "Sternezahl über 5 wird abgelehnt");
   assert(
     (await postFeedback({ rating: 3, reason: "x".repeat(501) })).status === 400,

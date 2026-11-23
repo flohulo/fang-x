@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FEEDBACK_MAX_RATING,
@@ -26,8 +26,24 @@ export function FeedbackPanel({ role }: { role: FeedbackRole | null }) {
   const [reason, setReason] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [dismissed, setDismissed] = useState(false);
+  // Der Server weiss, ob GlitchTip eingerichtet ist. Bis zur Antwort und ohne GlitchTip bleibt
+  // das Fenster weg.
+  const [enabled, setEnabled] = useState(false);
 
-  if (dismissed) return null;
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/feedback")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: { enabled?: boolean } | null) => {
+        if (!cancelled) setEnabled(body?.enabled === true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!enabled || dismissed) return null;
 
   if (status === "sent") {
     return (

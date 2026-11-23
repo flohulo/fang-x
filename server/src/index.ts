@@ -193,8 +193,14 @@ const handler = {
       return Response.json({ code: codeCheck[1], exists }, { headers: NO_STORE });
     }
 
-    // Rückmeldung zur Runde (anonym). Sie geht als Ereignis an GlitchTip; ohne DSN wird sie
-    // verworfen, wie die Fehlerberichte auch.
+    // Rückmeldung zur Runde (anonym). Sie geht als Ereignis an GlitchTip. Ohne DSN gibt es
+    // keine Rückmeldung: Der Client blendet das Fenster dann aus.
+    if (url.pathname === "/api/feedback" && request.method === "GET") {
+      const limited = await checkRateLimit(env.LOOKUP_LIMIT, request);
+      if (limited) return limited;
+      return Response.json({ enabled: Boolean(env.GLITCHTIP_DSN) }, { headers: NO_STORE });
+    }
+
     if (url.pathname === "/api/feedback" && request.method === "POST") {
       const unverified = await requireTicket(env, request);
       if (unverified) return unverified;
@@ -205,6 +211,12 @@ const handler = {
         return Response.json(
           { error: "Die Rückmeldung ist ungültig." },
           { status: 400, headers: NO_STORE },
+        );
+      }
+      if (!env.GLITCHTIP_DSN) {
+        return Response.json(
+          { error: "Rückmeldungen sind nicht eingerichtet." },
+          { status: 503, headers: NO_STORE },
         );
       }
       Sentry.captureEvent({
