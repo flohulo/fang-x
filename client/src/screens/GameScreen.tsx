@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { ChatPanel } from "../components/ChatPanel";
+import { FeedbackPanel } from "../components/FeedbackPanel";
 import { RadioPanel } from "../components/RadioPanel";
 import { MapView } from "../components/MapView";
 import {
@@ -539,6 +540,7 @@ export function GameScreen({
                 : t("game.safety.confirm")}
             </button>
           </section>
+          {me && <FeedbackPanel key={code} role={me.role === "HOST" ? null : me.role} />}
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             {t("game.backToStart")}
           </button>

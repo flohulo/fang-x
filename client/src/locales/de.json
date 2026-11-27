@@ -362,6 +362,19 @@
       "farthest": "Am weitesten gelaufen",
       "roleX": "X"
     },
+    "feedback": {
+      "title": "Wie war die Runde?",
+      "question": "Wie hat dir die Runde gefallen?",
+      "starLabel": "{{count}} von {{max}} Sternen",
+      "whyBad": "Was hat dir nicht gefallen? Was sollen wir besser machen?",
+      "whyGood": "Was hat dir besonders gut gefallen?",
+      "privacy": "Optional und anonym. Es werden weder Name noch Spiel-Code noch Standort gespeichert.",
+      "send": "Rückmeldung senden",
+      "sending": "Wird gesendet …",
+      "skip": "Überspringen",
+      "error": "Die Rückmeldung konnte nicht gesendet werden. Versuche es bitte gleich nochmal.",
+      "thanks": "Danke für deine Rückmeldung!"
+    },
     "backToStart": "Zurück zur Startseite",
     "exportSettings": "Einstellungen dieser Runde exportieren",
     "settingsExported": "Einstellungen exportiert ✓",

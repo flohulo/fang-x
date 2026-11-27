@@ -54,6 +54,7 @@ nav:
   - Alle sicher und Funkstille: Alle-sicher-und-Funkstille.md
   - Akku-Warnung: Akku-Warnung.md
   - Spielende-Auswertung: Spielende-Auswertung.md
+  - Rückmeldung: Rueckmeldung.md
 
 # Die interne Regelwerk-Spezifikation bleibt im Repository, gehört aber nicht ins Handbuch.
 exclude_docs: |
@@ -113,6 +114,7 @@ plugins:
             Alle sicher und Funkstille: Everyone safe and radio silence
             Akku-Warnung: Low battery warning
             Spielende-Auswertung: Round summary
+            Rückmeldung: Round feedback
 
 extra:
   social:

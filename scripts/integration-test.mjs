@@ -1216,6 +1216,35 @@ async function run() {
   skipX.ws.close();
   skipDetective.ws.close();
 
+  // Rückmeldung zur Runde: gültige Angaben werden angenommen, ungültige abgelehnt.
+  const postFeedback = (body) =>
+    fetch(`${HTTP}/api/feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(humanTicket ? { "X-Human-Ticket": humanTicket } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+  // Ohne GLITCHTIP_DSN (lokal) ist die Rückmeldung aus; mit DSN wird sie angenommen.
+  const { enabled: feedbackEnabled } = await (await fetch(`${HTTP}/api/feedback`)).json();
+  assert(typeof feedbackEnabled === "boolean", "Server meldet, ob Rückmeldungen möglich sind");
+  const expectedStatus = feedbackEnabled ? 200 : 503;
+  assert(
+    (await postFeedback({ rating: 2, reason: "Zu wenig Sichtungen", role: "DETECTIVE" })).status ===
+      expectedStatus,
+    "Rückmeldung mit Sternen und Begründung wird je nach Einrichtung angenommen oder abgelehnt",
+  );
+  assert(
+    (await postFeedback({ rating: 5, role: "X" })).status === expectedStatus,
+    "Rückmeldung ohne Begründung verhält sich ebenso",
+  );
+  assert((await postFeedback({ rating: 6 })).status === 400, "Sternezahl über 5 wird abgelehnt");
+  assert(
+    (await postFeedback({ rating: 3, reason: "x".repeat(501) })).status === 400,
+    "Zu langer Freitext wird abgelehnt",
+  );
+
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);
 }
