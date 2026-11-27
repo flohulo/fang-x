@@ -399,6 +399,16 @@ export function GameScreen({
     setOwnPositionAt(position ? Date.now() : null);
   }, [position]);
 
+  // Detektive sehen frühere Sichtungen von X, soweit die Regeln einen Verlauf erlauben.
+  const trailRules = ruleset?.reveal;
+  const trailLimit =
+    !trailRules || !trailRules.detectivesSeesXHistory || trailRules.showTrail === "NONE"
+      ? 0
+      : trailRules.showTrail === "LAST3"
+        ? 3
+        : 50;
+  const xTrail = trailLimit > 0 ? pingHistory.slice(-trailLimit) : [];
+
   const playerMarkers = players.map((p) => ({
     id: p.id,
     name: p.name,
@@ -572,7 +582,8 @@ export function GameScreen({
           playAreaPolygon={playAreaPolygon}
           players={playerMarkers}
           lastReveal={lastReveal}
-          pingHistory={isX ? pingHistory : []}
+          pingHistory={isX ? pingHistory : xTrail}
+          pingHistoryIsOwn={isX}
           objective={isX ? objective : null}
           teamMarkers={isX ? [] : teamMarkers}
           onRemoveTeamMarker={onRemoveTeamMarker}

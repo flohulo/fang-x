@@ -276,6 +276,8 @@ interface MapViewProps {
   lastReveal: RevealEvent | null;
   /** Bisherige Pings von X (nur für X selbst) — nummerierte Marker mit Radius. */
   pingHistory?: RevealEvent[];
+  /** true: Pings von X selbst ("Ping 3"); false: frühere Sichtungen von X für Detektive. */
+  pingHistoryIsOwn?: boolean;
   objective: ObjectiveState | null;
   /** Markierungen der Detektive; X bekommt keine. */
   teamMarkers?: TeamMarker[];
@@ -293,6 +295,7 @@ export function MapView({
   players,
   lastReveal,
   pingHistory = [],
+  pingHistoryIsOwn = true,
   objective,
   teamMarkers = [],
   onRemoveTeamMarker,
@@ -469,18 +472,20 @@ export function MapView({
     if (!map) return;
     for (const marker of pingMarkersRef.current) marker.remove();
     pingMarkersRef.current = pingHistory.map((ping) => {
-      const el = pinElement("#ef4444", i18n.t("map.pingLabel", { index: ping.index }), ping.index);
+      const label = i18n.t(pingHistoryIsOwn ? "map.pingLabel" : "map.xPinLabel", {
+        index: ping.index,
+      });
+      const el = pinElement("#ef4444", label, ping.index);
       const time = formatTime(ping.at);
+      const popup = pingHistoryIsOwn
+        ? i18n.t("map.pingPopup", { index: ping.index, time })
+        : i18n.t("map.xPinPopup", { time });
       return new Marker({ element: el, anchor: "bottom" })
         .setLngLat([ping.pos.lng, ping.pos.lat])
-        .setPopup(
-          new Popup({ closeButton: false }).setText(
-            i18n.t("map.pingPopup", { index: ping.index, time }),
-          ),
-        )
+        .setPopup(new Popup({ closeButton: false }).setText(popup))
         .addTo(map);
     });
-  }, [pingHistory]);
+  }, [pingHistory, pingHistoryIsOwn]);
 
   // Markierungen der Detektive
   useEffect(() => {
@@ -599,7 +604,10 @@ export function MapView({
     const map = mapRef.current;
     revealMarkerRef.current?.remove();
     revealMarkerRef.current = null;
-    if (!map || !lastReveal || pingHistory.length > 0) return;
+    if (!map || !lastReveal) return;
+    // Steht die Sichtung schon als Pin im Verlauf, nicht doppelt zeichnen.
+    if (pingHistory.some((ping) => ping.index === lastReveal.index) && !lastReveal.isLive) return;
+    if (pingHistoryIsOwn && pingHistory.length > 0) return;
     const el = pinElement("#ef4444", i18n.t("map.xPinLabel"), lastReveal.index);
     const time = formatTime(lastReveal.at);
     revealMarkerRef.current = new Marker({ element: el, anchor: "bottom" })

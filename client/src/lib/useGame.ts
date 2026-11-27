@@ -337,6 +337,13 @@ export function useGame() {
           break;
         case "reveal":
           setLastReveal(msg.reveal);
+          // Frühere Sichtungen bleiben als Pins stehen (Detektive); Live-Standorte nicht.
+          if (!msg.reveal.isLive) {
+            const sighting = msg.reveal;
+            setPingHistory((current) =>
+              [...current.filter((r) => r.index !== sighting.index), sighting].slice(-50),
+            );
+          }
           break;
         case "positionShared":
           setLastPositionShared({ at: msg.at, index: msg.index, live: msg.live });
