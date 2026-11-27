@@ -98,7 +98,7 @@ Steht eine neue Version bereit, fragt dich die App, ob sie neu geladen werden so
 laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerungen. Du kommst
 über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
 aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
-Startseite.
+Startseite. Dort siehst du die letzten fünf Versionen.
 
 ## Status und Neuigkeiten
 

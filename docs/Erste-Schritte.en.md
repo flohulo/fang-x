@@ -77,7 +77,7 @@ shows the time of that location report.
 When a new version is available, the app asks whether to reload. After **Reload** the version
 history (changelog) opens automatically so you can see what is new. The back link takes you to
 the home screen at any time, where a running game is resumed. You can also find the changelog in
-the menu and via the version number on the home screen.
+the menu and via the version number on the home screen. It shows the last five versions.
 
 ## Status and news
 
