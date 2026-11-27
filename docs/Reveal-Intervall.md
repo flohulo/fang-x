@@ -22,7 +22,7 @@ auslösen.
 | **Einstellung** | Erste Standortmeldung (Minuten) |
 |---|---|
 | **Regelparameter** | `reveal.firstRevealAfterMinutes` |
-| **Standardwert** | 3 Minuten |
+| **Standardwert** | 0 Minuten (sofort nach dem Vorsprung) |
 
 Die erste Standortmeldung folgt nach dem Ende des Vorsprungs. Mit einem Wert von **0** wird X
 sofort nach dem Vorsprung zum ersten Mal gemeldet; danach gilt das eingestellte Intervall.
@@ -43,4 +43,7 @@ letzten Minuten".
 X sieht auf der eigenen Karte alle bisherigen Standortmeldungen als rote Pins mit Fadenkreuz-Symbol.
 Angezeigt wird die Position, die die Detektive erhalten haben (inklusive Versatz). Antippen eines
 Pins zeigt die Nummer und die Uhrzeit der Meldung. Die Detektive sehen die letzte Sichtung
-ebenfalls als Pin, mit der Uhrzeit der Meldung.
+ebenfalls als Pin, mit der Uhrzeit der Meldung. Kommt eine neue Sichtung dazu, bleiben die alten
+Pins stehen. Wie viele es sind, steuert die Spur-Einstellung: keine Spur (nur die letzte Sichtung),
+die letzten drei oder alle Sichtungen. Ist der Verlauf für Detektive ausgeschaltet, sehen sie nur
+die letzte Sichtung.

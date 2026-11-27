@@ -38,6 +38,7 @@ Freien achten solltet.
 | :material-shield-check: [Alle sicher und Funkstille](Alle-sicher-und-Funkstille.md) | Warnung bei Funkstille, Sicherheitsabfrage am Ende |
 | :material-battery-alert: [Akku-Warnung](Akku-Warnung.md) | Alle erfahren, wenn ein Akku fast leer ist |
 | :material-chart-box: [Spielende-Auswertung](Spielende-Auswertung.md) | Kennzahlen am Ende der Runde |
+| :material-star-outline: [Rückmeldung](Rueckmeldung.md) | Sterne und kurze Begründung nach der Runde |
 
 ## Sicher spielen
 

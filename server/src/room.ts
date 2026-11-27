@@ -895,7 +895,9 @@ export class GameRoom {
     ws.addEventListener("close", () => {
       if (closed) return;
       if (!player) return;
-      this.markDisconnected(player);
+      // Hat eine neue Verbindung den Platz schon übernommen (Reconnect, während der alte
+      // Socket noch halb offen war), darf der alte Socket den Spieler nicht auf offline setzen.
+      if (player.ws === ws) this.markDisconnected(player);
       player = null;
     });
   }

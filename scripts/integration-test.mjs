@@ -658,6 +658,37 @@ async function run() {
   );
   assert(true, "Beide Spieler wieder verbunden");
 
+  // Übernahme bei noch offenem alten Socket (halb offene Mobilfunk-Verbindung): der Server
+  // schließt den alten Socket, der neue Platz darf dadurch nicht als offline gelten.
+  const b2Closed = new Promise((resolve) => b2.ws.on("close", (code) => resolve(code)));
+  const b3 = await connect(code2);
+  b3.ws.send(
+    JSON.stringify({
+      t: "join",
+      code: code2,
+      name: "B",
+      wantsX: false,
+      playerId: bJoined.playerId,
+      token: bJoined.token,
+    }),
+  );
+  await b3.waitFor((m) => m.t === "joined");
+  assert((await b2Closed) === 4001, "Übernommener alter Socket wird mit Code 4001 geschlossen");
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const c = await connect(code2);
+  c.ws.send(JSON.stringify({ t: "join", code: code2, name: "C", wantsX: false }));
+  await c.waitFor((m) => m.t === "joined");
+  const afterTakeover = await b3.waitFor(
+    (m) => m.t === "players" && m.players.some((p) => p.name === "C"),
+    5000,
+  );
+  assert(
+    afterTakeover.players.find((p) => p.id === bJoined.playerId)?.connected === true,
+    "Nach der Übernahme bleibt der Spieler verbunden und erhält weiter Nachrichten",
+  );
+  c.ws.close();
+  b3.ws.close();
+
   // Fremde Spieler-ID ohne Token darf den Platz nicht übernehmen
   const thief = await connect(code2);
   thief.ws.send(
@@ -1254,6 +1285,35 @@ async function run() {
   assert(liveShared.shared === true, "X wird gewarnt, dass sein Standort live geteilt wird");
   liveX.ws.close();
   liveDetective.ws.close();
+
+  // Rückmeldung zur Runde: gültige Angaben werden angenommen, ungültige abgelehnt.
+  const postFeedback = (body) =>
+    fetch(`${HTTP}/api/feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(humanTicket ? { "X-Human-Ticket": humanTicket } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+  // Ohne GLITCHTIP_DSN (lokal) ist die Rückmeldung aus; mit DSN wird sie angenommen.
+  const { enabled: feedbackEnabled } = await (await fetch(`${HTTP}/api/feedback`)).json();
+  assert(typeof feedbackEnabled === "boolean", "Server meldet, ob Rückmeldungen möglich sind");
+  const expectedStatus = feedbackEnabled ? 200 : 503;
+  assert(
+    (await postFeedback({ rating: 2, reason: "Zu wenig Sichtungen", role: "DETECTIVE" })).status ===
+      expectedStatus,
+    "Rückmeldung mit Sternen und Begründung wird je nach Einrichtung angenommen oder abgelehnt",
+  );
+  assert(
+    (await postFeedback({ rating: 5, role: "X" })).status === expectedStatus,
+    "Rückmeldung ohne Begründung verhält sich ebenso",
+  );
+  assert((await postFeedback({ rating: 6 })).status === 400, "Sternezahl über 5 wird abgelehnt");
+  assert(
+    (await postFeedback({ rating: 3, reason: "x".repeat(501) })).status === 400,
+    "Zu langer Freitext wird abgelehnt",
+  );
 
   console.log(`\n=== Ergebnis: ${passed} bestanden, ${failed} fehlgeschlagen ===`);
   process.exit(failed > 0 ? 1 : 0);

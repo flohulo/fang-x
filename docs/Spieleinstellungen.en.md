@@ -13,7 +13,7 @@ The name appears in the file name when the settings are exported as a JSON file 
 | Game duration | 30 minutes | [Game duration](Spieldauer.md) |
 | Head start for X | 2 minutes | [Head start for X](Vorsprung-fuer-X.md) |
 | Countdown before start | 10 seconds | Time to get ready after the start |
-| First location report | 3 minutes | [Reveal interval](Reveal-Intervall.md#first-location-report) |
+| First location report | 0 minutes (right after the head start) | [Reveal interval](Reveal-Intervall.md#first-location-report) |
 | Reveal interval | 3 minutes | [Reveal interval](Reveal-Intervall.md) |
 | Reveal radius | 5 meters | [Reveal radius](Sichtradius.md) |
 | Catch radius | 30 meters | [Catch radius](Fangradius.md) |

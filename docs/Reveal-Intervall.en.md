@@ -21,7 +21,7 @@ Regardless of the interval, leaving the play area can trigger a separate live lo
 | **Setting** | First location report (minutes) |
 |---|---|
 | **Rule parameter** | `reveal.firstRevealAfterMinutes` |
-| **Default** | 3 minutes |
+| **Default** | 0 minutes (right after the head start) |
 
 The first location report follows after the head start ends. With a value of **0**, X is
 reported for the first time immediately after the head start; after that the configured interval

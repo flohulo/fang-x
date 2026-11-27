@@ -72,7 +72,7 @@ Einstellungen überschreibt.
 
 | Key | Typ | Bereich | Default | Bedeutung |
 |---|---|---|---|---|
-| `reveal.firstRevealAfterMinutes` | int | 0–60 | **3** | Erste Standortmeldung nach Spielbeginn. |
+| `reveal.firstRevealAfterMinutes` | int | 0–60 | **0** | Erste Standortmeldung nach Spielbeginn (0 = sofort nach dem Vorsprung). |
 | `reveal.liveLocationFinalMinutes` | number | 0–60 | **0** | In den letzten N Spielminuten sehen die Detektive X dauerhaft live (0 = aus). X wird gewarnt. |
 | `reveal.intervalMinutes` | number | 0.5–30 | **3** | Intervall zwischen Aufdeckungen (fixed-Modus). |
 | `reveal.schedule` | enum | `FIXED` / `DECREASING` / `RANDOM` | FIXED | Wie sich das Intervall verhält. |
@@ -201,7 +201,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
   "name": "Klassisch (Original-treu)",
   "game": { "durationMinutes": 30, "headStartMinutes": 2, "overtimeEnabled": false },
   "reveal": {
-    "firstRevealAfterMinutes": 3,
+    "firstRevealAfterMinutes": 0,
     "liveLocationFinalMinutes": 0,
     "intervalMinutes": 3,
     "schedule": "FIXED",

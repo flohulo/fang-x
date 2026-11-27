@@ -127,7 +127,7 @@ export const DEFAULT_RULESET: Ruleset = {
     detectivesWaitDuringHeadStart: false,
   },
   reveal: {
-    firstRevealAfterMinutes: 3,
+    firstRevealAfterMinutes: 0,
     intervalMinutes: 3,
     schedule: "FIXED",
     decreaseStepMinutes: 0.5,

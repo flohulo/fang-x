@@ -84,13 +84,17 @@ Benachrichtigung.
 ## Standort vor dem Start
 
 Schon während des Countdowns ("Start in …") siehst du deinen eigenen Standort auf der Karte. Dein
-Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet.
+Standort wird dabei nur auf deinem Gerät verwendet und noch nicht an den Server gesendet. Das
+gilt auch, wenn du als Detektiv im Vorsprung warten musst: Du siehst dich selbst, geteilt wird dein
+Standort erst nach dem Vorsprung. Findet dein Gerät keinen genauen GPS-Standort, etwa in Gebäuden,
+nutzt die App automatisch die ungenauere Ortung über Netzwerk und WLAN.
 
 ## Standorte auf der Karte
 
 Dein eigener Standort ist immer sichtbar: ein blauer Kreis mit Personen-Symbol. Tippst du auf den
 Live-Standort eines anderen Spielers, siehst du seinen Namen und wann er zuletzt synchronisiert
-wurde. Pins von X (rotes Fadenkreuz-Symbol) zeigen beim Antippen die Uhrzeit der Standortmeldung.
+wurde. Liefert das Gerät eines Spielers gerade keinen neuen Standort, bleibt sein zuletzt
+bekannter Standort auf der Karte stehen; die Zeitangabe zeigt dir, wie alt er ist. Pins von X (rotes Fadenkreuz-Symbol) zeigen beim Antippen die Uhrzeit der Standortmeldung.
 
 ## App-Updates
 
@@ -98,7 +102,7 @@ Steht eine neue Version bereit, fragt dich die App, ob sie neu geladen werden so
 laden** öffnet sich automatisch der Versionsverlauf (Changelog) mit den Neuerungen. Du kommst
 über den Zurück-Link jederzeit wieder zur Startseite; ein laufendes Spiel wird dort wieder
 aufgenommen. Den Versionsverlauf findest du auch im Menü und über die Versionsnummer auf der
-Startseite.
+Startseite. Dort siehst du die letzten fünf Versionen.
 
 ## Status und Neuigkeiten
 

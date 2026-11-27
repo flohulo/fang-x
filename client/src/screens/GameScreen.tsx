@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { ChatPanel } from "../components/ChatPanel";
+import { FeedbackPanel } from "../components/FeedbackPanel";
 import { RadioPanel } from "../components/RadioPanel";
 import { MapView } from "../components/MapView";
 import {
@@ -67,7 +68,9 @@ interface GameScreenProps {
   serverError: string | null;
   yourPositionIsShared: boolean;
   gameResult: GameResult | null;
-  onPosition: (pos: LatLng) => void;
+  /** Gibt false zurück, wenn die Position wegen fehlender Verbindung nicht gesendet wurde. */
+  onPosition: (pos: LatLng) => boolean;
+  connected: boolean;
   onSetObjective: (target: LatLng) => void;
   onUseTransitStop: (mode: "bus" | "train", count: number) => void;
   onSendChat: (text: string) => void;
@@ -183,6 +186,7 @@ export function GameScreen({
   yourPositionIsShared,
   gameResult,
   onPosition,
+  connected,
   onSetObjective,
   onUseTransitStop,
   onSendChat,
@@ -217,27 +221,63 @@ export function GameScreen({
   const me = players.find((p) => p.id === myId);
   const isX = me?.role === "X";
   // Im Countdown läuft GPS nur lokal, damit du deinen Standort schon siehst (nichts wird gesendet).
-  const trackingActive =
-    phase === "COUNTDOWN" ||
-    phase === "RUNNING" ||
-    (phase === "HEADSTART" && (!ruleset?.game.detectivesWaitDuringHeadStart || isX));
+  // Das gilt auch für wartende Detektive im Vorsprung: Sie sehen sich selbst, der Server nimmt
+  // ihren Standort aber erst nach dem Vorsprung an.
+  const trackingActive = phase === "COUNTDOWN" || phase === "HEADSTART" || phase === "RUNNING";
 
   const playAreaRadius: number = ruleset?.map?.playAreaRadiusMeters ?? 700;
   const playAreaPolygon = ruleset?.map?.playAreaPolygon ?? null;
 
+  // Die jeweils neueste Messung wird spätestens nach dem Mindestabstand gesendet. Messungen
+  // dazwischen werden nicht verworfen, sondern ersetzen sich: Wer stillsteht, bekommt von GPS
+  // nur selten neue Werte, und der Server soll trotzdem den aktuellen Stand haben.
+  const latestPositionRef = useRef<LatLng | null>(null);
+  const sendTimerRef = useRef<number | null>(null);
+  const flushPositionRef = useRef<() => void>(() => {});
+  flushPositionRef.current = () => {
+    if (sendTimerRef.current !== null) {
+      window.clearTimeout(sendTimerRef.current);
+      sendTimerRef.current = null;
+    }
+    const pos = latestPositionRef.current;
+    if (!pos || phase === "COUNTDOWN") return;
+    const minInterval = (ruleset?.movement?.minUpdateSeconds ?? 15) * 1000;
+    const wait = lastSentRef.current + minInterval - Date.now();
+    if (wait > 0) {
+      sendTimerRef.current = window.setTimeout(() => flushPositionRef.current(), wait);
+      return;
+    }
+    // Nur zählen, was wirklich gesendet wurde; sonst geht die Position bei einem Verbindungsabriss verloren.
+    if (onPosition(pos)) lastSentRef.current = Date.now();
+  };
+
   const handlePosition = useCallback(
     (pos: LatLng) => {
-      if (phase !== "COUNTDOWN") {
-        const now = Date.now();
-        const minInterval = (ruleset?.movement?.minUpdateSeconds ?? 15) * 1000;
-        if (now - lastSentRef.current >= minInterval) {
-          lastSentRef.current = now;
-          onPosition(pos);
-        }
-      }
+      latestPositionRef.current = pos;
+      flushPositionRef.current();
       if (!mapCenter) setMapCenter(pos);
     },
-    [onPosition, mapCenter, ruleset, phase],
+    [mapCenter],
+  );
+
+  // Nach einem Reconnect hat der Server unseren Standort evtl. verworfen: sofort nachsenden.
+  useEffect(() => {
+    if (!connected) return;
+    lastSentRef.current = 0;
+    flushPositionRef.current();
+  }, [connected]);
+
+  // Beim Wechsel in die Spielphase den schon bekannten Standort sofort melden (sonst fehlt er,
+  // bis GPS wieder einen neuen Wert liefert).
+  useEffect(() => {
+    flushPositionRef.current();
+  }, [phase]);
+
+  useEffect(
+    () => () => {
+      if (sendTimerRef.current !== null) window.clearTimeout(sendTimerRef.current);
+    },
+    [],
   );
 
   const { position, error, simulated, setSimulatedPosition, enableRealGps } = useGeolocation(
@@ -399,6 +439,16 @@ export function GameScreen({
     setOwnPositionAt(position ? Date.now() : null);
   }, [position]);
 
+  // Detektive sehen frühere Sichtungen von X, soweit die Regeln einen Verlauf erlauben.
+  const trailRules = ruleset?.reveal;
+  const trailLimit =
+    !trailRules || !trailRules.detectivesSeesXHistory || trailRules.showTrail === "NONE"
+      ? 0
+      : trailRules.showTrail === "LAST3"
+        ? 3
+        : 50;
+  const xTrail = trailLimit > 0 ? pingHistory.slice(-trailLimit) : [];
+
   const playerMarkers = players.map((p) => ({
     id: p.id,
     name: p.name,
@@ -539,6 +589,7 @@ export function GameScreen({
                 : t("game.safety.confirm")}
             </button>
           </section>
+          {me && <FeedbackPanel key={code} role={me.role === "HOST" ? null : me.role} />}
           <button onClick={onLeave} style={{ marginTop: 24 }}>
             {t("game.backToStart")}
           </button>
@@ -571,7 +622,8 @@ export function GameScreen({
           playAreaPolygon={playAreaPolygon}
           players={playerMarkers}
           lastReveal={lastReveal}
-          pingHistory={isX ? pingHistory : []}
+          pingHistory={isX ? pingHistory : xTrail}
+          pingHistoryIsOwn={isX}
           objective={isX ? objective : null}
           teamMarkers={isX ? [] : teamMarkers}
           onRemoveTeamMarker={onRemoveTeamMarker}

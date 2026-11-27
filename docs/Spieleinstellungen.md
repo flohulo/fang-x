@@ -15,7 +15,7 @@ JSON-Datei exportiert werden.
 | Spieldauer | 30 Minuten | [Spieldauer](Spieldauer.md) |
 | Vorsprung für X | 2 Minuten | [Vorsprung für X](Vorsprung-fuer-X.md) |
 | Countdown vor dem Start | 10 Sekunden | Zeit zum Bereitmachen nach dem Start |
-| Erste Standortmeldung | 3 Minuten | [Reveal-Intervall](Reveal-Intervall.md#erste-standortmeldung) |
+| Erste Standortmeldung | 0 Minuten (sofort nach dem Vorsprung) | [Reveal-Intervall](Reveal-Intervall.md#erste-standortmeldung) |
 | Reveal-Intervall | 3 Minuten | [Reveal-Intervall](Reveal-Intervall.md) |
 | Sichtradius | 5 Meter | [Sichtradius](Sichtradius.md) |
 | Fangradius | 30 Meter | [Fangradius](Fangradius.md) |

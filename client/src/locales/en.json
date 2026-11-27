@@ -364,6 +364,19 @@
       "farthest": "Walked the farthest",
       "roleX": "X"
     },
+    "feedback": {
+      "title": "How was the round?",
+      "question": "How did you like the round?",
+      "starLabel": "{{count}} of {{max}} stars",
+      "whyBad": "What didn't you like? What should we improve?",
+      "whyGood": "What did you like most?",
+      "privacy": "Optional and anonymous. No name, game code or location is stored.",
+      "send": "Send feedback",
+      "sending": "Sending …",
+      "skip": "Skip",
+      "error": "Your feedback could not be sent. Please try again in a moment.",
+      "thanks": "Thanks for your feedback!"
+    },
     "backToStart": "Back to the start page",
     "exportSettings": "Export settings of this round",
     "settingsExported": "Settings exported ✓",

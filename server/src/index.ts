@@ -12,7 +12,7 @@ import {
 } from "./human-check";
 import type { DurableObject } from "cloudflare:workers";
 import * as Sentry from "@sentry/cloudflare";
-import { scrubErrorEvent } from "@fang-x/shared";
+import { parseFeedback, scrubErrorEvent } from "@fang-x/shared";
 import { GameRoom } from "./room";
 import { HUMAN_CHECK_DIFFICULTY_BITS } from "@fang-x/shared";
 
@@ -23,6 +23,7 @@ export interface Env {
   LOOKUP_LIMIT: RateLimit;
   VERIFY_LIMIT: RateLimit;
   JOIN_LIMIT: RateLimit;
+  FEEDBACK_LIMIT: RateLimit;
   ASSETS: Fetcher;
   /** Optional: JSON-Liste von ICE-Servern (STUN/TURN) für den Sprechfunk der Detektive. */
   ICE_SERVERS?: string;
@@ -190,6 +191,43 @@ const handler = {
         .fetch(new Request("http://internal/exists", { method: "GET" }))
         .then((r) => r.json() as Promise<{ exists: boolean }>);
       return Response.json({ code: codeCheck[1], exists }, { headers: NO_STORE });
+    }
+
+    // Rückmeldung zur Runde (anonym). Sie geht als Ereignis an GlitchTip. Ohne DSN gibt es
+    // keine Rückmeldung: Der Client blendet das Fenster dann aus.
+    if (url.pathname === "/api/feedback" && request.method === "GET") {
+      const limited = await checkRateLimit(env.LOOKUP_LIMIT, request);
+      if (limited) return limited;
+      return Response.json({ enabled: Boolean(env.GLITCHTIP_DSN) }, { headers: NO_STORE });
+    }
+
+    if (url.pathname === "/api/feedback" && request.method === "POST") {
+      const unverified = await requireTicket(env, request);
+      if (unverified) return unverified;
+      const limited = await checkRateLimit(env.FEEDBACK_LIMIT, request);
+      if (limited) return limited;
+      const input = parseFeedback(await request.json().catch(() => null));
+      if (!input) {
+        return Response.json(
+          { error: "Die Rückmeldung ist ungültig." },
+          { status: 400, headers: NO_STORE },
+        );
+      }
+      if (!env.GLITCHTIP_DSN) {
+        return Response.json(
+          { error: "Rückmeldungen sind nicht eingerichtet." },
+          { status: 503, headers: NO_STORE },
+        );
+      }
+      Sentry.captureEvent({
+        message: `Rückmeldung zur Runde: ${input.rating} Sterne`,
+        level: "info",
+        tags: { kind: "round-feedback", rating: String(input.rating), role: input.role ?? "none" },
+        // Gleiche Sternezahl gruppiert zu einem Eintrag, so zählt GlitchTip die Rückmeldungen.
+        fingerprint: ["round-feedback", String(input.rating)],
+        extra: { reason: input.reason },
+      });
+      return Response.json({ ok: true }, { headers: NO_STORE });
     }
 
     // Unbekannte API-Pfade bekommen JSON statt der SPA-HTML-Seite
