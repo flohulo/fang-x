@@ -78,7 +78,10 @@ export function parseChangelog(markdown: string): ChangelogRelease[] {
   return releases.filter((r) => r.sections.some((s) => s.items.length > 0));
 }
 
-const RELEASES = parseChangelog(changelogRaw);
+/** Anzahl der Versionen, die der Versionsverlauf in der App anzeigt. */
+const MAX_RELEASES = 5;
+
+const RELEASES = parseChangelog(changelogRaw).slice(0, MAX_RELEASES);
 
 const SECTION_CLASSES: Record<string, string> = {
   Neu: "cat-feature",
@@ -162,7 +165,7 @@ export function ChangelogScreen() {
           <h1>Fang X entwickelt sich weiter.</h1>
           <p className="legal-subtitle">
             Hier findest du neue Funktionen, Verbesserungen und Fehlerbehebungen aus den letzten
-            Versionen.
+            fünf Versionen.
           </p>
         </header>
 
