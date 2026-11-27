@@ -22,7 +22,7 @@ auslösen.
 | **Einstellung** | Erste Standortmeldung (Minuten) |
 |---|---|
 | **Regelparameter** | `reveal.firstRevealAfterMinutes` |
-| **Standardwert** | 3 Minuten |
+| **Standardwert** | 0 Minuten (sofort nach dem Vorsprung) |
 
 Die erste Standortmeldung folgt nach dem Ende des Vorsprungs. Mit einem Wert von **0** wird X
 sofort nach dem Vorsprung zum ersten Mal gemeldet; danach gilt das eingestellte Intervall.
