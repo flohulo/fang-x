@@ -658,6 +658,37 @@ async function run() {
   );
   assert(true, "Beide Spieler wieder verbunden");
 
+  // Übernahme bei noch offenem alten Socket (halb offene Mobilfunk-Verbindung): der Server
+  // schließt den alten Socket, der neue Platz darf dadurch nicht als offline gelten.
+  const b2Closed = new Promise((resolve) => b2.ws.on("close", (code) => resolve(code)));
+  const b3 = await connect(code2);
+  b3.ws.send(
+    JSON.stringify({
+      t: "join",
+      code: code2,
+      name: "B",
+      wantsX: false,
+      playerId: bJoined.playerId,
+      token: bJoined.token,
+    }),
+  );
+  await b3.waitFor((m) => m.t === "joined");
+  assert((await b2Closed) === 4001, "Übernommener alter Socket wird mit Code 4001 geschlossen");
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  const c = await connect(code2);
+  c.ws.send(JSON.stringify({ t: "join", code: code2, name: "C", wantsX: false }));
+  await c.waitFor((m) => m.t === "joined");
+  const afterTakeover = await b3.waitFor(
+    (m) => m.t === "players" && m.players.some((p) => p.name === "C"),
+    5000,
+  );
+  assert(
+    afterTakeover.players.find((p) => p.id === bJoined.playerId)?.connected === true,
+    "Nach der Übernahme bleibt der Spieler verbunden und erhält weiter Nachrichten",
+  );
+  c.ws.close();
+  b3.ws.close();
+
   // Fremde Spieler-ID ohne Token darf den Platz nicht übernehmen
   const thief = await connect(code2);
   thief.ws.send(
