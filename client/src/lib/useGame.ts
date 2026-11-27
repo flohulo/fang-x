@@ -198,7 +198,17 @@ export function useGame() {
           setMyId(msg.playerId);
           savePlayerId(session.code, msg.playerId, msg.token);
           setPhase(msg.phase);
-          setPlayers(msg.players);
+          // Nach einem Reconnect die zuletzt bekannten Standorte behalten.
+          setPlayers((current) =>
+            msg.players.map((player) => {
+              const known = current.find((existing) => existing.id === player.id);
+              return {
+                ...player,
+                position: known?.position ?? null,
+                positionAt: known?.positionAt ?? null,
+              };
+            }),
+          );
           setRuleset(msg.ruleset);
           setTransitStops(msg.transitStops);
           setRevealTimer(null);
@@ -241,6 +251,10 @@ export function useGame() {
             setBatteryWarning(null);
             setChatMessages([]);
             setCatchPending(false);
+            // Neue Runde: alte Standorte gehören nicht mehr auf die Karte.
+            setPlayers((current) =>
+              current.map((player) => ({ ...player, position: null, positionAt: null })),
+            );
           } else if (msg.reveals && msg.reveals.length > 0) {
             // Nach Reload/Reconnect: letzte Sichtung nachziehen.
             setLastReveal(msg.reveals[msg.reveals.length - 1]);
@@ -310,10 +324,13 @@ export function useGame() {
           });
           break;
         case "playerPosition":
+          // Verwirft der Server einen Standort (kein Update seit 3 Intervallen, Verbindung weg),
+          // bleibt hier der zuletzt bekannte stehen; die Uhrzeit im Popup zeigt, wie alt er ist.
+          if (!msg.pos) break;
           setPlayers((current) =>
             current.map((player) =>
               player.id === msg.playerId
-                ? { ...player, position: msg.pos, positionAt: msg.pos ? Date.now() : null }
+                ? { ...player, position: msg.pos, positionAt: Date.now() }
                 : player,
             ),
           );
