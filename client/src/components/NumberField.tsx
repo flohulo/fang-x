@@ -75,24 +75,26 @@ export function NumberField({ id, value, min, max, step, onChange }: NumberField
         onBlur={handleBlur}
         onFocus={(event) => event.target.select()}
       />
-      <button
-        type="button"
-        className="secondary number-field-step"
-        aria-label={t("lobby.decrease")}
-        disabled={value <= min}
-        onClick={() => nudge(-1)}
-      >
-        −
-      </button>
-      <button
-        type="button"
-        className="secondary number-field-step"
-        aria-label={t("lobby.increase")}
-        disabled={value >= max}
-        onClick={() => nudge(1)}
-      >
-        +
-      </button>
+      <div className="number-field-steps">
+        <button
+          type="button"
+          className="secondary number-field-step"
+          aria-label={t("lobby.increase")}
+          disabled={value >= max}
+          onClick={() => nudge(1)}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          className="secondary number-field-step"
+          aria-label={t("lobby.decrease")}
+          disabled={value <= min}
+          onClick={() => nudge(-1)}
+        >
+          −
+        </button>
+      </div>
     </div>
   );
 }
