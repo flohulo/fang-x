@@ -640,6 +640,27 @@ export function LobbyScreen({
             </div>
 
             <div className="config-field">
+              <label htmlFor="cfg-live-final">{t("lobby.liveFinal")}</label>
+              <input
+                id="cfg-live-final"
+                type="number"
+                min="0"
+                max="60"
+                step="1"
+                value={localRuleset.reveal.liveLocationFinalMinutes}
+                onChange={(e) =>
+                  updateNested("reveal", {
+                    liveLocationFinalMinutes: Math.max(
+                      0,
+                      Math.min(60, Number(e.target.value) || 0),
+                    ),
+                  })
+                }
+              />
+              <p className="config-hint">{t("lobby.liveFinalHint")}</p>
+            </div>
+
+            <div className="config-field">
               <div className="config-label-row">
                 <label htmlFor="cfg-interval">{t("lobby.interval")}</label>
                 <ParamInfoButton

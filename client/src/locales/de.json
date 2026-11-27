@@ -192,6 +192,8 @@
     "headStart": "Vorsprung (Minuten)",
     "countdown": "Countdown vor dem Start (Sekunden)",
     "firstReveal": "Erste Standortmeldung (Minuten)",
+    "liveFinal": "X live sichtbar in den letzten Minuten",
+    "liveFinalHint": "0 = aus. Sonst sehen die Detektive X in den letzten Spielminuten dauerhaft live auf der Karte; X wird dabei gewarnt.",
     "interval": "Reveal-Intervall (Minuten)",
     "revealRadius": "Sichtradius (Meter)",
     "catchRadius": "Fangradius (Meter)",

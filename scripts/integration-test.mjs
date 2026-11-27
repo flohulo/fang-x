@@ -1247,6 +1247,45 @@ async function run() {
   skipX.ws.close();
   skipDetective.ws.close();
 
+  // Live-Standort von X in den letzten Spielminuten
+  console.log("\n=== X live in den letzten Minuten ===");
+  const codeLive = await createGame();
+  const liveX = await connect(codeLive);
+  liveX.ws.send(JSON.stringify({ t: "join", code: codeLive, name: "Live-X", wantsX: true }));
+  await liveX.waitFor((m) => m.t === "joined");
+  const liveDetective = await connect(codeLive);
+  liveDetective.ws.send(
+    JSON.stringify({ t: "join", code: codeLive, name: "Live-Detektiv", wantsX: false }),
+  );
+  await liveDetective.waitFor((m) => m.t === "joined");
+  liveX.ws.send(
+    JSON.stringify({
+      t: "configure",
+      ruleset: {
+        game: { durationMinutes: 1, headStartMinutes: 0, countdownSeconds: 0 },
+        reveal: { firstRevealAfterMinutes: 30, liveLocationFinalMinutes: 1 },
+        map: { outOfBoundsEnabled: false },
+      },
+    }),
+  );
+  const liveConfig = await liveX.waitFor((m) => m.t === "config");
+  assert(
+    liveConfig.ruleset.reveal.liveLocationFinalMinutes === 1,
+    "Regel liveLocationFinalMinutes wird übernommen",
+  );
+  liveX.ws.send(JSON.stringify({ t: "start" }));
+  await liveX.waitFor((m) => m.t === "phase" && m.phase === "RUNNING", 10000);
+  liveX.ws.send(JSON.stringify({ t: "position", pos: { lat: 47.3769, lng: 8.5417 } }));
+  const liveReveal = await liveDetective.waitFor((m) => m.t === "reveal" && m.reveal.isLive, 15000);
+  assert(
+    Math.abs(liveReveal.reveal.pos.lat - 47.3769) < 1e-6,
+    "Detektive sehen X in den letzten Minuten live",
+  );
+  const liveShared = await liveX.waitFor((m) => m.t === "yourPositionIsShared" && m.shared, 5000);
+  assert(liveShared.shared === true, "X wird gewarnt, dass sein Standort live geteilt wird");
+  liveX.ws.close();
+  liveDetective.ws.close();
+
   // Rückmeldung zur Runde: gültige Angaben werden angenommen, ungültige abgelehnt.
   const postFeedback = (body) =>
     fetch(`${HTTP}/api/feedback`, {

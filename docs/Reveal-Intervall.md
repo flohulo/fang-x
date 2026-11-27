@@ -30,6 +30,14 @@ sofort nach dem Vorsprung zum ersten Mal gemeldet; danach gilt das eingestellte 
 Ein späterer erster Ping gibt X Zeit, sich zu lösen, ohne dass die Detektive sofort einen
 Anhaltspunkt haben. Ein früher erster Ping bringt die Jagd schneller in Gang.
 
+## Live-Standort in den letzten Minuten
+
+Mit der Regel `reveal.liveLocationFinalMinutes` sehen die Detektive X in den letzten Spielminuten
+dauerhaft live auf der Karte, zusätzlich zu den regulären Sichtungen. Der Wert gibt die Minuten vor
+Spielende an; **0** schaltet die Funktion aus (Standard). X bekommt einen Hinweis, sobald sein
+Standort geteilt wird. In der Lobby findest du die Einstellung unter "X live sichtbar in den
+letzten Minuten".
+
 ## Ping-Verlauf für X
 
 X sieht auf der eigenen Karte alle bisherigen Standortmeldungen als rote Pins mit Fadenkreuz-Symbol.

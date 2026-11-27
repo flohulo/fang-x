@@ -192,6 +192,8 @@
     "headStart": "Head start (minutes)",
     "countdown": "Countdown before start (seconds)",
     "firstReveal": "First location report (minutes)",
+    "liveFinal": "X visible live in the final minutes",
+    "liveFinalHint": "0 = off. Otherwise the detectives see X live on the map during the last minutes of the game; X is warned.",
     "interval": "Reveal interval (minutes)",
     "revealRadius": "Reveal radius (meters)",
     "catchRadius": "Catch radius (meters)",
