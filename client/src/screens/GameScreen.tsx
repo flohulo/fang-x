@@ -218,10 +218,9 @@ export function GameScreen({
   const me = players.find((p) => p.id === myId);
   const isX = me?.role === "X";
   // Im Countdown läuft GPS nur lokal, damit du deinen Standort schon siehst (nichts wird gesendet).
-  const trackingActive =
-    phase === "COUNTDOWN" ||
-    phase === "RUNNING" ||
-    (phase === "HEADSTART" && (!ruleset?.game.detectivesWaitDuringHeadStart || isX));
+  // Das gilt auch für wartende Detektive im Vorsprung: Sie sehen sich selbst, der Server nimmt
+  // ihren Standort aber erst nach dem Vorsprung an.
+  const trackingActive = phase === "COUNTDOWN" || phase === "HEADSTART" || phase === "RUNNING";
 
   const playAreaRadius: number = ruleset?.map?.playAreaRadiusMeters ?? 700;
   const playAreaPolygon = ruleset?.map?.playAreaPolygon ?? null;
