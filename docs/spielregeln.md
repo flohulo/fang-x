@@ -72,7 +72,7 @@ Einstellungen überschreibt.
 
 | Key | Typ | Bereich | Default | Bedeutung |
 |---|---|---|---|---|
-| `reveal.firstRevealAfterMinutes` | int | 0–60 | **3** | Erste Standortmeldung nach Spielbeginn. |
+| `reveal.firstRevealAfterMinutes` | int | 0–60 | **0** | Erste Standortmeldung nach Spielbeginn (0 = sofort nach dem Vorsprung). |
 | `reveal.intervalMinutes` | number | 0.5–30 | **3** | Intervall zwischen Aufdeckungen (fixed-Modus). |
 | `reveal.schedule` | enum | `FIXED` / `DECREASING` / `RANDOM` | FIXED | Wie sich das Intervall verhält. |
 | `reveal.decreaseStepMinutes` | number | — | 0.5 | Nacheinander-Modus: um wie viel jedes Intervall kürzer wird. |
@@ -200,7 +200,7 @@ Alle Specials sind standardmäßig **aus** (`0`/`false`) und lassen sich im Rege
   "name": "Klassisch (Original-treu)",
   "game": { "durationMinutes": 30, "headStartMinutes": 2, "overtimeEnabled": false },
   "reveal": {
-    "firstRevealAfterMinutes": 3,
+    "firstRevealAfterMinutes": 0,
     "intervalMinutes": 3,
     "schedule": "FIXED",
     "revealRadiusMeters": 5,
