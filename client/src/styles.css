@@ -1074,21 +1074,21 @@ label {
 
 .number-field {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   align-items: stretch;
 }
 
 .number-field input {
   flex: 1;
   min-width: 0;
-  text-align: center;
 }
 
 .number-field-step {
   flex: 0 0 auto;
-  width: 44px;
+  width: 34px;
   padding: 0;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 500;
   line-height: 1;
 }
 
