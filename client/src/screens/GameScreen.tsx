@@ -68,7 +68,9 @@ interface GameScreenProps {
   serverError: string | null;
   yourPositionIsShared: boolean;
   gameResult: GameResult | null;
-  onPosition: (pos: LatLng) => void;
+  /** Gibt false zurück, wenn die Position wegen fehlender Verbindung nicht gesendet wurde. */
+  onPosition: (pos: LatLng) => boolean;
+  connected: boolean;
   onSetObjective: (target: LatLng) => void;
   onUseTransitStop: (mode: "bus" | "train", count: number) => void;
   onSendChat: (text: string) => void;
@@ -184,6 +186,7 @@ export function GameScreen({
   yourPositionIsShared,
   gameResult,
   onPosition,
+  connected,
   onSetObjective,
   onUseTransitStop,
   onSendChat,
@@ -225,19 +228,56 @@ export function GameScreen({
   const playAreaRadius: number = ruleset?.map?.playAreaRadiusMeters ?? 700;
   const playAreaPolygon = ruleset?.map?.playAreaPolygon ?? null;
 
+  // Die jeweils neueste Messung wird spätestens nach dem Mindestabstand gesendet. Messungen
+  // dazwischen werden nicht verworfen, sondern ersetzen sich: Wer stillsteht, bekommt von GPS
+  // nur selten neue Werte, und der Server soll trotzdem den aktuellen Stand haben.
+  const latestPositionRef = useRef<LatLng | null>(null);
+  const sendTimerRef = useRef<number | null>(null);
+  const flushPositionRef = useRef<() => void>(() => {});
+  flushPositionRef.current = () => {
+    if (sendTimerRef.current !== null) {
+      window.clearTimeout(sendTimerRef.current);
+      sendTimerRef.current = null;
+    }
+    const pos = latestPositionRef.current;
+    if (!pos || phase === "COUNTDOWN") return;
+    const minInterval = (ruleset?.movement?.minUpdateSeconds ?? 15) * 1000;
+    const wait = lastSentRef.current + minInterval - Date.now();
+    if (wait > 0) {
+      sendTimerRef.current = window.setTimeout(() => flushPositionRef.current(), wait);
+      return;
+    }
+    // Nur zählen, was wirklich gesendet wurde; sonst geht die Position bei einem Verbindungsabriss verloren.
+    if (onPosition(pos)) lastSentRef.current = Date.now();
+  };
+
   const handlePosition = useCallback(
     (pos: LatLng) => {
-      if (phase !== "COUNTDOWN") {
-        const now = Date.now();
-        const minInterval = (ruleset?.movement?.minUpdateSeconds ?? 15) * 1000;
-        if (now - lastSentRef.current >= minInterval) {
-          lastSentRef.current = now;
-          onPosition(pos);
-        }
-      }
+      latestPositionRef.current = pos;
+      flushPositionRef.current();
       if (!mapCenter) setMapCenter(pos);
     },
-    [onPosition, mapCenter, ruleset, phase],
+    [mapCenter],
+  );
+
+  // Nach einem Reconnect hat der Server unseren Standort evtl. verworfen: sofort nachsenden.
+  useEffect(() => {
+    if (!connected) return;
+    lastSentRef.current = 0;
+    flushPositionRef.current();
+  }, [connected]);
+
+  // Beim Wechsel in die Spielphase den schon bekannten Standort sofort melden (sonst fehlt er,
+  // bis GPS wieder einen neuen Wert liefert).
+  useEffect(() => {
+    flushPositionRef.current();
+  }, [phase]);
+
+  useEffect(
+    () => () => {
+      if (sendTimerRef.current !== null) window.clearTimeout(sendTimerRef.current);
+    },
+    [],
   );
 
   const { position, error, simulated, setSimulatedPosition, enableRealGps } = useGeolocation(
