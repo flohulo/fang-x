@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "enabledManagers": ["npm", "pub"],
+  "enabledManagers": ["npm", "pub", "github-actions"],
   "ignoreDeps": ["dev.flutter.flutter-plugin-loader"],
   "packageRules": [
     {
