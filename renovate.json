@@ -1,19 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "schedule:weekly"],
-  "semanticCommits": "enabled",
-  "semanticCommitType": "chore",
-  "semanticCommitScope": "deps",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["npm", "pub"],
+  "ignoreDeps": ["dev.flutter.flutter-plugin-loader"],
   "packageRules": [
     {
-      "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "npm-minor-patch"
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "actions-minor-patch"
+      "groupName": "all non-major dependencies",
+      "schedule": ["every 2 weeks on Monday"],
+      "automerge": true
     }
   ]
 }
