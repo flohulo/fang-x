@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.13.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.12.0...fang-x-v0.13.0) (2026-11-27)
+
+
+### Features
+
+* erste standortmeldung standardmässig sofort nach dem vorsprung ([#121](https://github.com/flohulo/fang-x/issues/121)) ([a29c1b5](https://github.com/flohulo/fang-x/commit/a29c1b5c6f6ac3f9043794b75746b35d083bf367))
+* rückmeldung mit sternen und begründung nach der runde ([#113](https://github.com/flohulo/fang-x/issues/113)) ([60f6a96](https://github.com/flohulo/fang-x/commit/60f6a96b643cfd537ec467df2cb1b9fec8d8c415))
+* versionsverlauf in der app auf die letzten fünf versionen begrenzen ([#119](https://github.com/flohulo/fang-x/issues/119)) ([68c2e72](https://github.com/flohulo/fang-x/commit/68c2e727816a33306440c2544bd1cfda3076c605))
+* x in den letzten spielminuten live für detektive sichtbar ([#114](https://github.com/flohulo/fang-x/issues/114)) ([58dda28](https://github.com/flohulo/fang-x/commit/58dda28e39342276c72268015cc0e0a7f526059a))
+
+
+### Bug Fixes
+
+* eigener standort ist auch im vorsprung und bei gps-timeout sichtbar ([#112](https://github.com/flohulo/fang-x/issues/112)) ([0cace75](https://github.com/flohulo/fang-x/commit/0cace755cc1f226dac1f871d7c9ffaa17c018b9f))
+* frühere sichtungen von x bleiben für detektive auf der karte ([#110](https://github.com/flohulo/fang-x/issues/110)) ([1901c89](https://github.com/flohulo/fang-x/commit/1901c89db1a36e993866272a3fe42ae4048bbb6a))
+* letzter bekannter standort anderer spieler bleibt auf der karte ([#111](https://github.com/flohulo/fang-x/issues/111)) ([7cbaa8f](https://github.com/flohulo/fang-x/commit/7cbaa8ff21a636c3f604d9ea04f53d222bb4ff7d))
+* neueste messung wird nachgesendet und nach reconnect erneut gemeldet ([#109](https://github.com/flohulo/fang-x/issues/109)) ([04aa70c](https://github.com/flohulo/fang-x/commit/04aa70c3eb0fa73385bbe2c89e4b8d7defe95c66))
+* übernommener alter socket setzt spieler nicht mehr offline ([#108](https://github.com/flohulo/fang-x/issues/108)) ([a4de83b](https://github.com/flohulo/fang-x/commit/a4de83b2dbd0d775873b18d5cf47d3980cf14dcc))
+* zahlenfelder in den spieleinstellungen einfacher bearbeiten ([#107](https://github.com/flohulo/fang-x/issues/107)) ([1206594](https://github.com/flohulo/fang-x/commit/12065942e300416d69e5192a067487403e144887))
+
 ## [0.12.0](https://github.com/flohulo/fang-x/compare/fang-x-v0.11.0...fang-x-v0.12.0) (2026-11-20)
 
 
