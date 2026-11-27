@@ -1128,6 +1128,35 @@ button.feedback-star-on {
   position: relative;
 }
 
+.number-field {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.number-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.number-field-steps {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 2px;
+  width: 34px;
+}
+
+.number-field-step {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
 .optional-game-settings {
   display: grid;
   gap: 12px;

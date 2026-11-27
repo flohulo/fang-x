@@ -195,6 +195,8 @@
     "interval": "Reveal interval (minutes)",
     "revealRadius": "Reveal radius (meters)",
     "catchRadius": "Catch radius (meters)",
+    "decrease": "Decrease",
+    "increase": "Increase",
     "playArea": "Play area (radius, meters)",
     "objective": "Enable bonus mission for X",
     "wikiFooter": "💡 Questions about tactics & settings?",

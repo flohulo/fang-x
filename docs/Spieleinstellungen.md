@@ -8,6 +8,10 @@ Unter **Name der Einstellungen** vergibt der Host einen Namen für die Runde, zu
 „Samstagsrunde“. Der Name erscheint im Dateinamen, wenn die Einstellungen nach dem Spiel als
 JSON-Datei exportiert werden.
 
+Zahlenfelder lassen sich frei leeren und neu eintippen. Gültige Werte werden sofort übernommen.
+Verlässt du das Feld mit einem zu großen oder zu kleinen Wert, setzt Fang X ihn in den erlaubten
+Bereich. Mit den Tasten **−** und **+** neben dem Feld änderst du den Wert schrittweise.
+
 ## Übersicht
 
 | Einstellung | Standard | Details |

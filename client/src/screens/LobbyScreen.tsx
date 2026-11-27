@@ -1,11 +1,12 @@
 import { LocationAccess } from "../components/LocationAccess";
 import { MicrophoneAccess } from "../components/MicrophoneAccess";
+import { NumberField } from "../components/NumberField";
 import { PlayAreaEditor } from "../components/PlayAreaEditor";
 import { PreGameChecklist, PreGameChecklistItems } from "../components/PreGameChecklist";
 import { useLocationPermission } from "../lib/useLocationPermission";
 import { useMicrophonePermission } from "../lib/useMicrophonePermission";
 import type { Ruleset, XSeesDetectives } from "@fang-x/shared";
-import { DEFAULT_RULESET, evaluatePreGameChecks } from "@fang-x/shared";
+import { DEFAULT_RULESET, RULESET_LIMITS, evaluatePreGameChecks } from "@fang-x/shared";
 import { type ReactNode, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { docsUrl } from "../lib/docs";
@@ -467,16 +468,17 @@ export function LobbyScreen({
                       <label htmlFor="cfg-bus-stops">{t("lobby.busStopsForX")}</label>
                       <WikiInfoLink />
                     </div>
-                    <input
+                    <NumberField
                       id="cfg-bus-stops"
-                      type="number"
-                      min="0"
+                      min={RULESET_LIMITS.transitStops[0]}
+                      max={RULESET_LIMITS.transitStops[1]}
+                      step={1}
                       value={localRuleset.movement.xTransitBudget.busStops}
-                      onChange={(event) =>
+                      onChange={(value) =>
                         updateNested("movement", {
                           xTransitBudget: {
                             ...localRuleset.movement.xTransitBudget,
-                            busStops: Math.max(0, Number(event.target.value) || 0),
+                            busStops: value,
                           },
                         })
                       }
@@ -487,16 +489,17 @@ export function LobbyScreen({
                       <label htmlFor="cfg-train-stops">{t("lobby.trainStopsForX")}</label>
                       <WikiInfoLink />
                     </div>
-                    <input
+                    <NumberField
                       id="cfg-train-stops"
-                      type="number"
-                      min="0"
+                      min={RULESET_LIMITS.transitStops[0]}
+                      max={RULESET_LIMITS.transitStops[1]}
+                      step={1}
                       value={localRuleset.movement.xTransitBudget.trainStops}
-                      onChange={(event) =>
+                      onChange={(value) =>
                         updateNested("movement", {
                           xTransitBudget: {
                             ...localRuleset.movement.xTransitBudget,
-                            trainStops: Math.max(0, Number(event.target.value) || 0),
+                            trainStops: value,
                           },
                         })
                       }
@@ -548,16 +551,13 @@ export function LobbyScreen({
                   }
                 />
               </div>
-              <input
+              <NumberField
                 id="cfg-duration"
-                type="text"
-                inputMode="numeric"
+                min={RULESET_LIMITS.durationMinutes[0]}
+                max={RULESET_LIMITS.durationMinutes[1]}
+                step={5}
                 value={localRuleset.game.durationMinutes}
-                onChange={(e) =>
-                  updateNested("game", {
-                    durationMinutes: parseInt(e.target.value, 10) || 30,
-                  })
-                }
+                onChange={(value) => updateNested("game", { durationMinutes: value })}
               />
               {activeInfoKey === "duration" && (
                 <ParamPopover
@@ -579,16 +579,13 @@ export function LobbyScreen({
                   }
                 />
               </div>
-              <input
+              <NumberField
                 id="cfg-headstart"
-                type="text"
-                inputMode="numeric"
+                min={RULESET_LIMITS.headStartMinutes[0]}
+                max={RULESET_LIMITS.headStartMinutes[1]}
+                step={1}
                 value={localRuleset.game.headStartMinutes}
-                onChange={(e) =>
-                  updateNested("game", {
-                    headStartMinutes: parseInt(e.target.value, 10) || 0,
-                  })
-                }
+                onChange={(value) => updateNested("game", { headStartMinutes: value })}
               />
               {activeInfoKey === "headStart" && (
                 <ParamPopover
@@ -604,17 +601,13 @@ export function LobbyScreen({
                 <label htmlFor="cfg-countdown">{t("lobby.countdown")}</label>
                 <WikiInfoLink />
               </div>
-              <input
+              <NumberField
                 id="cfg-countdown"
-                type="number"
-                min="0"
-                max="60"
+                min={RULESET_LIMITS.countdownSeconds[0]}
+                max={RULESET_LIMITS.countdownSeconds[1]}
+                step={5}
                 value={localRuleset.game.countdownSeconds}
-                onChange={(event) =>
-                  updateNested("game", {
-                    countdownSeconds: Math.max(0, Math.min(60, Number(event.target.value) || 0)),
-                  })
-                }
+                onChange={(value) => updateNested("game", { countdownSeconds: value })}
               />
             </div>
 
@@ -629,17 +622,13 @@ export function LobbyScreen({
                   }
                 />
               </div>
-              <input
+              <NumberField
                 id="cfg-first-reveal"
-                type="number"
-                min="0"
-                step="0.5"
+                min={RULESET_LIMITS.firstRevealAfterMinutes[0]}
+                max={RULESET_LIMITS.firstRevealAfterMinutes[1]}
+                step={0.5}
                 value={localRuleset.reveal.firstRevealAfterMinutes}
-                onChange={(e) =>
-                  updateNested("reveal", {
-                    firstRevealAfterMinutes: Math.max(0, Number(e.target.value) || 0),
-                  })
-                }
+                onChange={(value) => updateNested("reveal", { firstRevealAfterMinutes: value })}
               />
               {activeInfoKey === "firstReveal" && (
                 <ParamPopover
@@ -661,16 +650,13 @@ export function LobbyScreen({
                   }
                 />
               </div>
-              <input
+              <NumberField
                 id="cfg-interval"
-                type="text"
-                inputMode="numeric"
+                min={RULESET_LIMITS.intervalMinutes[0]}
+                max={RULESET_LIMITS.intervalMinutes[1]}
+                step={1}
                 value={localRuleset.reveal.intervalMinutes}
-                onChange={(e) =>
-                  updateNested("reveal", {
-                    intervalMinutes: parseInt(e.target.value, 10) || 3,
-                  })
-                }
+                onChange={(value) => updateNested("reveal", { intervalMinutes: value })}
               />
               {activeInfoKey === "interval" && (
                 <ParamPopover
@@ -692,16 +678,13 @@ export function LobbyScreen({
                   }
                 />
               </div>
-              <input
+              <NumberField
                 id="cfg-revealradius"
-                type="text"
-                inputMode="numeric"
+                min={RULESET_LIMITS.revealRadiusMeters[0]}
+                max={RULESET_LIMITS.revealRadiusMeters[1]}
+                step={5}
                 value={localRuleset.reveal.revealRadiusMeters}
-                onChange={(e) =>
-                  updateNested("reveal", {
-                    revealRadiusMeters: parseInt(e.target.value, 10) || 5,
-                  })
-                }
+                onChange={(value) => updateNested("reveal", { revealRadiusMeters: value })}
               />
               {activeInfoKey === "revealRadius" && (
                 <ParamPopover
@@ -724,16 +707,13 @@ export function LobbyScreen({
                     }
                   />
                 </div>
-                <input
+                <NumberField
                   id="cfg-catchradius"
-                  type="text"
-                  inputMode="numeric"
+                  min={RULESET_LIMITS.catchRadiusMeters[0]}
+                  max={RULESET_LIMITS.catchRadiusMeters[1]}
+                  step={5}
                   value={localRuleset.catch.radiusMeters}
-                  onChange={(e) =>
-                    updateNested("catch", {
-                      radiusMeters: parseInt(e.target.value, 10) || 30,
-                    })
-                  }
+                  onChange={(value) => updateNested("catch", { radiusMeters: value })}
                 />
                 {activeInfoKey === "catchRadius" && (
                   <ParamPopover
@@ -761,16 +741,13 @@ export function LobbyScreen({
                   {t("lobby.playAreaDrawn", { count: localRuleset.map.playAreaPolygon.length })}
                 </p>
               ) : (
-                <input
+                <NumberField
                   id="cfg-playarea"
-                  type="text"
-                  inputMode="numeric"
+                  min={RULESET_LIMITS.playAreaRadiusMeters[0]}
+                  max={RULESET_LIMITS.playAreaRadiusMeters[1]}
+                  step={100}
                   value={localRuleset.map.playAreaRadiusMeters}
-                  onChange={(e) =>
-                    updateNested("map", {
-                      playAreaRadiusMeters: parseInt(e.target.value, 10) || 700,
-                    })
-                  }
+                  onChange={(value) => updateNested("map", { playAreaRadiusMeters: value })}
                 />
               )}
               {youAreHost && (

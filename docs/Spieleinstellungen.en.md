@@ -6,6 +6,10 @@ all players immediately. The rules can no longer be changed during the round.
 Under **Name of the settings** the host gives the round a name, for example "Saturday round".
 The name appears in the file name when the settings are exported as a JSON file after the game.
 
+Number fields can be cleared and retyped freely. Valid values are applied immediately. If you
+leave a field with a value that is too large or too small, Fang X sets it to the allowed range.
+The **−** and **+** buttons next to a field change the value step by step.
+
 ## Overview
 
 | Setting | Default | Details |
